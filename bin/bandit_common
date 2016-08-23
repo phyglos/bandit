@@ -1,0 +1,130 @@
+#!/bin/bash
+#
+# bandit_common - BANDIT common functions
+#
+# Copyright (C) 2015 Àngel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+#---
+# Directory helpers
+#---
+
+bandit_mkdir()
+{
+    [ -d $1 ] || mkdir -p $1
+}
+
+bandit_pushd()
+{
+    pushd $1 > /dev/null 
+}
+
+bandit_popd()
+{
+    popd > /dev/null 
+}
+
+#---
+# File helpers
+#---
+
+bandit_backup()
+{
+    local file=$1
+    
+    if [ -x $file ]; then
+	cp $file $file-${BANDIT_STAMP}
+    fi
+}
+
+bandit_md5sum()
+{
+    local value=""
+    local expected=""
+
+    value=$(md5sum $1 | awk '{print $1}')
+    [ -r "$1.md5" ] && expected=$(cat $1.md5 | awk '{print $1}')
+
+    if [ "$value" != "$expected" ]; then 
+	bandit_msg "Checksum error for package $1" red
+	return 1
+    fi
+    return 0
+}
+export -f bandit_md5sum
+
+#---
+# Script helpers
+#---
+
+bandit_exit()
+{  
+    bandit_msg "$1" red
+    exit 1
+}
+
+# Finds a function $2 in a script shell S1
+bandit_script_has()
+{  
+    if [ -z $(grep "$2()" "$1") ]; then 
+	return 1
+    else
+	return 0
+    fi
+}
+
+#---
+# Log and messages helpers
+#---
+
+# Get new unique timestamp 
+bandit_timestamp()
+{
+    local _retval=$1
+
+    eval "$_retval"=$(date +%Y%m%d-%H%M%S.%N)
+}
+
+## Terminal colors
+BLUE="\\033[1;34m"
+CYAN="\\033[1;36m"
+GREEN="\\033[1;32m"
+GREY="\\033[0;39m"
+RED="\\033[1;31m"
+YELLOW="\\033[1;33m"
+
+bandit_log()
+{
+    echo
+    echo "--------------------"
+    echo "$1"
+    echo "---"
+}
+export -f bandit_log
+
+bandit_msg()
+{
+    local color=""
+
+    case $2 in
+	blue)   color=$BLUE ;;
+	cyan)   color=$BLUE ;;
+	green)  color=$GREEN ;;
+	grey)   color=$GREY ;;
+	red)    color=$RED ;;
+	yellow) color=$YELLOW ;;
+    esac     
+
+    local line=$color"$1"
+    [ -n "$2" ] && line=$line$GREY
+
+    echo -e $line
+}
+export -f bandit_msg

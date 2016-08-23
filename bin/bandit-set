@@ -1,0 +1,29 @@
+#!/bin/bash
+#
+# bandit-set - Set enviromment variables for BANDIT
+#
+# Copyright (C) 2015 Àngel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+###----------------------------------------
+# Prepare the environment for BANDIT
+###----------------------------------------
+
+echo
+echo "Setting BANDIT_HOME..."
+export BANDIT_HOME=`pwd`
+echo "BANDIT_HOME="$BANDIT_HOME
+
+echo
+echo "Adding BANDIT_HOME/bin to PATH"
+export PATH=$PATH:$BANDIT_HOME/bin
+echo "PATH="$PATH
+echo
+

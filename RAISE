@@ -1,0 +1,122 @@
+#
+# RAISE - Instructions to raise a phyglos system
+#
+# Copyright (C) 2015-2016 Àngel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+Raising a new system from the HOST using BANDIT
+===============================================
+
+=== WARNING ===
+You need to work as root and create disks partitions for the new TARGET system.
+If you don't know how to perform these tasks DO NOT CONTINUE. 
+You can destroy the HOST system and loose your data.
+===
+
+Log in as a privileged user  (e.g. root) in the HOST system, or use "sudo" for each priviledged command marked with #.
+
+Prepare a new disk partition and a new swap partition for the TARGET system.
+This procedure depends on your HOST distro. Consult the related documentation.
+
+Install BANDIT in the HOST system as explained in the INSTALL file.
+
+Change the working directory to the BANDIT home directory.
+# cd $BANDIT_HOME
+
+Edit the file etc/bandit.conf and set the appropiate configuration values.
+Take special care about the TARGET system variables.
+
+Check the HOST system to meet the building requirements.
+# bandit --system host check
+
+Install the required packages in the HOST system when neeeded until all requirements are met.
+
+If any previous installation exists, clean the HOST system:
+# bandit --system host clean
+
+=== WARNING ===
+You are about to initialize the TARGET partitions.
+Check again the values in the etc/bandit.conf file before proceeding
+You can destroy the HOST system and loose your data.
+===
+
+Download the first bundle before entering the BUILDER system:
+# bandit phyglos-builder fetch
+
+Initialize the HOST system:
+# bandit --system host init
+
+Building the BUILDER system
+===========================
+Login as the bandit unprivileged user in the HOST system:
+# su - bandit
+
+Change the working directory to the BANDIT home directory.
+# cd $BANDIT_HOME
+
+Edit etc/bundles/phyglos-builder.conf file and set proper values.
+
+Raise the PHYGLOS-BUILDER bundle, as unprivileged user:
+(bandit)$ bandit phyglos-builder raise
+
+This process can take between 30 and 90 minutes or even more depending on your hardware.
+
+Download other needed bundles sources before entering the BUILDER system:
+# bandit phyglos-core fetch
+# bandit phyglos-security fetch
+
+Log out from the bandit user
+# exit
+
+
+Setting up the TARGET system
+============================
+
+Edit etc/bundles/phyglos-core.conf file and set proper values.
+
+Initialize the TARGET system:
+# bandit --system target init
+
+Enter into the BUILDER system:
+# bandit-builder-enter
+
+Add the PHYGLOS-CORE bundle:
+[BUILDER]# bandit phyglos-core raise
+
+This process can take between 30 and 90 minutes or even more depending on your hardware.
+
+Logout from the BUILDER
+[BUILDER]# logout
+
+
+Building the rest of components
+===============================
+Enter into the TARGET system:
+# bandit-target-enter
+
+Edit /opt/bandit/bundles/phyglos-security.conf file 
+
+Raise the PHYGLOS-SECURITY bundle
+[TARGET]# bandit phyglos-security raise 
+
+Edit Edit /opt/bandit/bundles/phyglos-kernel.conf file and set needed values
+
+Configure and raise the PHYGLOS-KERNEL component
+[TARGET]# bandit phyglos-kernel config 
+[TARGET]# bandit phyglos-kernel raise
+
+
+Boot into the new system
+========================
+Logout from the TARGET
+[TARGET]# logout
+
+Update HOST bootloader and reboot.
+This depends on your HOST distro. Consult the related documentation.

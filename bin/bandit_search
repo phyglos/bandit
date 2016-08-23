@@ -1,0 +1,120 @@
+#!/bin/bash
+#
+# bandit_search - BANDIT functions for searches
+#
+# Copyright (C) 2016 Àngel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+source $BANDIT_HOME/bin/bandit_database
+
+bandit_search()
+{
+    local expr=$1
+    local options=$2
+
+    local bundles
+    local files
+    local items
+    local lines
+    local words
+    local name
+
+    if [ "$expr" == "all" ]; then expr='[a-z]'; fi
+
+    #---
+    # Search bundles
+    #---
+    if [[ $options =~ "b" ]]; then 
+	bandit_db_get_bundles_available bundles ${expr}
+	if [ -n "$bundles" ]; then 
+	    echo "Bundles available:"
+	    for bundle in ${bundles[*]}
+	    do
+		name=$(basename $bundle)
+		echo "  "[${name/.desc/}] 
+	    done
+	fi
+    fi
+
+    #---
+    # Search items
+    #---
+    if [[ $options =~ "i" ]]; then 
+	bandit_db_get_bundle_items_available items ${expr}
+	if [ -n "$items" ]; then 
+	    echo "Bundle items available:"
+	    lines=(${items})
+	    for line in ${lines[*]}
+	    do
+		OLD=$IFS IFS="|" words=(${line[*]}) IFS=$OLD 
+		bundle=$(basename ${words[0]})
+		echo "  "[${bundle/.desc/}] $item ${words[1]} ${words[2]}
+	    done
+	fi
+    fi
+
+    #---
+    # Search cache
+    #---
+    if [[ $options =~ "x" ]]; then 
+	bandit_db_get_cache_sources files ${expr}
+	if [ -n "$files" ]; then 
+	    echo "Sources in cache:"
+	    for line in $files
+	    do
+		if [ -d ${line} ]; then continue; fi 
+		if [[ "${line}" =~ \.md5$ ]]; then continue; fi 
+		echo "  "$(basename ${line})
+	    done
+	fi
+	bandit_db_get_cache_builds files ${expr}
+	if [ -n "$files" ]; then 
+	    echo "Builds in cache:"
+	    for line in ${files}
+	    do
+		if [ -d ${line} ]; then continue; fi 
+		if [[ "${line}" =~ \.md5$ ]]; then continue; fi 
+		echo "  "$(basename ${line})
+	    done
+	fi
+    fi
+
+    #---
+    # Installed files
+    #---
+    if [[ $options =~ "f" ]]; then 
+	bandit_db_get_files_installed files ${expr}
+	if [ -n "$files" ]; then 
+	    echo "Installed files:"
+	    lines=(${files})
+	    for line in ${lines[*]}
+	    do
+		OLD=$IFS IFS="|" words=(${line[*]}) IFS=$OLD 
+		echo "  "${words[0]}" ("$(basename ${words[1]})")"
+	    done
+	fi
+    fi
+
+    #---
+    # Search logs
+    #---
+    if [[ $options =~ "l" ]]; then 
+	bandit_db_get_log_entries logs ${expr}
+	if [ -n "$logs" ]; then 
+	    echo "Log entries:"
+	    for line in $logs
+	    do
+		OLD=$IFS IFS="|" words=(${line[*]}) IFS=$OLD 
+		echo ${words[0]}: [${words[1]/.sh/}] ${words[2]}  
+	    done
+	fi
+    fi
+}
+

@@ -1,0 +1,138 @@
+#!/bin/bash
+#
+# bandit_bundle - BANDIT functions for bundles
+#
+# Copyright (C) 2015-2016 Àngel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+source $BANDIT_HOME/bin/bandit_bundle_item
+source $BANDIT_HOME/bin/bandit_common
+
+bandit_bundle_do()
+{
+    local action=$1
+    local bundle=$2
+    local item=$3
+
+    local stamp
+    bandit_timestamp stamp
+
+    # Default directories to be overloaded by the bundle configuration
+    BUILD_SCRIPTS=$BANDIT_HOME/etc/bundles/$bundle.dir
+    BUILD_SOURCES=$BANDIT_ORIG/$bundle
+    BUILD_DESTDIR=$BANDIT_DEST/$bundle
+    BUILD_LOGS=$BANDIT_LOGS/bundles/$bundle-${stamp}
+    BUILD_WORK=$BANDIT_WORK/$bundle-${stamp}
+
+    # Source bundle description
+    if [ -r $BANDIT_HOME/etc/bundles/$bundle.desc ]; then
+	source $BANDIT_HOME/etc/bundles/$bundle.desc
+    else
+	bandit_exit "BANDIT: Cannot find $bundle.desc file"
+    fi
+
+    # Source bundle configuration
+    if [ -r $BANDIT_HOME/etc/bundles/$bundle.conf ]; then 
+	source $BANDIT_HOME/etc/bundles/$bundle.conf
+    fi
+    
+    ## Default variables
+    # Keep or remove *.la files from libtool?
+    BUILD_KEEP_LA=${BUNDLE_KEEP_LA:-$BANDIT_BUILD_KEEP_LA}
+
+    ## Check for variables:
+    # BUNDLE_RELEASE
+    BUILD_RELEASE=${BUNDLE_RELEASE:-$BANDIT_BUILD_RELEASE}
+    # BUNDLE_CATALOG
+    #??
+    # BUNDLE_SOURCES
+    BUILD_SOURCES=$BANDIT_ORIG/$BUNDLE_SOURCES
+    
+    # Create working directories
+    bandit_mkdir $BUILD_SOURCES
+    bandit_mkdir $BUILD_DESTDIR 
+    bandit_mkdir $BUILD_LOGS 
+    bandit_mkdir $BUILD_WORK 
+
+    # Build inside work directory
+    bandit_pushd $BUILD_WORK
+
+    # Parse bundle command list by lines
+    OLD=$IFS; IFS=$'\n';
+    for line in ${BUILD_CMD[*]}; do
+	IFS=$OLD
+	
+	# Parse line into parameters
+	words=( $line )
+
+	# Ignore all other items, when just one package or script is selected
+	if [ "${item}" != "all" ] && [ "${item}" != "${words[2]}" ]; then continue; fi
+
+	case $action in 
+	    config)
+		bandit_package_do config ${words[*]:2}
+		;;
+	    download | fetch | build | install | raise)
+		case ${words[0]} in
+		    package)
+			case ${words[1]} in
+			    do)
+				bandit_package_do $action ${words[*]:2}
+				;;
+			    do_as) 
+				bandit_package_do_as $action ${words[*]:2}
+				;;
+			    do_in) 
+				bandit_package_do_in $action ${words[*]:2}
+				;;
+			esac
+			;;
+		    script)
+			# Ignore some commands on scripts
+			if [ $action == "download" ]; then continue; fi
+			if [ $action == "fetch" ]; then continue; fi
+			# scripts only have 'run' verb
+			case ${words[1]} in
+			    run) 
+				bandit_script_run ${words[*]:2}
+				;;
+			esac
+			;;
+		esac
+		;;
+	    remove)
+		case ${words[0]} in
+		    package)
+			case ${words[1]} in
+			    do | do_as | do_in)
+				bandit_package_do $action ${words[*]:2}
+				;;
+			esac
+			;;
+		    script)
+			# Ignore removing for scripts
+			;;
+		esac			
+		;;
+	esac
+    done
+    IFS=$OLD
+
+    # Return from build directory
+    bandit_popd
+    rm -rf $BUILD_WORK 
+
+    # Update locate database (except for the unprivileged BANDIT user at HOST)
+    if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
+	[ -x /usr/bin/updatedb ] && updatedb
+    fi
+}
+export -f bandit_bundle_do
+

@@ -1,0 +1,29 @@
+#
+# INSTALL - Instructions to install the BANDIT
+#
+# Copyright (C) 2015-2016 Àngel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+Installing BANDIT on the HOST system
+====================================
+
+Install a copy of BANDIT into the HOST /opt directory.
+# cd /opt
+# tar -xvf bandit-1.3.tar.xz 
+# cd bandit-1.3 
+
+Initialize the HOST environment for BANDIT from the bandit home directory:
+# source bin/bandit-set
+
+Bandit should work now in the HOST. Test with:
+# bandit --version
+
+Read the file RAISE to learn how to use the BANDIT to raise a new TARGET system.
+

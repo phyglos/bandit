@@ -1,0 +1,227 @@
+#!/bin/bash
+#
+# bandit - the Build AND Install Toolkit
+#
+# Copyright (C) 2015 Àngel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+###----------------------------------------
+# Simple display and exit options. 
+# Do not source scripts. Show and quit.
+###----------------------------------------
+
+bandit_show_version()
+{
+    echo "bandit 1.3 - the Build AND Install Toolkit"
+    echo
+    echo " Copyright (C) 2015 Àngel Linares Zapater"
+    echo " BANDIT comes with ABSOLUTELY NO WARRANTY." 
+    echo
+    echo "This is free software, and you are welcome to redistribute it"
+    echo "under certain conditions. Visit http://phy.wiki/doc/bandit"
+    echo
+}
+
+bandit_show_help()
+{
+    echo "Usage for searches:"
+    echo "  bandit search [-c|-b|-i|-f|-x] <expression>"
+    echo "    -c           Search for catalogs"
+    echo "    -b           Search for bundles"
+    echo "    -i           Search for items in bundles"
+    echo "    -f           Search for installed files"
+    echo "    -x           Search cache for sources and builds"
+    echo "    <expression> partial expression to search for"
+    echo "                 or 'all' for everything"
+    echo
+    echo "Usage for bundles: "
+    echo "  bandit -b|--bundle <bundle> [-i|-item <item>] <action>" 
+    echo "    <bundle>:     Name of the bundle"
+    echo "    -i <item>:    Apply the action on this item in the bundle"
+    echo "    <action>:"
+    echo "      download    Download (inconditionally) sources from origins"
+    echo "      fetch       Download (when not in cache) sources from origins"
+    echo "      config      Only with -i. Interactively configure the bundle"
+    echo "      build       Only with -i. Build the bundle and save a build package in local cache"
+    echo "      install     Only with -i. Install the build package from local cache"
+    echo "      raise       Build and install"
+    echo "      remove      Remove the bundle from the system"
+    echo
+    echo "Usage for packages: "
+    echo "  bandit -p|--package <package> <action>" 
+    echo "    <package>:   Name of the package(s)"
+    echo "    <action>:"
+    echo "      info       Provides information about packages"
+    echo "      files      List installed files for that package"
+    echo "      bundles    List bundles that install this package"
+    echo
+    echo "Usage for catalogs: "
+    echo "  bandit -c|--catalog <catalog> <action>" 
+    echo
+    echo "Usage for systems: "
+    echo "  bandit -s|--system <system> <action>" 
+    echo
+}
+
+case $1 in 
+    ""|-h|--help)
+	bandit_show_version
+	bandit_show_help
+	exit 0
+	;;
+    -v|--version)
+	bandit_show_version
+	exit 0
+	;;
+esac
+
+###----------------------------------------
+# Working with bundles, packages and systems
+###----------------------------------------
+
+source $BANDIT_HOME/etc/bandit.conf
+source $BANDIT_HOME/bin/bandit_common
+source $BANDIT_HOME/bin/bandit_database
+source $BANDIT_HOME/bin/bandit_search
+source $BANDIT_HOME/bin/bandit_bundle
+
+#--- 
+# Work with verbs...
+#---
+
+case $1 in
+    search)
+	shift
+
+	# Get search options
+	options=""
+	while getopts "bixfl" opt; do
+	    case $opt in
+		b|i|x|f|l)
+		    options+=$opt
+		    ;;
+		\?)
+		    echo "Invalid option: -$OPTARG"
+		    ;;
+	    esac
+	done
+	# Set default search
+	if [ -z $options ]; then options="bixfl"; fi
+
+	# Skip options so expression is left in $1
+	shift $((OPTIND-1))
+	bandit_search ${1} ${options} | more
+	exit 0
+	;;
+esac
+
+#---
+# Work with objects...
+#---
+
+# Check if any type of object is set or default 
+object="-default"
+if [[ $1 == -* ]]; then object=$1; fi
+
+case $object in
+    -b|--bundle | -default)
+	# Get the bundle name
+	if [ $object != "-default" ]; then shift; fi
+	bundle=$1; shift
+
+	# Get the item in the bundle, if given
+	item="all"
+	case $1 in 
+	    -i|--item) 
+		shift
+		item="$1"; shift
+		;;
+	esac
+
+	# Get the command
+	command=$1; shift
+
+	# Check proper use of the command
+	#case $command in
+	#    build|install) 
+	#	bandit_exit "Use this action only with -i <item>"
+	#	;;
+	#esac
+
+        # Start the work on the bundle
+	bandit_mkdir $BANDIT_LOGS/bundles
+	case $command in
+	    config)
+		# config runs interactively
+		bandit_bundle_do config "${bundle}" "${item}"
+		;;
+	    download | fetch | build | install | raise | remove)
+		# All other commands run non-interactively
+		bandit_timestamp stamp
+		(time bandit_bundle_do $command "${bundle}" "${item}") 2>&1 \
+		    | tee $BANDIT_LOGS/bundles/${bundle}.$command-${stamp}.log
+		;;
+	    *) 
+		bandit_exit "BANDIT: Command ${command} not specified for bundles."
+		;;
+	esac
+	;;
+    -p|--package)
+	shift
+
+	# Execute command
+	command=$2
+	case $command in
+	    info)
+		bandit_db_get_packages_available packages $1
+		for p in $packages
+		do
+		    echo "Information for $(basename $p):"
+		    bandit_db_get_package_info $(basename $p)
+		done
+		;;
+	    files)
+		bandit_db_get_packages_installed packages $1
+		for p in $packages
+		do
+		    package=$(basename $p)
+		    bandit_db_get_package_files $package
+		done
+		;;
+	    bundles)
+		bandit_db_get_packages_available packages $1
+		for p in $packages
+		do
+		    bundle=$(basename $(dirname $p))
+		    package=$(basename $p)
+		    package=${package/.sh/}
+   		    echo "[${bundle}] ${package}" 
+		done
+		;;
+	    *) 
+		bandit_exit "BANDIT: Command ${command} not specified for packages."
+		;;
+	esac
+	;;
+    -s|--system)
+	shift
+
+	bandit_mkdir $BANDIT_LOGS/systems
+	bandit_timestamp stamp
+	(time sh $BANDIT_HOME/bin/systems/bandit-"$1"-"$2".sh) 2>&1 \
+            | tee $BANDIT_LOGS/systems/bandit-"$1"."$2"-${stamp}.log
+	;;
+    *)
+	bandit_exit "BANDIT: Unknow option $1."
+	;;
+esac
+
+# Done
+exit 0

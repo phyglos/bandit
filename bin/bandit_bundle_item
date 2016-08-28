@@ -148,7 +148,7 @@ bandit_package_build()
 	bandit_timestamp stamp
 	build_pack 2>&1 > $BUILD_LOGS/$script.pack-${stamp}.log
 	bandit_pushd $BUILD_PACK      
-	tar -c * | xz -4e > ../$pack
+	tar -c * | xz -1 > ../$pack
 	cd ..
 	md5sum -b $pack > $pack.md5
 	bandit_popd
@@ -161,17 +161,19 @@ bandit_package_install()
     if [ -r $BUILD_DESTDIR/$pack ]; then 
 	bandit_msg "...unpacking..."
 
-	# Prefix porg to command, if available
+	# Prefix porg to command, if available (except for the bandit user)
 	local CMD=""
 	local PRE="eval"
-	if [ -e /usr/bin/porg ]; then 
-	    PRE="porg -lp+ $script"
-	    # Prefix sudo if available
-	    if [ -e /usr/bin/sudo ]; then 
-		PRE="sudo "$PRE
+	if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
+	    if [ -e /usr/bin/porg ]; then 
+		PRE="porg -lp+ $script"
+		# Prefix sudo if available
+		if [ -e /usr/bin/sudo ]; then 
+		    PRE="sudo "$PRE
+		fi
 	    fi
 	fi
-
+	
 	# Unpack
 	( 
 	bandit_timestamp stamp

@@ -28,7 +28,7 @@ bandit_bundle_do()
     BUILD_SCRIPTS=$BANDIT_HOME/etc/bundles/$bundle.dir
     BUILD_SOURCES=$BANDIT_ORIG/$bundle
     BUILD_DESTDIR=$BANDIT_DEST/$bundle
-    BUILD_LOGS=$BANDIT_LOGS/bundles/$bundle-${stamp}
+    BUILD_LOGS=$BANDIT_LOGS/bundles/$bundle.$action-${stamp}
     BUILD_WORK=$BANDIT_WORK/$bundle-${stamp}
 
     # Source bundle description

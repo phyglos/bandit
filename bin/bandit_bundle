@@ -83,7 +83,7 @@ bandit_bundle_do()
 		case ${words[0]} in
 		    package)
 			case ${words[1]} in
-			    do)
+			    "do")
 				bandit_package_do $action ${words[*]:2}
 				;;
 			    do_as) 
@@ -111,8 +111,12 @@ bandit_bundle_do()
 		case ${words[0]} in
 		    package)
 			case ${words[1]} in
-			    do | do_as | do_in)
+			    "do")
 				bandit_package_do $action ${words[*]:2}
+				;;
+			    do_as | do_in)
+				# Do not pass original tarball
+				bandit_package_do $action ${words[2]} ${words[3]} ${words[5]}
 				;;
 			esac
 			;;

@@ -133,9 +133,11 @@ bandit_bundle_do()
     bandit_popd
     rm -rf $BUILD_WORK 
 
-    # Update locate database (except for the unprivileged BANDIT user at HOST)
+    # Update system databases
+    # (except for the unprivileged 'bandit' user at HOST)
     if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
 	[ -x /usr/bin/updatedb ] && updatedb
+	[ -x /usr/bin/mandb ]    && mandb &> /dev/null
     fi
 }
 export -f bandit_bundle_do

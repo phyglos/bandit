@@ -12,7 +12,9 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
-source $BANDIT_HOME/bin/bandit_bundle_item
+source $BANDIT_HOME/bin/bandit_bundle_package
+source $BANDIT_HOME/bin/bandit_bundle_script
+source $BANDIT_HOME/bin/bandit_bundle_module
 source $BANDIT_HOME/bin/bandit_common
 
 bandit_bundle_do()
@@ -105,6 +107,13 @@ bandit_bundle_do()
 				;;
 			esac
 			;;
+		    module)
+			case ${words[1]} in
+			    perl5)
+				bandit_module perl5 $action ${words[*]:2}
+				;;
+			esac
+			;;
 		esac
 		;;
 	    remove)
@@ -122,6 +131,9 @@ bandit_bundle_do()
 			;;
 		    script)
 			# Ignore removing for scripts
+			;;
+		    module)
+			bandit_module $action ${words[*]}
 			;;
 		esac			
 		;;

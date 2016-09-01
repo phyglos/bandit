@@ -53,7 +53,7 @@ if [ -h $BANDIT_HOST_TGT_MNT/dev/shm ]; then
 fi
 
 # libs
-case $BANDIT_TARGET_MACH in
+case $BANDIT_TARGET_ARCH in
     x86) 
 	ln -sv lib32 $BANDIT_HOST_TGT_MNT/lib
         ln -sv lib32 $BANDIT_HOST_TGT_MNT/usr/lib

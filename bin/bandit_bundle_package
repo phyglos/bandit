@@ -257,7 +257,7 @@ bandit_package_do()
     source $BUILD_SCRIPTS/$script.sh
 
     # Set the build pack name
-    pack=${script}-${BANDIT_TARGET_MACH}-${BUILD_RELEASE}.tar.xz
+    pack=${script}-${BANDIT_TARGET_ARCH}-${BUILD_RELEASE}.tar.xz
 
     # Declare list of package origins
     declare -a sources_fetch_url

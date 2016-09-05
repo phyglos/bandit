@@ -260,9 +260,14 @@ bandit_package_do()
     pack=${script}-${BANDIT_TARGET_ARCH}-${BUILD_RELEASE}.tar.xz
 
     # Declare list of package origins
-    declare -a sources_fetch_url
-    declare -a sources_fetch_md5
-
+    if [ $option_from_cache == 0 ]; then     
+	declare -a sources_fetch_url
+	declare -a sources_fetch_md5
+    else
+	# Sources are already set when --from-cache is used
+	:
+    fi
+    
     case $action in
 	download)
 	    bandit_package_get_origins
@@ -273,8 +278,9 @@ bandit_package_do()
 	    bandit_package_fetch_sources
 	    ;;
 	config)
-	    bandit_package_get_origins
 	    if [ $option_from_cache == 0 ]; then
+		# No need to get_origins and fetch
+		bandit_package_get_origins
 		bandit_package_fetch_sources
 	    fi
             bandit_package_prepare_sources
@@ -284,8 +290,9 @@ bandit_package_do()
 	    ;;
 	raise)
 	    # Copy and mix build and raise options code for bash3 compatibility
-	    bandit_package_get_origins
 	    if [ $option_from_cache == 0 ]; then
+		# No need to get_origins and fetch
+		bandit_package_get_origins
 		bandit_package_fetch_sources
 	    fi
 	    bandit_package_prepare_sources
@@ -296,8 +303,9 @@ bandit_package_do()
 	    bandit_popd 
 	    ;;
 	build)
-	    bandit_package_get_origins
 	    if [ $option_from_cache == 0 ]; then
+		# No need to get_origins and fetch
+		bandit_package_get_origins
 		bandit_package_fetch_sources
 	    fi
 	    bandit_package_prepare_sources
@@ -358,12 +366,13 @@ bandit_package_do_in()
     local tarball=$3      `# Package original tarball`
     local variant=$4      `# Script variant`
 
-    local tmpxz=$directory.tar.xz `# New temporary tarball`
+    local tmpxz=$directory.tmp.tar.xz `# New temporary tarball`
 
     bandit_log  "Repackaging $tarball content into $tmpxz..."
 
     # Ignore if just downloading
-    if [ $action != "download" ] && [ $action != "fetch" ]; then 
+    if [ $action != "download" ] && [ $action != "fetch" ]; then
+	
 	# Check if tarball exists
 	[ -r $BUILD_SOURCES/$tarball ] || bandit_exit "BANDIT: $tarball not found in local cache"
 	# Check if MD5 is correct
@@ -372,22 +381,24 @@ bandit_package_do_in()
 	# Build a temporary tarball with a base directory named $tarball
 	bandit_mkdir $tmpxz
 	cd $tmpxz
-	bandit_mkdir $directory
-	cd $directory
-	tar -xf $BUILD_SOURCES/$tarball
-	cd ..
-	tar -c $directory | xz -0e       > $BUILD_SOURCES/$tmpxz
-	md5sum -b $BUILD_SOURCES/$tmpxz  > $BUILD_SOURCES/$tmpxz.md5
+  	   bandit_mkdir $directory
+	   cd $directory
+	      tar -xf $BUILD_SOURCES/$tarball
+	   cd ..
+	   tar -c $directory | xz -0e       > $BUILD_SOURCES/$tmpxz
+	   md5sum -b $BUILD_SOURCES/$tmpxz  > $BUILD_SOURCES/$tmpxz.md5
 	cd ..
     fi
 
-    # Force cache to use the new temporary tarball
+    # Force to use the new temporary tarball in cache
     sources_fetch_url[0]=$BUILD_SOURCES/$tmpxz
     sources_fetch_md5[0]=$BUILD_SOURCES/$tmpxz.md5
-    bandit_package_do $action --from-cache $directory tar.xz $variant
+    
+    bandit_package_do $action --from-cache $directory tmp.tar.xz $variant
 
     # Ignore if just downloading
-    if [ $action != "download" ] && [ $action != "fetch" ]; then 
+    if [ $action != "download" ] && [ $action != "fetch" ]; then
+	# Remove temporary tarball
 	rm -rf $tmpxz
 	rm $BUILD_SOURCES/$tmpxz{,.md5}
     fi

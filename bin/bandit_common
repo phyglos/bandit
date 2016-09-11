@@ -39,7 +39,7 @@ bandit_backup()
 {
     local file=$1
     
-    if [ -x $file ]; then
+    if [ -r $file ]; then
 	cp $file $file-${BANDIT_STAMP}
     fi
 }

@@ -23,10 +23,6 @@ bandit_package_get_origins()
     # MD5: list of corresponding MD5 cheksums
     # ADD: list of other origins to include in this fetch
 
-    local catalog=$BANDIT_HOME/etc/origins/$BUNDLE_CATALOG/sources 
-    [ -r $catalog/$package ] || bandit_exit "BANDIT: No origin $package in catalog $BUNDLE_CATALOG"
-    source $catalog/$package
-
     # Get the sources URLs to fetch from
     sources_fetch_url=(${URL[*]})
     sources_fetch_md5=(${MD5[*]})
@@ -40,17 +36,17 @@ bandit_package_get_origins()
 	done
     fi
 
+    # Clean sourced origins variables
     unset URL[*], MD5[*], ADD[*] 2>/dev/null
 }
 
 bandit_package_fetch_sources()
 {
-# $1 = download -> do not use cache, force download
+    # $1 = download -> do not use cache, force download
 
     let len=${#sources_fetch_url[*]}
     for ((i=0; i<len; i++)); do
-	file=$(basename ${sources_fetch_url[i]})
-
+	file=$(basename "${sources_fetch_url[i]}")
 	if [ "$1" == "download" ]; then
 	    # Force downloading by removing files in local cache 
 	    rm $BUILD_SOURCES/$file{,.md5} 2>/dev/null
@@ -65,12 +61,13 @@ bandit_package_fetch_sources()
 	else
 	    # Or download from remote repository
 	    bandit_msg "...fetching $file from remote origin..."
- 
+	    
 	    # Download from URL into BUILD_SOURCES
+
 	    wget ${sources_fetch_url[i]} \
-		--directory-prefix=$BUILD_SOURCES \
-		--no-verbose \
-		--no-clobber
+		 --directory-prefix=$BUILD_SOURCES \
+		 --no-verbose \
+		 --no-clobber
 	    if [[ $? != 0 ]]; then 
 		bandit_msg "Connection error to ${sources_fetch_url[i]}" red; 
 	    fi
@@ -80,6 +77,13 @@ bandit_package_fetch_sources()
 	    bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
 	fi
     done
+    
+    # Prepare only downloaded sources. Files already in cache are OK.
+    if [ "$1" == "download" ]; then
+	if bandit_script_has $catalog/$package sources_prepare; then
+	    sources_prepare
+	fi
+    fi
 }
 
 bandit_package_prepare_sources()
@@ -237,6 +241,7 @@ bandit_package_do()
     bandit_log "$package${variant:+-}$variant [$(date)]"
 
     # Default functions to be overloaded by the package script
+    function sources_prepare() { :; } ; export -f sources_prepare
     function build_config()    { :; } ; export -f build_config
     function build_compile()   { :; } ; export -f build_compile
     function build_test()      { :; } ; export -f build_test
@@ -255,6 +260,11 @@ bandit_package_do()
     fi
     [ -r $BUILD_SCRIPTS/$script.sh ] || bandit_exit "BANDIT: Cannot find $script.sh file"
     source $BUILD_SCRIPTS/$script.sh
+
+    # Source origin file from the catalog directory 
+    catalog=$BANDIT_HOME/etc/origins/$BUNDLE_CATALOG/sources 
+    [ -r $catalog/$package ] || bandit_exit "BANDIT: No origin $package in catalog $BUNDLE_CATALOG"
+    source $catalog/$package
 
     # Set the build pack name
     pack=${script}-${BANDIT_TARGET_ARCH}-${BUILD_RELEASE}.tar.xz

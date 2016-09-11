@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# bandit_bundle_source - BANDIT functions for bundle sources
+#
+# Copyright (C) 2015-2016 Àngel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+bandit_source_rename()
+{
+    local orig=$1
+    local dest=$2
+
+    bandit_pushd $BUILD_SOURCES
+
+    # Rename file and .md5 in filessystem
+    if [ -r $orig ]; then
+	mv $orig     $dest
+	mv $orig.md5 $dest.md5
+    fi
+
+    # Change file name in sources_fetch_URL[] variable
+    let len=${#sources_fetch_url[*]}
+    for ((i=0; i<len; i++)); do
+	if [ "${sources_fetch_url[i]}" == "${orig}" ]; then
+	    ${sources_fetch_url[i]}="${dest}"
+	    break
+	fi
+    done
+    
+    bandit_popd
+}
+export -f bandit_source_rename

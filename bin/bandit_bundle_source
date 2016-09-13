@@ -19,17 +19,17 @@ bandit_source_rename()
 
     bandit_pushd $BUILD_SOURCES
 
-    # Rename file and .md5 in filessystem
+    # Rename the file and .md5 in filessystem
     if [ -r $orig ]; then
 	mv $orig     $dest
 	mv $orig.md5 $dest.md5
     fi
 
-    # Change file name in sources_fetch_URL[] variable
-    let len=${#sources_fetch_url[*]}
+    # Change file name in sources_tarball variable
+    let len=${#sources_tarball[*]}
     for ((i=0; i<len; i++)); do
-	if [ "${sources_fetch_url[i]}" == "${orig}" ]; then
-	    ${sources_fetch_url[i]}="${dest}"
+	if [ "$(basename ${sources_tarball[i]})" == "${orig}" ]; then
+	    sources_tarball[i]=$BUILD_SOURCES/${dest}
 	    break
 	fi
     done

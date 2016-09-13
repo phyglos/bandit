@@ -47,6 +47,7 @@ bandit_package_fetch_sources()
     let len=${#sources_fetch_url[*]}
     for ((i=0; i<len; i++)); do
 	file=$(basename "${sources_fetch_url[i]}")
+	
 	if [ "$1" == "download" ]; then
 	    # Force downloading by removing files in local cache 
 	    rm $BUILD_SOURCES/$file{,.md5} 2>/dev/null
@@ -59,42 +60,48 @@ bandit_package_fetch_sources()
 	    # just check for MD5 
 	    bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
 	else
-	    # Or download from remote repository
-	    bandit_msg "...fetching $file from remote origin..."
-	    
-	    # Download from URL into BUILD_SOURCES
-
-	    wget ${sources_fetch_url[i]} \
-		 --directory-prefix=$BUILD_SOURCES \
-		 --no-verbose \
-		 --no-clobber
-	    if [[ $? != 0 ]]; then 
-		bandit_msg "Connection error to ${sources_fetch_url[i]}" red; 
-	    fi
-
-	    # Check if MD5 is correct
-	    echo ${sources_fetch_md5[i]} > $BUILD_SOURCES/$file.md5
-	    bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
+	    case ${sources_fetch_url[i]} in
+		file*)
+		    # Copy from filesystem
+		    bandit_msg "...fetching $file from local filesystem..."
+		    cp ${sources_fetch_url[i]#file:}     $BUILD_SOURCES/$file
+		    cp ${sources_fetch_url[i]#file:}.md5 $BUILD_SOURCES/$file.md5
+		    # Check if MD5 is correct
+		    bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
+		    ;;
+		http*)
+		    # Download from URL into BUILD_SOURCES
+		    bandit_msg "...fetching $file from remote origin..."
+		    wget ${sources_fetch_url[i]} \
+			 --directory-prefix=$BUILD_SOURCES \
+			 --no-verbose \
+			 --no-clobber
+		    if [[ $? != 0 ]]; then
+			bandit_msg "Connection error to ${sources_fetch_url[i]}" red;
+		    fi
+		    # Check if MD5 is correct
+		    echo ${sources_fetch_md5[i]} > $BUILD_SOURCES/$file.md5
+		    bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
+		    ;;
+	    esac
 	fi
+
+	# Set the tarball
+	sources_tarball[i]=$BUILD_SOURCES/$file
     done
-    
-    # Prepare only downloaded sources. Files already in cache are OK.
-    if [ "$1" == "download" ]; then
-	if bandit_script_has $catalog/$package sources_prepare; then
-	    sources_prepare
-	fi
-    fi
 }
 
 bandit_package_prepare_sources()
 {
-    local tarball=$(basename ${sources_fetch_url[0]})
-
-    # Untar sources and change into build directory
-    # except when just fetching into cache
-    if [ $action != "download" ] && [ $action != "fetch" ]; then 
-	tar -xf $BUILD_SOURCES/$tarball -C .
+    # Custom sources preparation
+    if bandit_script_has $catalog/$package sources_prepare; then
+	bandit_msg "...preparing sources..."
+	# Refactor or rename tarball and payload
+	sources_prepare $sources_tarball
     fi
+
+    # Untar main source tarball
+    tar -xf ${sources_tarball[0]}
 }
 
 bandit_package_fetch_build()
@@ -278,6 +285,9 @@ bandit_package_do()
 	:
     fi
     
+    # Declare list of package tarball
+    declare -a sources_tarball
+
     case $action in
 	download)
 	    bandit_package_get_origins

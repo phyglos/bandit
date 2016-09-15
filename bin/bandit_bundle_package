@@ -233,7 +233,7 @@ bandit_package_remove()
 }
 
 ###---
-# Package DO, DO_AS, DO_IN functions
+# Package DO
 ###---
 
 bandit_package_do()
@@ -351,77 +351,4 @@ bandit_package_do()
     rm -rf $package
 }
 export -f bandit_package_do
-
-bandit_package_do_as()
-{
-    local action=$1
-    local package_new=$2.$3  `# Package alias`
-    local package_src=$4     `# Source package name`
-    local variant=$5         `# Script variant`
-
-    bandit_log "Doing $package_src as $package_new..."
-
-#TODO: do like package_do_in()
-    # Check if tarball exists
-#    [ -r $BUILD_SOURCES/$package ] || bandit_exit "BANDIT: $package not found in local cache"
-    # Check if MD5 is correct
-#    bandit_md5sum "$BUILD_SOURCES/$package" || bandit_exit
-
-    ln -s $BUILD_SOURCES/$package_src     $BUILD_SOURCES/$package_new
-    ln -s $BUILD_SOURCES/$package_src.md5 $BUILD_SOURCES/$package_new.md5
-
-    bandit_package_do $action $2 $3 $variant
-
-    rm $BUILD_SOURCES/$package_new{,.md5}
-}
-export -f bandit_package_do_as
-
-bandit_package_do_in()
-{
-# Add a top level subdirectory abc, repackage as abc.tmp.tar.xz and start again
-# when a package tarball abc.tar.x untars without a top level subdirectory abc.
-
-    local action=$1
-    local directory=$2    `# Package directory to create`
-    local tarball=$3      `# Package original tarball`
-    local variant=$4      `# Script variant`
-
-    local tmpxz=$directory.tmp.tar.xz `# New temporary tarball`
-
-    bandit_log  "Repackaging $tarball content into $tmpxz..."
-
-    # Ignore if just downloading
-    if [ $action != "download" ] && [ $action != "fetch" ]; then
-	
-	# Check if tarball exists
-	[ -r $BUILD_SOURCES/$tarball ] || bandit_exit "BANDIT: $tarball not found in local cache"
-	# Check if MD5 is correct
-	bandit_md5sum "$BUILD_SOURCES/$tarball" || bandit_exit
-
-	# Build a temporary tarball with a base directory named $tarball
-	bandit_mkdir $tmpxz
-	cd $tmpxz
-  	   bandit_mkdir $directory
-	   cd $directory
-	      tar -xf $BUILD_SOURCES/$tarball
-	   cd ..
-	   tar -c $directory | xz -0e       > $BUILD_SOURCES/$tmpxz
-	   md5sum -b $BUILD_SOURCES/$tmpxz  > $BUILD_SOURCES/$tmpxz.md5
-	cd ..
-    fi
-
-    # Force to use the new temporary tarball in cache
-    sources_fetch_url[0]=$BUILD_SOURCES/$tmpxz
-    sources_fetch_md5[0]=$BUILD_SOURCES/$tmpxz.md5
-    
-    bandit_package_do $action --from-cache $directory tmp.tar.xz $variant
-
-    # Ignore if just downloading
-    if [ $action != "download" ] && [ $action != "fetch" ]; then
-	# Remove temporary tarball
-	rm -rf $tmpxz
-	rm $BUILD_SOURCES/$tmpxz{,.md5}
-    fi
-}
-export -f bandit_package_do_in
 

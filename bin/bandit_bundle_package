@@ -292,10 +292,12 @@ bandit_package_do()
 	download)
 	    bandit_package_get_origins
 	    bandit_package_fetch_sources download
+            bandit_package_prepare_sources
 	    ;;
 	fetch)
 	    bandit_package_get_origins
 	    bandit_package_fetch_sources
+            bandit_package_prepare_sources
 	    ;;
 	config)
 	    if [ $option_from_cache == 0 ]; then

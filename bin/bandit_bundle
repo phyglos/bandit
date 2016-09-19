@@ -12,6 +12,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
+source $BANDIT_HOME/bin/bandit_bundle_source
 source $BANDIT_HOME/bin/bandit_bundle_package
 source $BANDIT_HOME/bin/bandit_bundle_script
 source $BANDIT_HOME/bin/bandit_bundle_module
@@ -88,12 +89,6 @@ bandit_bundle_do()
 			    "do")
 				bandit_package_do $action ${words[*]:2}
 				;;
-			    do_as) 
-				bandit_package_do_as $action ${words[*]:2}
-				;;
-			    do_in) 
-				bandit_package_do_in $action ${words[*]:2}
-				;;
 			esac
 			;;
 		    script)
@@ -123,14 +118,14 @@ bandit_bundle_do()
 			    "do")
 				bandit_package_do $action ${words[*]:2}
 				;;
-			    do_as | do_in)
-				# Do not pass original tarball
-				bandit_package_do $action ${words[2]} ${words[3]} ${words[5]}
-				;;
 			esac
 			;;
 		    script)
-			# Ignore removing for scripts
+			case ${words[1]} in
+			    run) 
+				bandit_script_reverse ${words[*]:2}
+				;;
+			esac
 			;;
 		    module)
 			bandit_module $action ${words[*]}

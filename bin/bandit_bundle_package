@@ -69,7 +69,7 @@ bandit_package_fetch_sources()
 		    # Check if MD5 is correct
 		    bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
 		    ;;
-		http*)
+		ftp*|http*)
 		    # Download from URL into BUILD_SOURCES
 		    bandit_msg "...fetching $file from remote origin..."
 		    wget ${sources_fetch_url[i]} \

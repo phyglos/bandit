@@ -63,8 +63,10 @@ bandit_bundle_do()
     # Create working directories
     bandit_mkdir $BUILD_SOURCES
     bandit_mkdir $BUILD_DESTDIR 
-    bandit_mkdir $BUILD_LOGS 
     bandit_mkdir $BUILD_WORK 
+    if [ $action != "download" -a $action != "fetch" ]; then 
+	bandit_mkdir $BUILD_LOGS
+    fi
 
     # Build inside work directory
     bandit_pushd $BUILD_WORK

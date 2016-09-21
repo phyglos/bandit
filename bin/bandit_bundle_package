@@ -137,10 +137,6 @@ bandit_package_build()
 	bandit_msg "...compiling..."
 	bandit_timestamp stamp
         build_compile 2>&1 > $BUILD_LOGS/$script.compile-${stamp}.log
-	# Remove unneeded files
-	if [ "$BUILD_KEEP_LA" != "yes" ]; then
-	    find / -name \*.la -a -not -path "*Image*" -delete
-	fi
     fi
 
     ## Test 
@@ -150,6 +146,11 @@ bandit_package_build()
 	    bandit_timestamp stamp
 	    build_test 2>&1 > $BUILD_LOGS/$script.test-${stamp}.log
 	fi
+    fi
+
+    # Remove unneeded files
+    if [ "$BUILD_KEEP_LA" != "yes" ]; then
+	find $BUILD_WORK -name \*.la -delete
     fi
 
     ## Pack 

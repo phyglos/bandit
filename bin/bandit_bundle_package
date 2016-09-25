@@ -137,6 +137,9 @@ bandit_package_build()
 	bandit_msg "...compiling..."
 	bandit_timestamp stamp
         build_compile 2>&1 > $BUILD_LOGS/$script.compile-${stamp}.log
+	if [[ $# != 0 ]]; then
+	    bandit_exit "BANDIT: Error ($#) in build_compile()"
+	fi
     fi
 
     ## Test 
@@ -320,6 +323,15 @@ bandit_package_do()
 	    fi
 	    bandit_package_prepare_sources
 	    bandit_pushd $package
+
+	    find .. -name 'ltmain*' | xargs \
+	      sed \
+		 -e "/func_warning.*remember to run/c\ : "        \
+ 		 -e "/func_warning.*has not been installed/c\ : " \
+ 		 -e "/func_warning.*seems to be moved/c\ : " \
+ 		 -e "/func_warning.*relinking/c\ : "              \
+		 -i /usr/bin/libtool 
+
 	    bandit_package_build
 	    bandit_package_install
 	    bandit_package_setup

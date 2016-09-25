@@ -104,6 +104,21 @@ bandit_package_prepare_sources()
     tar -xf ${sources_tarball[0]}
 }
 
+bandit_package_prepare_build()
+{
+    bandit_pushd $package
+
+    # Patch libtool to avoid warnings due to staged build
+    find .. -name 'ltmain*' | \
+	xargs \
+	    sed \
+	    -e "/func_warning.*remember to run/c\ : "        \
+ 	    -e "/func_warning.*has not been installed/c\ : " \
+ 	    -e "/func_warning.*seems to be moved/c\ : " \
+ 	    -e "/func_warning.*relinking/c\ : "              \
+	    -i /usr/bin/libtool 
+}
+
 bandit_package_fetch_build()
 {
     if [ -r $BUILD_DESTDIR/$pack ]; then
@@ -310,7 +325,7 @@ bandit_package_do()
 		bandit_package_fetch_sources
 	    fi
             bandit_package_prepare_sources
-	    bandit_pushd $package
+	    bandit_package_prepare_build
 	    bandit_package_config
 	    bandit_popd 
 	    ;;
@@ -322,16 +337,7 @@ bandit_package_do()
 		bandit_package_fetch_sources
 	    fi
 	    bandit_package_prepare_sources
-	    bandit_pushd $package
-
-	    find .. -name 'ltmain*' | xargs \
-	      sed \
-		 -e "/func_warning.*remember to run/c\ : "        \
- 		 -e "/func_warning.*has not been installed/c\ : " \
- 		 -e "/func_warning.*seems to be moved/c\ : " \
- 		 -e "/func_warning.*relinking/c\ : "              \
-		 -i /usr/bin/libtool 
-
+	    bandit_package_prepare_build
 	    bandit_package_build
 	    bandit_package_install
 	    bandit_package_setup
@@ -344,13 +350,13 @@ bandit_package_do()
 		bandit_package_fetch_sources
 	    fi
 	    bandit_package_prepare_sources
-	    bandit_pushd $package
+	    bandit_package_prepare_build
 	    bandit_package_build
 	    bandit_popd 
 	    ;;
 	install)
 	    bandit_package_fetch_build
-	    bandit_pushd $package
+	    bandit_package_prepare_build
 	    bandit_package_install
 	    bandit_package_setup
 	    bandit_popd 
@@ -363,7 +369,7 @@ bandit_package_do()
     # Remove temporary DESTDIR
     rm -rf $BUILD_DESTDIR/$script
     # Remove WORK package directory
-    rm -rf $package
+#    rm -rf $package
 }
 export -f bandit_package_do
 

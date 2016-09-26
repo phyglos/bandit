@@ -369,7 +369,7 @@ bandit_package_do()
     # Remove temporary DESTDIR
     rm -rf $BUILD_DESTDIR/$script
     # Remove WORK package directory
-#    rm -rf $package
+    rm -rf $package
 }
 export -f bandit_package_do
 

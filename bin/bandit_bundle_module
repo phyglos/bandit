@@ -49,6 +49,9 @@ bandit_module()
     
     # Perform module action
     case $action in
+	build)
+	    echo "...no build required for modules..."
+	    ;;
 	raise|install)
 	    bandit_module_install ${module_name}
 	    ;;

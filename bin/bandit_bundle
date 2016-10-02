@@ -132,7 +132,11 @@ bandit_bundle_do()
 			esac
 			;;
 		    module)
-			bandit_module $action ${words[*]}
+			case ${words[1]} in
+			    perl5)
+				bandit_module perl5 $action ${words[*]:2}
+				;;
+			esac
 			;;
 		esac			
 		;;

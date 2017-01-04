@@ -66,3 +66,24 @@ bandit_script_run()
 }
 export -f bandit_script_run
 
+bandit_script_reverse()
+{
+    local script=$1   `# Script name`
+    shift
+
+    bandit_log "$script $@ [$(date)]"
+
+    # Default functions to be overloaded by the script
+    function script_reverse()  { :; } ; export -f script_reverse
+
+    source $BUILD_SCRIPTS/$script.sh
+    
+    ## Reversing setup
+    if bandit_script_has $BUILD_SCRIPTS/$script.sh script_reverse; then  
+	bandit_msg "...reversing set up..."
+	bandit_timestamp stamp
+	script_reverse 2>&1 > $BUILD_LOGS/$script.reverse-${stamp}.log 
+    fi
+}
+export -f bandit_script_reverse
+

@@ -109,14 +109,16 @@ bandit_package_prepare_build()
     bandit_pushd $package
 
     # Patch libtool to avoid warnings due to staged build
-    find .. -name 'ltmain*' | \
-	xargs \
-	    sed \
-	    -e "/remember to run/c\ : "        \
- 	    -e "/has not been installed/c\ : " \
- 	    -e "/seems to be moved/c\ : " \
- 	    -e "/relinking /c\ : "              \
-	    -i /usr/bin/libtool 
+    if [ -x /usr/bin/libtool ]; then 
+	find .. -name 'ltmain*' | \
+	    xargs \
+		sed \
+		-e "/remember to run/c\ : "        \
+ 		-e "/has not been installed/c\ : " \
+ 		-e "/seems to be moved/c\ : " \
+ 		-e "/relinking /c\ : "              \
+		-i /usr/bin/libtool
+    fi
 }
 
 bandit_package_fetch_build()

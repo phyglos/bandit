@@ -1,7 +1,7 @@
 #
-# README - First description of the contents of this package
+# README - General description of the contents of the tarball
 #
-# Copyright (C) 2015-2016 Àngel Linares Zapater
+# Copyright (C) 2015-2017 Àngel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -16,10 +16,14 @@ Meet the BANDIT
 
 The "Build AND Install Toolkit", BANDIT, is the tool for installing a phyglos distribution. 
 
+The COPYING file contains the GNU License for this software.
+
+The RELEASE file describes the main changes in this release.
+
 The INSTALL file describes how to install BANDIT in the HOST system. 
 
 The RAISE file describes a quick way to raise a phyglos machine from the HOST system using BANDIT. 
 
-Visit http://phy.wiki for more details and other installation methods.
+Visit http://phy.wiki/doc/bandit for more information and other installation methods.
 
 

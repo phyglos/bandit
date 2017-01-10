@@ -24,7 +24,7 @@ bandit_log "Removing BANDIT user from HOST..."
 
 userdel $BANDIT_USR
 rm -vrf /home/$BANDIT_USR
-
+rm -vrf /var/mail/$BANDIT_USR
 
 bandit_log "Removing TARGET partitions from HOST system..."
 

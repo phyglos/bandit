@@ -57,7 +57,7 @@ bandit_log "Preparing TARGET partition..."
 lsblk -ip
 bandit_msg "Enter 'init' to erase $BANDIT_TARGET_PART :" red 
 read CMD
-[ "$CMD"=="init" ] || exit 1
+[ "$CMD" == "init" ] || bandit_exit "Cancelled"
 
 mkdir -pv $BANDIT_HOST_TGT_MNT
 mkfs -v -t $BANDIT_TARGET_PART_TYPE -L ${BANDIT_TARGET_PART_LABEL} $BANDIT_TARGET_PART
@@ -70,7 +70,7 @@ bandit_log "Preparing TARGET swap area..."
 lsblk -ip
 bandit_msg "Enter 'init' to erase $BANDIT_TARGET_SWAP :" red 
 read CMD
-[ "$CMD"=="init" ] || exit 1
+[ "$CMD" == "init" ] || bandit_exit "Cancelled "
 
 mkswap -L ${BANDIT_TARGET_SWAP_LABEL} $BANDIT_TARGET_SWAP
 echo
@@ -89,7 +89,7 @@ ln -sv $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR $BANDIT_BUILDER_DIR
 # Done
 bandit_log "The HOST system is ready..."
 echo
-bandit_msg "Then you can log as the bandit to continue: " green
+bandit_msg "Then you can log as the user $BANDIT_USR to continue: " green
 echo
 bandit_msg "#su - $BANDIT_USR" green
 echo

@@ -2,7 +2,7 @@
 #
 # bandit-host-check.sh - Check for HOST build requirements
 #
-# Copyright (C) 2015-2016 Àngel Linares Zapater
+# Copyright (C) 2015-2017 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -18,7 +18,7 @@ source $BANDIT_HOME/bin/bandit_common
 # Check whether the HOST meets the building requirements
 ###----------------------------------------
 
-bandit_log "Checking HOST requirements..." 
+bandit_log "Checking HOST building requirements..." 
 
 export LC_ALL=C
 

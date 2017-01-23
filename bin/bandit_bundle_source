@@ -22,10 +22,11 @@ bandit_source_rename()
     # Check if origin exists
     [ -r $orig ] || bandit_exit "BANDIT: $orig not found in local cache"
 
-    # Rename the file and .md5 in filessystem
+    # Copy the file and .md5 in the cache
+    # Keep a copy of the original tarball to avoid unintended downloads
     if [ -r $orig ]; then
-	mv $orig     $dest
-	mv $orig.md5 $dest.md5
+	cp $orig     $dest
+	cp $orig.md5 $dest.md5
     fi
 
     # Change file name in sources_tarball variable
@@ -43,8 +44,9 @@ export -f bandit_source_rename
 
 bandit_source_repackage_into()
 {
-    # Add a top level subdirectory abc, then repackage as abc.tmp.tar.xz 
-    # when a package tarball abc.tar.x untars without a top level subdirectory abc.
+    # Add a top level subdirectory abc when a package tarball abc.tar.*
+    # untars without the expected top level subdirectory abc.
+    # Then repackage again as abc.tmp.tar.XZ 
 
     local tarball=$1         `# Package original tarball`
     local directory=$2       `# Directory to create in new package`
@@ -73,10 +75,13 @@ bandit_source_repackage_into()
 
     cd ..
 
-    # Remove original tarball and rename temporary file
-    rm -rf $tmp  
-    rm $tarball
-    rm $tarball.md5
+    # Do not remove original tarball
+    # so no download is initiated when repackaging from .gz to .xz
+    #rm $tarball
+    #rm $tarball.md5
+    
+    # Remove temporary directory and rename temporary file
+    rm -rf $tmp
     mv $tmp.tar.xz $directory.tar.xz
     md5sum -b $directory.tar.xz > $directory.tar.xz.md5
 

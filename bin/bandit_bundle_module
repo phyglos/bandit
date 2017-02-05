@@ -39,7 +39,7 @@ bandit_module()
     # Set LOG file name
     module_log="${module_class}_${module_name}"
 
-    bandit_log "Module (${module_class}) ${module_name} $@ [$(date)]"
+    bandit_log "${module_name} module (${module_class}) $@ [$(date)]"
 
     # Default functions to be overloaded by the module plugin
     function module_install()  { :; } ; export -f module_install

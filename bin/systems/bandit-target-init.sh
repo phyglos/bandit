@@ -19,11 +19,18 @@ source $BANDIT_HOME/bin/bandit_common
 # Install BANDIT, from HOST to TARGET
 ###----------------------------------------
 
-bandit_log "Installing the BANDIT in TARGET..." 
+bandit_log "Installing the BANDIT in the TARGET system..." 
 
-bandit_msg "Copying BANDIT_HOME in TARGET filesystem..."
+bandit_msg "Copying BANDIT in the TARGET filesystem..."
 bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_HOME
-cp -R $BANDIT_HOME/* $BANDIT_HOST_TGT_MNT$BANDIT_HOME
+cp    $BANDIT_HOME/*             $BANDIT_HOST_TGT_MNT$BANDIT_HOME 2&>/dev/null
+cp -R $BANDIT_HOME/{bin,etc,lib} $BANDIT_HOST_TGT_MNT$BANDIT_HOME 
+
+bandit_msg "Copying caches in the TARGET filesystem..."
+bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_ORIG
+cp -R $BANDIT_ORIG/* $BANDIT_HOST_TGT_MNT$BANDIT_ORIG
+bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_DEST
+cp -R $BANDIT_DEST/* $BANDIT_HOST_TGT_MNT$BANDIT_DEST
 
 ###----------------------------------------
 # Layout TARGET filesystem

@@ -109,7 +109,7 @@ bandit_package_prepare_build()
     bandit_pushd $package
 
     # Patch libtool to avoid warnings due to staged build
-    if [ -x /usr/bin/libtool ]; then 
+    if [ -w /usr/bin/libtool ]; then 
 	find .. -name 'ltmain*' | \
 	    xargs \
 		sed \

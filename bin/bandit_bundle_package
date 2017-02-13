@@ -245,8 +245,8 @@ bandit_package_remove()
     # Log files from porg database and remove the package
     bandit_timestamp stamp
     (
-    porg -f $script
-    yes | porg -r $script
+    porg -fx ${script}
+    yes | porg -rx ${script}
     ) 2>&1 > $BUILD_LOGS/$script.remove-${stamp}.log 
 }
 

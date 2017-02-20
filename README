@@ -17,13 +17,10 @@ Meet the BANDIT
 The "Build AND Install Toolkit", BANDIT, is the tool for installing a phyglos distribution. 
 
 The COPYING file contains the GNU License for this software.
-
+The INSTALL file describes how to install BANDIT in the HOST system. 
+The RAISE file describes a quick way to raise a phyglos machine from the HOST system using BANDIT. 
 The RELEASE file describes the main changes in this release.
 
-The INSTALL file describes how to install BANDIT in the HOST system. 
-
-The RAISE file describes a quick way to raise a phyglos machine from the HOST system using BANDIT. 
-
-Visit http://phy.wiki/doc/bandit for more information and other installation methods.
+Visit http://phy.wiki for more information and other installation methods.
 
 

@@ -14,12 +14,18 @@
 Installing BANDIT on the HOST system
 ====================================
 
-Install a copy of BANDIT into the HOST /opt directory.
+Download the latest version of the bandit from phyglos.org
+$ wget ftp://phyglos.org/bandit/bandit 
+$ tar xvf bandit
+$ mv bandit-x.y.z bandit
+
+As root, move the file to /opt and change into that directory
+# mv bandit /opt
 # cd /opt
-# tar -xvf bandit-1.3.tar.xz 
+# chown -R root.root /opt/bandit
 
 Initialize the HOST environment for BANDIT from the bandit home directory:
-# cd bandit-1.3 
+# cd bandit
 # source bin/bandit-set
 
 Bandit should work now in the HOST. Test with:

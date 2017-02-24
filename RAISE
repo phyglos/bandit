@@ -30,7 +30,7 @@ Install BANDIT in the HOST system as explained in the INSTALL file.
 Change the working directory to the BANDIT home directory.
 # cd $BANDIT_HOME
 
-Edit the file etc/bandit.conf and set the appropiate configuration values.
+Edit the file $BANDIT_HOME/etc/bandit.conf and set the appropiate configuration values.
 Take special care about the TARGET system variables.
 
 Check the HOST system to meet the building requirements.
@@ -42,14 +42,14 @@ If any previous installation exists, clean the HOST system:
 # bandit --system host clean
 
 Download the latest version of the phyglos catalog from phyglos.org
-# wget ftp://phyglos.org/catalogs/phyglos
-# tar xvf phyglos
+# wget ftp://phyglos.org/catalogs/phyglos-latest.tar.gz
+# tar xvf phyglos-latest.tar.gz
 
 Copy the catalog into $BANDIT_HOME
 # cd phyglos-<x.y.z>
-# mv bundles /opt/bandit/etc
-# mv origins /opt/bandit/etc
-# chown -R root.root /opt/bandit/etc
+# mv bundles $BANDIT_HOME/etc
+# mv origins $BANDIT_HOME/etc
+# chown -R root.root $BANDIT_HOME/etc
 
 Download the needed bundles sources before entering the BUILDER system:
 # bandit phyglos-builder fetch
@@ -57,9 +57,9 @@ Download the needed bundles sources before entering the BUILDER system:
 # bandit phyglos-security fetch
 
 === WARNING ===
-You are about to initialize the TARGET partitions.
-Check again the values in the etc/bandit.conf file before proceeding
-You can destroy the HOST system and loose your data.
+You are about to initialize the TARGET partitions in the HOST system.
+Check again the values in the $BANDIT_HOME/etc/bandit.conf file before proceeding
+You can destroy other HOST system partitions and loose your data.
 ===
 
 Initialize the HOST system:
@@ -75,7 +75,7 @@ Login as the bandit unprivileged user in the HOST system:
 Change the working directory to the BANDIT home directory.
 (bandit)$ cd $BANDIT_HOME
 
-Edit etc/bundles/phyglos-builder.conf file and set proper values.
+Edit $BANDIT_HOME/etc/bundles/phyglos-builder.conf file and set proper values.
 
 Raise the PHYGLOS-BUILDER bundle, as unprivileged user:
 (bandit)$ bandit phyglos-builder raise
@@ -89,7 +89,7 @@ Log out from the bandit user
 Setting up the TARGET system
 ============================
 
-Edit etc/bundles/phyglos-core.conf file and set proper values.
+Edit $BANDIT_HOME/etc/bundles/phyglos-core.conf file and set proper values.
 
 Initialize the TARGET system:
 # bandit --system target init
@@ -112,12 +112,12 @@ Building the rest of components
 Enter into the TARGET system:
 # bandit-target-enter
 
-Edit /opt/bandit/bundles/phyglos-security.conf file 
+Edit $BANDIT_HOME/etc/bundles/phyglos-security.conf file 
 
 Raise the PHYGLOS-SECURITY bundle
 [TARGET]# bandit phyglos-security raise 
 
-Edit Edit /opt/bandit/bundles/phyglos-kernel.conf file and set needed values
+Edit Edit $BANDIT_HOME/etc/bundles/phyglos-kernel.conf file and set needed values
 
 Configure and raise the PHYGLOS-KERNEL component
 [TARGET]# bandit phyglos-kernel config 

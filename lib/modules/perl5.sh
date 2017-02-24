@@ -2,7 +2,7 @@
 #
 # perl5 - BANDIT plugin for perl5 module 
 #
-# Copyright (C) 2016 Àngel Linares Zapater
+# Copyright (C) 2016-2017 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 

@@ -13,13 +13,15 @@
 #
 
 ###----------------------------------------
-# Simple display and exit options. 
-# Do not source scripts. Show and quit.
+# Simple displaying options. 
+# Do not source scripts yet. Just show and quit.
 ###----------------------------------------
+
+RELEASE=RELEASE_MAJOR_MINOR_REVISION
 
 bandit_show_version()
 {
-    echo "bandit 1.3 - the Build AND Install Toolkit"
+    echo "bandit $RELEASE - The Build AND Install Toolkit"
     echo
     echo " Copyright (C) 2015-2017 Angel Linares Zapater"
     echo " BANDIT comes with ABSOLUTELY NO WARRANTY." 
@@ -42,13 +44,13 @@ bandit_show_help()
     echo "                 or 'all' for everything"
     echo
     echo "Usage for bundles: "
-    echo "  bandit -b|--bundle <bundle> [-i|-item <item>] <action>" 
+    echo "  bandit [-b|--bundle] <bundle> [-i|-item <item>] <action>" 
     echo "    <bundle>:     Name of the bundle"
     echo "    -i <item>:    Apply the action on this item in the bundle"
     echo "    <action>:"
     echo "      download    Download (inconditionally) sources from origins"
     echo "      fetch       Download (when not in cache) sources from origins"
-    echo "      config      Only with -i. Interactively configure the bundle"
+    echo "      config      Only with -i. Interactively configure the bundle item"
     echo "      build       Only with -i. Build the bundle and save a build package in local cache"
     echo "      install     Only with -i. Install the build package from local cache"
     echo "      raise       Build and install"
@@ -71,7 +73,7 @@ bandit_show_help()
 }
 
 case $1 in 
-    ""|-h|--help)
+    -h|--help | "")
 	bandit_show_version
 	bandit_show_help
 	exit 0
@@ -84,6 +86,7 @@ esac
 
 ###----------------------------------------
 # Working with bundles, packages and systems
+# Source files now.
 ###----------------------------------------
 
 source $BANDIT_HOME/etc/bandit.conf
@@ -159,11 +162,11 @@ case $object in
 	bandit_mkdir $BANDIT_LOGS/bundles
 	case $command in
 	    config)
-		# config runs interactively
+		# config runs interactively without logging
 		bandit_bundle_do config "${bundle}" "${item}"
 		;;
 	    download | fetch | build | install | raise | remove)
-		# All other commands run non-interactively
+		# All other commands run non-interactively and log
 		bandit_timestamp stamp
 		(time bandit_bundle_do $command "${bundle}" "${item}") 2>&1 \
 		    | tee $BANDIT_LOGS/bundles/${bundle}.$command-${stamp}.log

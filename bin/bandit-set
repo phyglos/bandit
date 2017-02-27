@@ -17,10 +17,27 @@
 ###----------------------------------------
 
 echo
+
+# Remove BANDIT_HOME from PATH
+if [ "$BANDIT_HOME" ] ; then
+    echo "Removing old BANDIT_HOME from PATH..."
+    NEW=""
+    OLDIFS=$IFS
+    IFS=':'
+    for STR in $PATH; do
+        if [ "$STR" != "$BANDIT_HOME/bin" ] ; then
+            NEW=${NEW:+$NEW:}$STR
+        fi
+    done
+    IFS=$OLDIFS
+    PATH=$NEW
+fi
+
+#Define BANDIT_HOME and add it to PATH   
+echo
 echo "Setting BANDIT_HOME..."
 export BANDIT_HOME=`pwd`
 echo "BANDIT_HOME="$BANDIT_HOME
-
 echo
 echo "Adding BANDIT_HOME/bin to PATH"
 export PATH=$PATH:$BANDIT_HOME/bin

@@ -27,7 +27,8 @@ bandit_bundle_do()
     local stamp
     bandit_timestamp stamp
 
-    # Default directories to be overloaded by the bundle configuration
+    # Make default directories available to the bundle scripts and origins
+    BUILD_BUNDLES=$BANDIT_HOME/etc/bundles
     BUILD_SCRIPTS=$BANDIT_HOME/etc/bundles/$bundle.dir
     BUILD_SOURCES=$BANDIT_ORIG/$bundle
     BUILD_DESTDIR=$BANDIT_DEST/$bundle
@@ -44,9 +45,12 @@ bandit_bundle_do()
     # Source bundle configuration
     if [ -r $BANDIT_HOME/etc/bundles/$bundle.conf ]; then 
 	source $BANDIT_HOME/etc/bundles/$bundle.conf
+    else
+	bandit_exit "BANDIT: Cannot find $bundle.conf file"
     fi
-    
-    ## Default variables
+
+    ## Clobber default variables
+
     # Keep or remove *.la files from libtool?
     BUILD_KEEP_LA=${BUNDLE_KEEP_LA:-$BANDIT_BUILD_KEEP_LA}
 

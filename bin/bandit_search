@@ -29,6 +29,13 @@ bandit_search()
     if [ "$expr" == "all" ]; then expr='[a-z]'; fi
 
     #---
+    # Search catalogs
+    #---
+    if [[ $options =~ "c" ]]; then
+	: # Not implemented
+    fi
+    
+    #---
     # Search bundles
     #---
     if [[ $options =~ "b" ]]; then 

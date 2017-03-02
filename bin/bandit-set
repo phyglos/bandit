@@ -39,7 +39,7 @@ echo "Setting BANDIT_HOME..."
 export BANDIT_HOME=`pwd`
 echo "BANDIT_HOME="$BANDIT_HOME
 echo
-echo "Adding BANDIT_HOME/bin to PATH"
+echo "Adding BANDIT_HOME/bin to PATH..."
 export PATH=$PATH:$BANDIT_HOME/bin
 echo "PATH="$PATH
 echo

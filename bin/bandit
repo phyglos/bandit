@@ -107,9 +107,9 @@ case $1 in
 
 	# Get search options
 	options=""
-	while getopts "bixfl" opt; do
+	while getopts "cbixfl" opt; do
 	    case $opt in
-		b|i|x|f|l)
+		c|b|i|x|f|l)
 		    options+=$opt
 		    ;;
 		\?)

@@ -12,9 +12,9 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
-#---
+###------------------------------
 # Directory helpers
-#---
+###------------------------------
 
 bandit_mkdir()
 {
@@ -31,9 +31,9 @@ bandit_popd()
     popd > /dev/null 
 }
 
-#---
+###------------------------------
 # File helpers
-#---
+###------------------------------
 
 bandit_backup()
 {
@@ -60,9 +60,9 @@ bandit_md5sum()
 }
 export -f bandit_md5sum
 
-#---
+###------------------------------
 # Script helpers
-#---
+###------------------------------
 
 bandit_exit()
 {  
@@ -80,9 +80,21 @@ bandit_script_has()
     fi
 }
 
-#---
-# Log and messages helpers
-#---
+###------------------------------
+# Other helpers
+###------------------------------
+
+# Set a random string of length $2 in variable $1
+bandit_random_string()
+{  
+    local _retval=$1
+    local length=$2
+    
+    [ $length ] || length=30
+    
+    eval "$_retval"=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w $length | head -n 1)
+}
+export -f bandit_random_string
 
 # Get new unique timestamp 
 bandit_timestamp()
@@ -91,6 +103,12 @@ bandit_timestamp()
 
     eval "$_retval"=$(date +%Y%m%d-%H%M%S.%N)
 }
+export -f bandit_timestamp
+
+###------------------------------
+# Log and messages helpers
+###------------------------------
+
 
 ## Terminal colors
 BLUE="\\033[1;34m"

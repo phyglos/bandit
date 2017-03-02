@@ -21,10 +21,10 @@ source $BANDIT_HOME/bin/bandit_common
 
 bandit_log "Setting up BANDIT user in HOST ..." 
 
+# Create group for the user
 groupadd $BANDIT_GRP
-useradd -g $BANDIT_GRP -s /bin/bash -m -k /dev/null $BANDIT_USR
-
-echo "$BANDIT_USR:$BANDIT_PSW" | chpasswd
+# Create user with no password nor use any skeleton
+useradd -g $BANDIT_GRP -p "*" -s /bin/bash -m -k /dev/null $BANDIT_USR
 
 # Prepare user environment
 cat > /home/$BANDIT_USR/.bash_profile <<EOF

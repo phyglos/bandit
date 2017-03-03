@@ -108,14 +108,15 @@ bandit_timestamp()
 {
     local _retval=$1
 
-    eval "$_retval"=$(date +%Y%m%d-%H%M%S.%N)
+    local d=$(date +%Y%m%d-%H%M%S.%N)
+
+    eval "$_retval"=${d:2:16}
 }
 export -f bandit_timestamp
 
 ###------------------------------
 # Log and messages helpers
 ###------------------------------
-
 
 ## Terminal colors
 BLUE="\\033[1;34m"

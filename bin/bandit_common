@@ -60,6 +60,13 @@ bandit_md5sum()
 }
 export -f bandit_md5sum
 
+# Finds whether a command $1 in installed the local system
+bandit_system_has()
+{
+    which ${1} 2>&1 >/dev/null
+    return $?
+}
+
 ###------------------------------
 # Script helpers
 ###------------------------------

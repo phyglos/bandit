@@ -91,15 +91,13 @@ bandit_script_has()
 # Other helpers
 ###------------------------------
 
-# Set a random string of length $2 in variable $1
+# Set a random string of length $2 (or 30 if not set) in variable $1
 bandit_random_string()
 {  
     local _retval=$1
     local length=$2
     
-    [ $length ] || length=30
-    
-    eval "$_retval"=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w $length | head -n 1)
+    eval "$_retval"=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${length:-30} | head -n 1)
 }
 export -f bandit_random_string
 

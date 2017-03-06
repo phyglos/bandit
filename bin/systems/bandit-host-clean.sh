@@ -19,7 +19,6 @@ source $BANDIT_HOME/bin/bandit_common
 # Remove previous users ans partitions from HOST
 ###----------------------------------------
 
-
 bandit_log "Removing BANDIT user from HOST..."
 
 userdel $BANDIT_USR
@@ -33,11 +32,14 @@ swapoff -v $BANDIT_TARGET_SWAP
 
 # Umount the target directory
 umount -vfl $BANDIT_HOST_TGT_MNT            
-rm -vrf $BANDIT_HOST_TGT_MNT            
+rm -rf $BANDIT_HOST_TGT_MNT            
 
 # Remove crosstools host link
-rm -vrf $BANDIT_BUILDER_DIR
+rm -rf $BANDIT_BUILDER_DIR
 
+# Remove bespoken commands
+rm $BANDIT_HOME/bin/bandit_builder_enter
+rm $BANDIT_HOME/bin/bandit_target_enter
 
 # Done
 echo

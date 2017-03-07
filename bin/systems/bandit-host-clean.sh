@@ -38,8 +38,8 @@ rm -rf $BANDIT_HOST_TGT_MNT
 rm -rf $BANDIT_BUILDER_DIR
 
 # Remove bespoken commands
-rm $BANDIT_HOME/bin/bandit_builder_enter
-rm $BANDIT_HOME/bin/bandit_target_enter
+rm $BANDIT_HOME/bin/bandit-builder-enter
+rm $BANDIT_HOME/bin/bandit-target-enter
 
 # Done
 echo

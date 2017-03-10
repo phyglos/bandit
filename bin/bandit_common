@@ -63,7 +63,7 @@ export -f bandit_md5sum
 # Finds whether a command $1 in installed the local system
 bandit_system_has()
 {
-    which ${1} >/dev/null 2>&1
+    which ${1} 2>&1 >/dev/null
     return $?
 }
 export -f bandit_system_has
@@ -87,30 +87,29 @@ bandit_script_has()
 	return 0
     fi
 }
-export -f bandit_script_has
 
 ###------------------------------
 # Other helpers
 ###------------------------------
 
-# Set a random string of length $2 in variable $1
+# Set a random string of length $2 (or 30 if not set) in variable $1
 bandit_random_string()
 {  
-    local retvar=$1
+    local _retval=$1
     local length=$2
     
-    eval "$retvar"=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${length:-30} | head -n 1)
+    eval "$_retval"=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${length:-30} | head -n 1)
 }
 export -f bandit_random_string
 
 # Get new unique timestamp 
 bandit_timestamp()
 {
-    local retvar=$1
+    local _retval=$1
 
     local d=$(date +%Y%m%d-%H%M%S.%N)
 
-    eval "$retvar"=${d:2:16}
+    eval "$_retval"=${d:2:16}
 }
 export -f bandit_timestamp
 

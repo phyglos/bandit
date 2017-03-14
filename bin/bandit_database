@@ -24,15 +24,15 @@
 # Get available bundles 
 bandit_db_get_bundles_available()
 {
-  local retvar=$1
-  local prefix=$2
-  local list=""
+  local _retvar=$1
+  local _prefix=$2
+  local _list=""
 
   if [ -d $BANDIT_HOME/etc/bundles ]; then 
-      list=$(find $BANDIT_HOME/etc/bundles -name *${prefix}*.desc | sort)
+      _list=$(find $BANDIT_HOME/etc/bundles -name *${_prefix}*.desc | sort)
   fi
   
-  eval $retvar="'$list'"
+  eval $_retvar="'$_list'"
 }
 
 
@@ -43,12 +43,12 @@ bandit_db_get_bundles_available()
 # Get available bundles 
 bandit_db_get_bundle_items_available()
 {
-  local retvar=$1
+  local _retvar=$1
   local _expr=$2
-  local list=""
+  local _list=""
 
   if [ -d $BANDIT_HOME/etc/bundles ]; then 
-      list=$(
+      _list=$(
 	  grep -e "${expr}" $BANDIT_HOME/etc/bundles/*.desc |
 	      sed -e "/#/d" -e "s/'//g" | 
 	      awk '{
@@ -62,7 +62,7 @@ bandit_db_get_bundle_items_available()
 	   ) 
   fi
   
-  eval $retvar="'$list'"
+  eval $_retvar="'$_list'"
 }
 
 
@@ -73,29 +73,29 @@ bandit_db_get_bundle_items_available()
 # Get available packages in downloaded bundles
 bandit_db_get_packages_available()
 {
-  local retvar=$1
-  local prefix=$2
-  local list=""
+  local _retvar=$1
+  local _prefix=$2
+  local _list=""
 
   if [ -d $BANDIT_HOME/etc/bundles ]; then 
-      list=$(find $BANDIT_HOME/etc/bundles -name ${prefix}.sh)
+      _list=$(find $BANDIT_HOME/etc/bundles -name ${_prefix}.sh)
   fi
 
-  eval $retvar="'$list'"
+  eval $_retvar="'$_list'"
 }
 
 # Get packages installed with bandit
 bandit_db_get_packages_installed()
 {
-  local retvar=$1
-  local prefix=$2
-  local list=""
+  local _retvar=$1
+  local _prefix=$2
+  local _list=""
 
   if [ -r /var/log/porg ]; then 
-      local list=$(find /var/log/porg -name ${prefix})
+      local _list=$(find /var/log/porg -name ${_prefix})
   fi
   
-  eval $retvar="'$list'"
+  eval $_retvar="'$_list'"
 }
 
 # Get porg files for an installed package
@@ -118,10 +118,10 @@ bandit_db_get_package_info()
 # Get installed files 
 bandit_db_get_files_installed()
 {
-  local retvar=$1
-  local prefix=$2
+  local _retvar=$1
+  local _prefix=$2
 
-  local list=$(grep -R ${prefix} /var/log/porg | 
+  local _list=$(grep -R ${_prefix} /var/log/porg | 
       sed -e "/#/d" -e "s/[:|]/ /g" | 
       awk '{
             package=$1
@@ -131,7 +131,7 @@ bandit_db_get_files_installed()
       sort
       ) 
 
-  eval $retvar="'$list'"
+  eval $_retvar="'$_list'"
 }
 
 ###------------------------------
@@ -141,29 +141,29 @@ bandit_db_get_files_installed()
 # Get cached sources
 bandit_db_get_cache_sources()
 {
-  local retvar=$1
-  local prefix=$2
-  local list=""
+  local _retvar=$1
+  local _prefix=$2
+  local _list=""
 
   if [ -d $BANDIT_ORIG ]; then 
-      list=$(find $BANDIT_ORIG -name "*${prefix}*" | sort -d)
+      _list=$(find $BANDIT_ORIG -name "*${_prefix}*" | sort -d)
   fi
 
-  eval $retvar="'$list'"
+  eval $_retvar="'$_list'"
 }
 
 # Get cached builds
 bandit_db_get_cache_builds()
 {
-  local retvar=$1
-  local prefix=$2
-  local list=""
+  local _retvar=$1
+  local _prefix=$2
+  local _list=""
 
   if [ -d $BANDIT_DEST ]; then 
-      list=$(find $BANDIT_DEST -name "*${prefix}*" | sort -d)
+      _list=$(find $BANDIT_DEST -name "*${_prefix}*" | sort -d)
   fi
   
-  eval $retvar="'$list'"
+  eval $_retvar="'$_list'"
 }
 
 
@@ -174,12 +174,12 @@ bandit_db_get_cache_builds()
 # Get log entries
 bandit_db_get_log_entries()
 {
-  local retvar=$1
-  local prefix=$2
-  local list=""
+  local _retvar=$1
+  local _prefix=$2
+  local _list=""
 
   if [ -d $BANDIT_LOGS ]; then 
-      list=$(find $BANDIT_LOGS -type f -name "*${prefix}*" | 
+      _list=$(find $BANDIT_LOGS -type f -name "*${_prefix}*" | 
 	      sed -e "s#${BANDIT_LOGS}/bundles/##g" -e "s/.log$//g" | 
               awk -F '/' '{
                            match($1, /[0-9]+-[0-9]+.[0-9]+/)
@@ -190,7 +190,7 @@ bandit_db_get_log_entries()
               sort -d)
   fi
   
-  eval $retvar="'$list'"
+  eval $_retvar="'$_list'"
 }
 
 

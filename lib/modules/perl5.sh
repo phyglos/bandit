@@ -14,6 +14,6 @@
 
 module_install()
 {
-    cpan -i ${*}
+    yes | cpan -iT ${*}
 }
 

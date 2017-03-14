@@ -12,12 +12,12 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
+RELEASE=1.3.b2
+
 ###----------------------------------------
 # Simple displaying options. 
 # Do not source scripts yet. Just show and quit.
 ###----------------------------------------
-
-RELEASE=RELEASE_MAJOR_MINOR_REVISION
 
 bandit_show_version()
 {
@@ -131,17 +131,17 @@ esac
 # Work with objects...
 #---
 
-# Check if any type of object is set or default 
-object="-default"
+# Check if any type of object is set or set default 
+object="--default"
 if [[ $1 == -* ]]; then object=$1; fi
 
 case $object in
-    -b|--bundle | -default)
+    -b|--bundle | --default)
 	# Get the bundle name
-	if [ $object != "-default" ]; then shift; fi
+	if [ $object != "--default" ]; then shift; fi
 	bundle=$1; shift
 
-	# Get the item in the bundle, if given
+	# Get optional item in the bundle
 	item="all"
 	case $1 in 
 	    -i|--item) 
@@ -153,24 +153,29 @@ case $object in
 	# Get the command
 	command=$1; shift
 
-	# Check proper use of the command
-	#case $command in
-	#    build|install) 
-	#	bandit_exit "Use this action only with -i <item>"
-	#	;;
-	#esac
-
+	# Get optional command parameters
+	command_params="--all"
+	if [[ $1 == -* ]]; then command_params="$1"; fi # Capture also one dash params to warn
+	case $command_params in
+	    --all | --sources | --builds)
+		:
+		;;
+	    *)
+		bandit_exit "BANDIT: Command parameter ${command_params} not defined."
+		;;
+	esac
+		
         # Start the work on the bundle
 	bandit_mkdir $BANDIT_LOGS/bundles
 	case $command in
 	    config)
 		# config runs interactively without logging
-		bandit_bundle_do config "${bundle}" "${item}"
+		bandit_bundle_do 
 		;;
 	    download | fetch | build | install | raise | remove)
 		# All other commands run non-interactively and log
 		bandit_timestamp stamp
-		(time bandit_bundle_do $command "${bundle}" "${item}") 2>&1 \
+		(time bandit_bundle_do) 2>&1 \
 		    | tee $BANDIT_LOGS/bundles/${bundle}.$command-${stamp}.log
 		;;
 	    *) 
@@ -181,33 +186,36 @@ case $object in
     -p|--package)
 	shift
 
+	# Get package expression
+	package_expr=${1}
+	
 	# Execute command
 	command=$2
 	case $command in
-	    info)
-		bandit_db_get_packages_available packages $1
-		for p in $packages
-		do
-		    echo "Information for $(basename $p):"
-		    bandit_db_get_package_info $(basename $p)
-		done
-		;;
-	    files)
-		bandit_db_get_packages_installed packages $1
-		for p in $packages
-		do
-		    package=$(basename $p)
-		    bandit_db_get_package_files $package
-		done
-		;;
 	    bundles)
-		bandit_db_get_packages_available packages $1
+		bandit_db_get_packages_available packages ${package_expr}
 		for p in $packages
 		do
 		    bundle=$(basename $(dirname $p))
 		    package=$(basename $p)
 		    package=${package/.sh/}
    		    echo "[${bundle}] ${package}" 
+		done
+		;;
+	    files)
+		bandit_db_get_packages_installed packages ${package_expr}
+		for p in $packages
+		do
+		    package=$(basename $p)
+		    bandit_db_get_package_files $package
+		done
+		;;
+	    info)
+		bandit_db_get_packages_available packages ${package_expr}
+		for p in $packages
+		do
+		    echo "Information for $(basename $p):"
+		    bandit_db_get_package_info $(basename $p)
 		done
 		;;
 	    *) 

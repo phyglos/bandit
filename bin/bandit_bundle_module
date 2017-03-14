@@ -30,7 +30,6 @@ bandit_module_install()
 bandit_module()
 {
     local module_class=$1; shift    `# Module class`
-    local action=$1;       shift    `# Action verb`
     local module_name=$1;  shift    `# Module name`
 
     # Check whether the module plugin exists
@@ -47,12 +46,12 @@ bandit_module()
     # Source module class tricks
     source $BANDIT_HOME/lib/modules/${module_class}.sh
     
-    # Perform module action
-    case $action in
+    # Perform module command
+    case $command in
 	build)
-	    echo "...no build required for modules..."
+	    echo "...no build command defined for modules..."
 	    ;;
-	raise|install)
+	install | raise )
 	    bandit_module_install ${module_name}
 	    ;;
     esac

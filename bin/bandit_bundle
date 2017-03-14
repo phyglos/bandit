@@ -20,10 +20,6 @@ source $BANDIT_HOME/bin/bandit_common
 
 bandit_bundle_do()
 {
-    local action=$1
-    local bundle=$2
-    local item=$3
-
     local stamp
     bandit_timestamp stamp
 
@@ -32,7 +28,7 @@ bandit_bundle_do()
     BUILD_SCRIPTS=$BANDIT_HOME/etc/bundles/$bundle.dir
     BUILD_SOURCES=$BANDIT_ORIG/$bundle
     BUILD_DESTDIR=$BANDIT_DEST/$bundle
-    BUILD_LOGS=$BANDIT_LOGS/bundles/$bundle.$action-${stamp}
+    BUILD_LOGS=$BANDIT_LOGS/bundles/$bundle.$command-${stamp}
     BUILD_WORK=$BANDIT_WORK/$bundle-${stamp}
 
     # Source bundle description
@@ -68,7 +64,7 @@ bandit_bundle_do()
     bandit_mkdir $BUILD_SOURCES
     bandit_mkdir $BUILD_DESTDIR 
     bandit_mkdir $BUILD_WORK 
-    if [ $action != "download" -a $action != "fetch" ]; then 
+    if [ $command != "download" -a $command != "fetch" ]; then 
 	bandit_mkdir $BUILD_LOGS
     fi
 
@@ -86,7 +82,7 @@ bandit_bundle_do()
 	# Ignore all other items, when just one package or script is selected
 	if [ "${item}" != "all" ] && [ "${item}" != "${words[2]}" ]; then continue; fi
 
-	case $action in 
+	case $command in 
 	    config)
 		bandit_package_do config ${words[*]:2}
 		;;
@@ -94,14 +90,14 @@ bandit_bundle_do()
 		case ${words[0]} in
 		    package)
 			case ${words[1]} in
-			    "do")
-				bandit_package_do $action ${words[*]:2}
+			    do)
+				bandit_package_do ${words[*]:2}
 				;;
 			esac
 			;;
 		    script)
-			if [ $action == "download" ]; then continue; fi
-			if [ $action == "fetch" ]; then continue; fi
+			if [ $command == "download" ]; then continue; fi
+			if [ $command == "fetch" ]; then continue; fi
 			case ${words[1]} in
 			    run) 
 				bandit_script_run ${words[*]:2}
@@ -109,11 +105,11 @@ bandit_bundle_do()
 			esac
 			;;
 		    module)
-			if [ $action == "download" ]; then continue; fi
-			if [ $action == "fetch" ]; then continue; fi
+			if [ $command == "download" ]; then continue; fi
+			if [ $command == "fetch" ]; then continue; fi
 			case ${words[1]} in
 			    perl5)
-				bandit_module perl5 $action ${words[*]:2}
+				bandit_module perl5 ${words[*]:2}
 				;;
 			esac
 			;;
@@ -123,8 +119,8 @@ bandit_bundle_do()
 		case ${words[0]} in
 		    package)
 			case ${words[1]} in
-			    "do")
-				bandit_package_do $action ${words[*]:2}
+			    do)
+				bandit_package_do ${words[*]:2}
 				;;
 			esac
 			;;
@@ -138,7 +134,7 @@ bandit_bundle_do()
 		    module)
 			case ${words[1]} in
 			    perl5)
-				bandit_module perl5 $action ${words[*]:2}
+				bandit_module perl5 ${words[*]:2}
 				;;
 			esac
 			;;
@@ -153,12 +149,13 @@ bandit_bundle_do()
     rm -rf $BUILD_WORK 
 
     # Update system databases
-    if [ $action != "download" -a $action != "fetch" ]; then 
+    if [ $command != "download" -a $command != "fetch" ]; then 
 	# except for the unprivileged 'bandit' user at HOST
 	if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
 	    echo 
-	    echo "Updating system databases..."
+	    echo "Updating system database..."
 	    [ -x /usr/bin/updatedb ] && updatedb
+	    echo "Updating man pages database..."
 	    [ -x /usr/bin/mandb ]    && mandb &> /dev/null
 	fi
     fi

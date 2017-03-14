@@ -12,9 +12,9 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
-#---
+###------------------------------
 # Fetch and prepare functions
-#---
+###------------------------------
 
 bandit_package_get_origins()
 {
@@ -40,6 +40,10 @@ bandit_package_get_origins()
     unset URL[*], MD5[*], ADD[*] 2>/dev/null
 }
 
+#---
+# Work with sources
+#---
+
 bandit_package_fetch_sources()
 {
     # $1 = download -> do not use cache, force download
@@ -55,7 +59,7 @@ bandit_package_fetch_sources()
 
 	if [ -r $BUILD_SOURCES/$file ]; then
 	    # Fetch from local cache if already exists
-	    bandit_msg "...fetching $file from local cache..."
+	    bandit_msg "...fetching $file from sources cache..."
 
 	    # just check for MD5 
 	    bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
@@ -71,17 +75,18 @@ bandit_package_fetch_sources()
 		    ;;
 		ftp*|http*)
 		    # Download from URL into BUILD_SOURCES
-		    bandit_msg "...fetching $file from remote origin..."
+		    bandit_msg "...fetching $file from source origin..."
 		    wget ${sources_fetch_url[i]} \
 			 --directory-prefix=$BUILD_SOURCES \
 			 --no-verbose \
 			 --no-clobber
 		    if [[ $? != 0 ]]; then
 			bandit_msg "Connection error to ${sources_fetch_url[i]}" red;
+		    else
+			# Check if MD5 is correct
+			echo ${sources_fetch_md5[i]} > $BUILD_SOURCES/$file.md5
+			bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
 		    fi
-		    # Check if MD5 is correct
-		    echo ${sources_fetch_md5[i]} > $BUILD_SOURCES/$file.md5
-		    bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
 		    ;;
 	    esac
 	fi
@@ -104,8 +109,54 @@ bandit_package_prepare_sources()
     tar -xf ${sources_tarball[0]}
 }
 
+#---
+# Work with builds
+#---
+
+bandit_package_fetch_builds()
+{
+    # $1 = download -> do not use cache, force download
+
+    if [ "$1" == "download" ]; then
+	# Force downloading by removing files in local cache 
+	rm $BUILD_DESTDIR/$pack{,.md5} 2>/dev/null
+    fi
+
+    if [ -r $BUILD_DESTDIR/$pack ]; then
+	# Fetch from local cache if already exists
+	bandit_msg "...fetching $pack from builds cache ..."
+	# just check for MD5 
+	bandit_md5sum $BUILD_DESTDIR/$pack || bandit_exit
+    else
+	# Download from URL into BUILD_DEST
+	bandit_msg "...fetching $pack from build origin..."
+
+	# Temporary download archive
+	local archive
+	archive="ftp://phyglos.org/archive/phyglos-1.8.b2/builds/$bundle"
+
+	local file
+	file=$archive"/$pack"
+
+	wget ${file} \
+	     --directory-prefix=$BUILD_DESTDIR \
+	     --no-verbose \
+	     --no-clobber
+	if [[ $? != 0 ]]; then
+	    bandit_msg "Connection error to ${file}" red;
+	else
+	    # Check if MD5 is correct
+#	    echo ${file} > $BUILD_DEST/$file.md5
+#	    bandit_md5sum "$BUILD_DEST/$file" || bandit_exit
+:
+	fi
+    fi
+}
+
 bandit_package_prepare_build()
 {
+    # Create working directory
+    bandit_mkdir $package
     bandit_pushd $package
 
     # Patch libtool to avoid warnings due to staged build
@@ -121,22 +172,9 @@ bandit_package_prepare_build()
     fi
 }
 
-bandit_package_fetch_build()
-{
-    if [ -r $BUILD_DESTDIR/$pack ]; then
-	bandit_msg "...fetching $pack from local cache ..."
-	bandit_md5sum $BUILD_DESTDIR/$pack || bandit_exit
-    else
-	bandit_exit "BANDIT: Build $pack not found in local cache"
-    fi
-
-    # Create working directory
-    bandit_mkdir $package
-}
-
-#---
+###------------------------------
 # Package_command functions
-#---
+###------------------------------
 
 bandit_package_config()
 {
@@ -250,18 +288,16 @@ bandit_package_remove()
     ) 2>&1 > $BUILD_LOGS/$script.remove-${stamp}.log 
 }
 
-###---
+###------------------------------
 # Package DO
-###---
+###------------------------------
 
 bandit_package_do()
 {
-    local action=$1   `# Action to perform`
-    local option_from_cache=0 
-    if [ $2 == "--from-cache" ]; then option_from_cache=1; shift; fi
-    local package=$2  `# Package name`
-    local tartype=$3  `# Compression type`
-    local variant=$4  `# Script variant` 
+    # Parse the line from the bundle description file
+    local package=$1  `# Package name`
+    local tartype=$2  `# Compression type`
+    local variant=$3  `# Script variant` 
 
     bandit_log "$package${variant:+-}$variant [$(date)]"
 
@@ -295,67 +331,77 @@ bandit_package_do()
     pack=${script}-${BANDIT_TARGET_ARCH}-${BUILD_RELEASE}.tar.xz
 
     # Declare list of package origins
-    if [ $option_from_cache == 0 ]; then     
-	declare -a sources_fetch_url
-	declare -a sources_fetch_md5
-    else
-	# Sources are already set when --from-cache is used
-	:
-    fi
+    declare -a sources_fetch_url
+    declare -a sources_fetch_md5
     
     # Declare list of package tarball
     declare -a sources_tarball
 
-    case $action in
+    case $command in
 	download)
-	    bandit_package_get_origins
-	    bandit_package_fetch_sources download
-            bandit_package_prepare_sources
+	    case $command_params in
+		"--sources")
+		    bandit_package_get_origins
+		    bandit_package_fetch_sources download
+		    bandit_package_prepare_sources
+		    ;;
+		"--builds") 
+		    bandit_package_fetch_builds download
+		    ;;
+		"--all" )
+		    bandit_package_get_origins
+		    bandit_package_fetch_sources download
+		    bandit_package_prepare_sources
+		    bandit_package_fetch_builds download
+	    esac
 	    ;;
 	fetch)
-	    bandit_package_get_origins
-	    bandit_package_fetch_sources
-            bandit_package_prepare_sources
+	    case $command_params in
+		"--sources")
+		    bandit_package_get_origins
+		    bandit_package_fetch_sources
+		    bandit_package_prepare_sources
+		    ;;
+		"--builds") 
+		    bandit_package_fetch_builds 
+		    ;;
+		"--all" )
+		    bandit_package_get_origins
+		    bandit_package_fetch_sources
+		    bandit_package_prepare_sources
+		    bandit_package_fetch_builds 
+	    esac
 	    ;;
 	config)
-	    if [ $option_from_cache == 0 ]; then
-		# No need to get_origins and fetch
-		bandit_package_get_origins
-		bandit_package_fetch_sources
-	    fi
+	    bandit_package_get_origins
+	    bandit_package_fetch_sources
             bandit_package_prepare_sources
 	    bandit_package_prepare_build
 	    bandit_package_config
 	    bandit_popd 
 	    ;;
-	raise)
-	    # Copy and mix build and raise options code for bash3 compatibility
-	    if [ $option_from_cache == 0 ]; then
-		# No need to get_origins and fetch
-		bandit_package_get_origins
-		bandit_package_fetch_sources
-	    fi
-	    bandit_package_prepare_sources
-	    bandit_package_prepare_build
-	    bandit_package_build
-	    bandit_package_install
-	    bandit_package_setup
-	    bandit_popd 
-	    ;;
 	build)
-	    if [ $option_from_cache == 0 ]; then
-		# No need to get_origins and fetch
-		bandit_package_get_origins
-		bandit_package_fetch_sources
-	    fi
+	    bandit_package_get_origins
+	    bandit_package_fetch_sources
 	    bandit_package_prepare_sources
 	    bandit_package_prepare_build
 	    bandit_package_build
 	    bandit_popd 
 	    ;;
 	install)
-	    bandit_package_fetch_build
+	    bandit_package_fetch_builds
 	    bandit_package_prepare_build
+	    bandit_package_install
+	    bandit_package_setup
+	    bandit_popd 
+	    ;;
+	raise)
+	    # Copy and mix build and raise options code for bash3 compatibility
+	    bandit_package_get_origins
+	    bandit_package_fetch_sources
+	    bandit_package_prepare_sources
+	    bandit_package_prepare_build
+	    bandit_package_build
 	    bandit_package_install
 	    bandit_package_setup
 	    bandit_popd 

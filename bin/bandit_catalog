@@ -1,0 +1,123 @@
+#!/bin/bash
+#
+# bandit_catalog - BANDIT functions for catalogs
+#
+# Copyright (C) 2017 Angel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+###------------------------------
+# Fetch and prepare functions
+###------------------------------
+
+bandit_catalog_fetch()
+{
+    # $1 = download -> do not use cache, force download
+
+    # Check if remote URL is defined
+    [ $URL != "none" ] || bandit_exit "BANDIT: Catalog $catalog is not downloadable"
+
+    file=$(basename "${URL}")
+
+    if [ "$1" == "download" ]; then
+	# Force downloading by removing files in local cache 
+	rm $BANDIT_XCATALOGS/$file{,.md5} 2>/dev/null
+    fi
+
+    if [ -r $BANDIT_XCATALOGS/$file ]; then
+	# Fetch from local cache if already exists
+	bandit_msg "...fetching $file from catalogs cache ..."
+	# just check for MD5 
+	bandit_md5sum $BANDIT_XCATALOGS/$file || bandit_exit
+    else
+	# Download from URL into 
+	bandit_msg "...fetching $file from mirror..."
+
+	# Download catalog tarball
+	wget ${URL} \
+	     --directory-prefix=$BANDIT_XCATALOGS \
+	     --no-verbose \
+	     --no-clobber
+	if [[ $? != 0 ]]; then
+	    bandit_msg "Connection error to ${URL}" red;
+	else
+	    # Check if MD5 is correct
+	    echo ${MD5} > $BANDIT_XCATALOGS/$file.md5
+	    bandit_md5sum "$BANDIT_XCATALOGS/$file" || bandit_exit
+	fi
+    fi
+}
+
+###------------------------------
+# Catalog_command functions
+###------------------------------
+
+bandit_catalog_install()
+{
+    ## Install 
+    if [ -r $BANDIT_XCATALOGS/$file ]; then 
+	bandit_msg "...unpacking..."
+
+	bandit_timestamp stamp
+	tar -C $BANDIT_CATALOGS -xvf $BANDIT_XCATALOGS/$file \
+	    2>&1 > $BUILD_LOGS/$catalog.unpack-${stamp}.log 
+    fi
+}
+
+bandit_catalog_remove()
+{
+    bandit_msg "...removing..."
+
+    ## Remove
+    bandit_timestamp stamp
+    rm -rvf $BANDIT_CATALOGS/$catalog \
+       2>&1 > $BUILD_LOGS/$catalog.remove-${stamp}.log 
+}
+
+###------------------------------
+# Catalog DO
+###------------------------------
+
+bandit_catalog_do()
+{
+    local stamp
+    bandit_timestamp stamp
+
+    # Set directories 
+    BUILD_LOGS=$BANDIT_LOGS/catalogs/$catalog.$command-${stamp}
+
+    # Source catalog configuration
+    if [ -r $BANDIT_HOME/etc/catalogs/$catalog.conf ]; then 
+	source $BANDIT_HOME/etc/catalogs/$catalog.conf
+    else
+	bandit_exit "BANDIT: Cannot find $catalog.conf file"
+    fi
+
+    # Create working directories
+    bandit_mkdir $BANDIT_XCATALOGS
+    bandit_mkdir $BANDIT_CATALOGS/$catalog
+    if [ $command != "download" ]; then 
+	bandit_mkdir $BUILD_LOGS
+    fi
+
+    case $command in 
+	download)
+	    bandit_catalog_fetch download
+	    ;;
+	install)
+	    bandit_catalog_fetch 
+	    bandit_catalog_install
+	    ;;
+	remove)
+	    bandit_catalog_remove
+	    ;;
+    esac
+}
+export -f bandit_catalog_do
+

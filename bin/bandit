@@ -50,6 +50,13 @@ bandit_show_help()
     echo "     host clean   Cleans the HOST from previous installations"
     echo "     target init  Initialize the TARGET filesystem"
     echo
+    echo "Usage for catalogs: "
+    echo "  bandit -c|--catalog <catalog> <action>" 
+    echo "    <catalog>:     Name of the catalog"
+    echo "    <action>:"
+    echo "      download    Download the catalog"
+    echo "      install     Install the catalog"
+    echo
     echo "Usage for bundles: "
     echo "  bandit [-b|--bundle] <bundle> [-i|-item <item>] <action>" 
     echo "    <bundle>:     Name of the bundle"
@@ -87,7 +94,7 @@ case $1 in
 esac
 
 ###----------------------------------------
-# Working with bundles, packages and systems
+# Working with catalogs, bundles, packages and systems
 # Source files now.
 ###----------------------------------------
 
@@ -95,6 +102,7 @@ source $BANDIT_HOME/etc/bandit.conf
 source $BANDIT_HOME/bin/bandit_common
 source $BANDIT_HOME/bin/bandit_database
 source $BANDIT_HOME/bin/bandit_search
+source $BANDIT_HOME/bin/bandit_catalog
 source $BANDIT_HOME/bin/bandit_bundle
 
 #--- 
@@ -179,7 +187,24 @@ case $object in
 		    | tee $BANDIT_LOGS/bundles/${bundle}.$command-${stamp}.log
 		;;
 	    *) 
-		bandit_exit "BANDIT: Command ${command} not specified for bundles."
+		bandit_exit "BANDIT: Command ${command} not defined for bundles."
+		;;
+	esac
+	;;
+    -c|--catalog)
+	shift
+
+	# Get catalog 
+	catalog=${1}
+	
+	# Execute command
+	command=$2
+	case $command in
+	    download | install | remove)
+		bandit_catalog_do
+		;;
+	    *) 
+		bandit_exit "BANDIT: Command ${command} not defined for catalogs."
 		;;
 	esac
 	;;

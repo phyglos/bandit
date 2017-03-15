@@ -145,8 +145,8 @@ bandit_db_get_cache_sources()
   local _prefix=$2
   local _list=""
 
-  if [ -d $BANDIT_ORIG ]; then 
-      _list=$(find $BANDIT_ORIG -name "*${_prefix}*" | sort -d)
+  if [ -d $BANDIT_XSOURCES ]; then 
+      _list=$(find $BANDIT_XSOURCES -name "*${_prefix}*" | sort -d)
   fi
 
   eval $_retvar="'$_list'"
@@ -159,8 +159,8 @@ bandit_db_get_cache_builds()
   local _prefix=$2
   local _list=""
 
-  if [ -d $BANDIT_DEST ]; then 
-      _list=$(find $BANDIT_DEST -name "*${_prefix}*" | sort -d)
+  if [ -d $BANDIT_XBUILDS ]; then 
+      _list=$(find $BANDIT_XBUILDS -name "*${_prefix}*" | sort -d)
   fi
   
   eval $_retvar="'$_list'"

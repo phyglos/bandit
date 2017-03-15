@@ -26,8 +26,8 @@ bandit_bundle_do()
     # Make default directories available to the bundle scripts and origins
     BUILD_BUNDLES=$BANDIT_HOME/etc/bundles
     BUILD_SCRIPTS=$BANDIT_HOME/etc/bundles/$bundle.dir
-    BUILD_SOURCES=$BANDIT_ORIG/$bundle
-    BUILD_DESTDIR=$BANDIT_DEST/$bundle
+    BUILD_SOURCES=$BANDIT_XSOURCES/$bundle
+    BUILD_DESTDIR=$BANDIT_XBUILDS/$bundle
     BUILD_LOGS=$BANDIT_LOGS/bundles/$bundle.$command-${stamp}
     BUILD_WORK=$BANDIT_WORK/$bundle-${stamp}
 
@@ -58,7 +58,7 @@ bandit_bundle_do()
     #??
 
     # BUNDLE_SOURCES
-    BUILD_SOURCES=$BANDIT_ORIG/$BUNDLE_SOURCES
+    BUILD_SOURCES=$BANDIT_XSOURCES/$BUNDLE_SOURCES
     
     # Create working directories
     bandit_mkdir $BUILD_SOURCES

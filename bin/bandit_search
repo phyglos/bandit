@@ -19,6 +19,7 @@ bandit_search()
     local expr=$1
     local options=$2
 
+    local catalogs
     local bundles
     local files
     local items
@@ -32,7 +33,23 @@ bandit_search()
     # Search catalogs
     #---
     if [[ $options =~ "c" ]]; then
-	: # Not implemented
+	bandit_db_get_catalogs_available catalogs ${expr}
+	if [ -n "$catalogs" ]; then 
+	    echo "Catalogs available:"
+	    for catalog in ${catalogs[*]}
+	    do
+		echo "  "[$(basename $catalog)] 
+	    done
+	fi
+
+    	bandit_db_get_catalogs_installed catalogs ${expr}
+	if [ -n "$catalogs" ]; then 
+	    echo "Catalogs installed:"
+	    for catalog in ${catalogs[*]}
+	    do
+		echo "  "[$(basename $catalog)] 
+	    done
+	fi
     fi
     
     #---

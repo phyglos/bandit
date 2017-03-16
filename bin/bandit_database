@@ -16,6 +16,31 @@
 # Catalog database 
 ###------------------------------
 
+# Get available catalogs
+bandit_db_get_catalogs_available()
+{
+  local _retvar=$1
+  local _prefix=$2
+  local _list=""
+
+  _list=$(ls -1 $BANDIT_HOME/etc/catalogs/${_prefix}*.conf | sed "s/.conf//")
+  
+  eval $_retvar="'$_list'"
+}
+
+# Get installed catalogs
+bandit_db_get_catalogs_installed()
+{
+  local _retvar=$1
+  local _prefix=$2
+  local _list=""
+
+  if [ -d $BANDIT_CATALOGS ]; then 
+      _list=$(ls -1 $BANDIT_CATALOGS)
+  fi
+  
+  eval $_retvar="'$_list'"
+}
 
 ###------------------------------
 # Bundles database 

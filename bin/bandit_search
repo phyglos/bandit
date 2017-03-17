@@ -24,15 +24,15 @@ bandit_search()
     local files
     local items
     local lines
-    local words
     local name
+    local words
 
-    if [ "$expr" == "all" ]; then expr='[a-z]'; fi
+    if [ "$expr" == "all" -o "$expr" == "" ]; then expr='[a-z]'; fi
 
     #---
     # Search catalogs
     #---
-    if [[ $options =~ "c" ]]; then
+    if [[ $options =~ "c" ]] && [[ ! $expr =~ "/" ]]; then
 	bandit_db_get_catalogs_available catalogs ${expr}
 	if [ -n "$catalogs" ]; then 
 	    echo "Catalogs available:"
@@ -55,39 +55,43 @@ bandit_search()
     #---
     # Search bundles
     #---
-    if [[ $options =~ "b" ]]; then 
+    if [[ $options =~ "b" ]] && [[ ! $expr =~ "/" ]]; then 
 	bandit_db_get_bundles_available bundles ${expr}
 	if [ -n "$bundles" ]; then 
 	    echo "Bundles available:"
 	    for bundle in ${bundles[*]}
 	    do
+		catalog=${bundle/$BANDIT_CATALOGS\//}
+		catalog=${catalog/\/bundles\/*.desc/}
 		name=$(basename $bundle)
-		echo "  "[${name/.desc/}] 
+		echo "  "[${catalog}] ${name/\.desc/}
 	    done
 	fi
     fi
-
+    
     #---
     # Search items
     #---
-    if [[ $options =~ "i" ]]; then 
+    if [[ $options =~ "i" ]] && [[ ! $expr =~ "/" ]]; then
 	bandit_db_get_bundle_items_available items ${expr}
 	if [ -n "$items" ]; then 
 	    echo "Bundle items available:"
 	    lines=(${items})
 	    for line in ${lines[*]}
 	    do
-		OLD=$IFS IFS="|" words=(${line[*]}) IFS=$OLD 
-		bundle=$(basename ${words[0]})
-		echo "  "[${bundle/.desc/}] $item ${words[1]} ${words[2]}
+	    	bundle=${line/$BANDIT_CATALOGS\//}
+		bundle=${bundle/\/bundles/}
+		bundle=${bundle/\.dir*/}
+		name=$(basename $line)
+		echo "  "[${bundle}] ${name/.sh/}
 	    done
 	fi
     fi
-
+    
     #---
     # Search cache
     #---
-    if [[ $options =~ "x" ]]; then 
+    if [[ $options =~ "x" ]] && [[ ! $expr =~ "/" ]]; then
 	bandit_db_get_cache_sources files ${expr}
 	if [ -n "$files" ]; then 
 	    echo "Sources in cache:"
@@ -109,7 +113,7 @@ bandit_search()
 	    done
 	fi
     fi
-
+    
     #---
     # Installed files
     #---
@@ -129,7 +133,7 @@ bandit_search()
     #---
     # Search logs
     #---
-    if [[ $options =~ "l" ]]; then 
+    if [[ $options =~ "l" ]] && [[ ! $expr =~ "/" ]]; then
 	bandit_db_get_log_entries logs ${expr}
 	if [ -n "$logs" ]; then 
 	    echo "Log entries:"

@@ -24,42 +24,40 @@ bandit_bundle_do()
     bandit_timestamp stamp
 
     # Make default directories available to the bundle scripts and origins
-    BUILD_BUNDLES=$BANDIT_HOME/etc/bundles
-    BUILD_SCRIPTS=$BANDIT_HOME/etc/bundles/$bundle.dir
+    BUILD_BUNDLES=$BANDIT_CATALOGS/$catalog/bundles
+    BUILD_ORIGINS=$BANDIT_CATALOGS/$catalog/origins
+    BUILD_SCRIPTS=$BUILD_BUNDLES/$bundle.dir
     BUILD_SOURCES=$BANDIT_XSOURCES/$bundle
     BUILD_DESTDIR=$BANDIT_XBUILDS/$bundle
     BUILD_LOGS=$BANDIT_LOGS/bundles/$bundle.$command-${stamp}
     BUILD_WORK=$BANDIT_WORK/$bundle-${stamp}
 
     # Source bundle description
-    if [ -r $BANDIT_HOME/etc/bundles/$bundle.desc ]; then
-	source $BANDIT_HOME/etc/bundles/$bundle.desc
+    if [ -r $BUILD_BUNDLES/$bundle.desc ]; then
+	source $BUILD_BUNDLES/$bundle.desc
     else
-	bandit_exit "BANDIT: Cannot find $bundle.desc file"
+	bandit_exit "BANDIT: Cannot find $bundle description file"
     fi
 
     # Source bundle configuration
-    if [ -r $BANDIT_HOME/etc/bundles/$bundle.conf ]; then 
-	source $BANDIT_HOME/etc/bundles/$bundle.conf
+    if [ -r $BUILD_BUNDLES/$bundle.conf ]; then 
+	source $BUILD_BUNDLES/$bundle.conf
     else
 	bandit_exit "BANDIT: Cannot find $bundle.conf file"
     fi
 
     ## Clobber default variables
 
+    # BUILD_ORIGIN
+    BUILD_ORIGIN=$BUILD_ORIGINS/$BUNDLE_ORIGIN
+    
+    # BUILD_RELEASE
+    BUILD_RELEASE=${BUNDLE_RELEASE:-$BANDIT_BUILD_RELEASE}
+
     # Keep or remove *.la files from libtool?
     BUILD_KEEP_LA=${BUNDLE_KEEP_LA:-$BANDIT_BUILD_KEEP_LA}
 
-    ## Check for variables:
-    # BUNDLE_RELEASE
-    BUILD_RELEASE=${BUNDLE_RELEASE:-$BANDIT_BUILD_RELEASE}
-
-    # BUNDLE_CATALOG
-    #??
-
-    # BUNDLE_SOURCES
-    BUILD_SOURCES=$BANDIT_XSOURCES/$BUNDLE_SOURCES
-    
+   
     # Create working directories
     bandit_mkdir $BUILD_SOURCES
     bandit_mkdir $BUILD_DESTDIR 

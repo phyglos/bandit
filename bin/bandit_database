@@ -34,11 +34,11 @@ bandit_db_get_catalogs_available()
 bandit_db_get_catalogs_installed()
 {
   local retvar=$1
-  local prefix=$2
+  local expr=$2
   local list=""
 
   if [ -d $BANDIT_CATALOGS ]; then
-      list=$(find $BANDIT_CATALOGS/* -maxdepth 0 -type d -name "${prefix}*" )
+      list=$(find $BANDIT_CATALOGS/* -maxdepth 0 -type d -name "${expr}*" )
   fi
   
   eval $retvar="'$list'"

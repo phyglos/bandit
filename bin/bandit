@@ -131,7 +131,7 @@ case $1 in
 
 	# Skip options so expression is left in $1
 	shift $((OPTIND-1))
-	bandit_search ${1} ${options} | more
+	bandit_search "${1}" "${options}" | more
 	exit 0
 	;;
 esac
@@ -150,6 +150,16 @@ case $object in
 	if [ $object != "--default" ]; then shift; fi
 	bundle=$1; shift
 
+	# Select catalog to work with
+	echo "Select the catalog to work with:"
+	echo "0) overlaid"
+	select option in ${BANDIT_CATALOG_LIST[*]}; do
+	    catalog=${option/$BANDIT_CATALOGS\//}
+	    catalog=${catalog/\/bundles*/}
+	    break
+	done
+	echo "Working with catalog $catalog"
+	
 	# Get optional item in the bundle
 	item="all"
 	case $1 in 

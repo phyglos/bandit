@@ -25,10 +25,8 @@ bandit_bundle_do()
 
     # Make default directories available to the bundle scripts and origins
     BUILD_BUNDLES=$BANDIT_CATALOGS/$catalog/bundles
+    BUILD_SCRIPTS=$BANDIT_CATALOGS/$catalog/bundles/$bundle.dir
     BUILD_ORIGINS=$BANDIT_CATALOGS/$catalog/origins
-    BUILD_SCRIPTS=$BUILD_BUNDLES/$bundle.dir
-    BUILD_SOURCES=$BANDIT_XSOURCES/$bundle
-    BUILD_DESTDIR=$BANDIT_XBUILDS/$bundle
     BUILD_LOGS=$BANDIT_LOGS/bundles/$bundle.$command-${stamp}
     BUILD_WORK=$BANDIT_WORK/$bundle-${stamp}
 
@@ -48,10 +46,12 @@ bandit_bundle_do()
 
     ## Clobber default variables
 
-    # BUILD_ORIGIN
+    # Sources
     BUILD_ORIGIN=$BUILD_ORIGINS/$BUNDLE_ORIGIN
-    
-    # BUILD_RELEASE
+    BUILD_SOURCES=$BANDIT_XSOURCES/$BUNDLE_ORIGIN
+
+    # Build packs
+    BUILD_DESTDIR=$BANDIT_XBUILDS/$bundle
     BUILD_RELEASE=${BUNDLE_RELEASE:-$BANDIT_BUILD_RELEASE}
 
     # Keep or remove *.la files from libtool?

@@ -30,7 +30,7 @@ bandit_package_get_origins()
     if [ -n $ADD ]; then
 	for payload in ${ADD[*]}; do
 	    unset URL[*], MD5[*] 2>/dev/null
-	    source $catalog/$payload
+	    source $BUILD_ORIGIN/sources/$payload
 	    sources_fetch_url=(${sources_fetch_url[*]} ${URL[*]})
 	    sources_fetch_md5=(${sources_fetch_md5[*]} ${MD5[*]})
 	done
@@ -78,7 +78,7 @@ bandit_package_fetch_sources()
 		    bandit_msg "...fetching $file from source origin..."
 		    wget ${sources_fetch_url[i]} \
 			 --directory-prefix=$BUILD_SOURCES \
-			 --no-verbose \
+			 --quiet \
 			 --no-clobber
 		    if [[ $? != 0 ]]; then
 			bandit_msg "Connection error to ${sources_fetch_url[i]}" red;
@@ -99,7 +99,7 @@ bandit_package_fetch_sources()
 bandit_package_prepare_sources()
 {
     # Custom sources preparation
-    if bandit_script_has $catalog/$package sources_prepare; then
+    if bandit_script_has $BUILD_ORIGIN/sources/$package sources_prepare; then
 	bandit_msg "...preparing sources..."
 	# Refactor or rename tarball and payload
 	sources_prepare $sources_tarball
@@ -140,11 +140,13 @@ bandit_package_fetch_builds()
 
 	wget ${file} \
 	     --directory-prefix=$BUILD_DESTDIR \
-	     --no-verbose \
+	     --quiet \
 	     --no-clobber
 	if [[ $? != 0 ]]; then
 	    bandit_msg "Connection error to ${file}" red;
 	else
+	    # Temporary MD5 creation
+	    md5sum $BUILD_DESTDIR/${pack} > $BUILD_DESTDIR/${pack}.md5
 	    # Check if MD5 is correct
 #	    echo ${file} > $BUILD_DEST/$file.md5
 #	    bandit_md5sum "$BUILD_DEST/$file" || bandit_exit

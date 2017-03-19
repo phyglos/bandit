@@ -26,6 +26,10 @@ bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_HOME
 cp    $BANDIT_HOME/*             $BANDIT_HOST_TGT_MNT$BANDIT_HOME 2&>/dev/null
 cp -R $BANDIT_HOME/{bin,etc,lib} $BANDIT_HOST_TGT_MNT$BANDIT_HOME 
 
+bandit_msg "Copying catalogs in the TARGET filesystem..."
+bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_CATALOGS
+cp -R $BANDIT_CATALOGS/* $BANDIT_HOST_TGT_MNT$BANDIT_CATALOGS
+
 bandit_msg "Copying caches in the TARGET filesystem..."
 bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XSOURCES
 cp -R $BANDIT_XSOURCES/* $BANDIT_HOST_TGT_MNT$BANDIT_XSOURCES

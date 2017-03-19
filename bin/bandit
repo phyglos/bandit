@@ -151,15 +151,17 @@ case $object in
 	bundle=$1; shift
 
 	# Select catalog to work with
-	echo "Select the catalog to work with:"
-	echo "0) overlaid"
-	select option in ${BANDIT_CATALOG_LIST[*]}; do
-	    catalog=${option/$BANDIT_CATALOGS\//}
-	    catalog=${catalog/\/bundles*/}
-	    break
-	done
+	if (( ${#BANDIT_CATALOG_LIST[*]} == 1 )); then
+	    catalog=${BANDIT_CATALOG_LIST}
+	else
+	    echo "Select the catalog to work with:"
+	    select option in ${BANDIT_CATALOG_LIST[*]}; do
+		catalog=${option}
+		break
+	    done
+	fi
 	echo "Working with catalog $catalog"
-	
+
 	# Get optional item in the bundle
 	item="all"
 	case $1 in 

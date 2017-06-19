@@ -13,6 +13,39 @@
 #
 
 ###------------------------------
+# BANDIT paths helpers
+###------------------------------
+
+bandit_path_get_catalog()
+{
+    local _retval=$1
+    
+    eval "$_retval"=$(basename $(dirname $(dirname $(dirname $2))))
+}
+
+bandit_path_get_bundle()
+{
+    local _retval=$1
+    local b
+    
+    b=$(basename $(dirname $2))
+    b=${b/.dir/}
+    
+    eval "$_retval"=$b
+}
+
+bandit_path_get_package()
+{
+    local _retval=$1
+    local p
+    
+    p=$(basename $2)
+    p=${p/.sh/}
+    
+    eval "$_retval"=$p
+}
+
+###------------------------------
 # Directory helpers
 ###------------------------------
 

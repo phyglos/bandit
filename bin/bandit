@@ -12,8 +12,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
-#RELEASE=RELEASE_MAJOR_MINOR_REVISION
-RELEASE=1.3.b2
+RELEASE=RELEASE_MAJOR_MINOR_REVISION
 
 ###----------------------------------------
 # Simple information displaying commands. 

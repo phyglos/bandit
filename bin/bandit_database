@@ -13,21 +13,70 @@
 #
 
 ###------------------------------
+# Repository database 
+###------------------------------
+
+# Get configured repositories
+bandit_db_get_repositories_configured()
+{
+  local retvar=$1
+  local expr=$2
+  local list=""
+
+  if [ -d $BANDIT_HOME/etc/repositories ]; then
+      list=$(find $BANDIT_HOME/etc/repositories/* -name "${expr}*" | sort)
+  fi
+
+  eval $retvar="'$list'"
+}
+
+# Get enabled repositories
+bandit_db_get_repositories_enabled()
+{
+  local retvar=$1
+
+  eval $retvar="'${BANDIT_REPOSITORY_LIST[*]}'"
+}
+
+# Get installed repositories
+bandit_db_get_repositories_installed()
+{
+  local retvar=$1
+  local expr=$2
+  local list=""
+
+  if [ -d $BANDIT_REPOSITORIES/* ]; then
+      list=$(find $BANDIT_REPOSITORIES/* -maxdepth 0 -type d -name "${expr}*" )
+  fi
+  
+  eval $retvar="'$list'"
+}
+
+
+###------------------------------
 # Catalog database 
 ###------------------------------
 
-# Get available catalogs
-bandit_db_get_catalogs_available()
+# Get configured catalogs
+bandit_db_get_catalogs_configured()
 {
   local retvar=$1
   local expr=$2
   local list=""
 
   if [ -d $BANDIT_HOME/etc/catalogs ]; then
-      list=$(find $BANDIT_HOME/etc/catalogs -name "${expr}*.conf" | sed "s/.conf//" | sort)
+      list=$(find $BANDIT_HOME/etc/catalogs/* -name "${expr}*" | sort)
   fi
 
   eval $retvar="'$list'"
+}
+
+# Get enabled catalogs
+bandit_db_get_catalogs_enabled()
+{
+  local retvar=$1
+
+  eval $retvar="'${BANDIT_CATALOG_LIST[*]}'"
 }
 
 # Get installed catalogs
@@ -93,8 +142,8 @@ bandit_db_get_packages_available()
   local prefix=$2
   local list=""
 
-  if [ -d $BANDIT_HOME/etc/bundles ]; then 
-      list=$(find $BANDIT_HOME/etc/bundles -name ${prefix}.sh)
+  if [ -d $BANDIT_CATALOGS ]; then 
+      list=$(find $BANDIT_CATALOGS/**/bundles/* -name ${prefix}.sh)
   fi
 
   eval $retvar="'$list'"

@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# bandit_search - BANDIT functions for searches
+# bandit_search - functions for BANDIT searches
 #
 # Copyright (C) 2016-2017 Angel Linares Zapater
 #
@@ -11,8 +11,6 @@
 # This program is distributed WITHOUT ANY WARRANTY; without even the 
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
-
-source $BANDIT_HOME/bin/bandit_database
 
 bandit_search()
 {
@@ -30,12 +28,46 @@ bandit_search()
     if [ "$expr" == "all" -o "$expr" == "" ]; then expr='[a-z]'; fi
 
     #---
+    # Search repositories
+    #---
+    if [[ $options =~ "r" ]]; then
+
+	bandit_db_get_repositories_configured repositories ${expr}
+	if [ -n "$repositories" ]; then 
+	    echo "Repositories (configured):"
+	    for repository in ${repositories[*]}
+	    do
+		echo "  "[$(basename $repository)] 
+	    done
+	fi
+
+    	bandit_db_get_repositories_installed repositories ${expr}
+	if [ -n "$repositories" ]; then 
+	    echo "Repositories (installed):"
+	    for repository in ${repositories[*]}
+	    do
+		echo "  "[$(basename $repository)] 
+	    done
+	fi
+	
+	bandit_db_get_repositories_enabled repositories
+	if [ -n "$repositories" ]; then 
+	    echo "Repositories (enabled):"
+	    for repository in ${repositories[*]}
+	    do
+		echo "  "[$(basename $repository)] 
+	    done
+	fi
+    fi
+    
+    #---
     # Search catalogs
     #---
     if [[ $options =~ "c" ]] && [[ ! $expr =~ "/" ]]; then
-	bandit_db_get_catalogs_available catalogs ${expr}
+
+	bandit_db_get_catalogs_configured catalogs ${expr}
 	if [ -n "$catalogs" ]; then 
-	    echo "Catalogs available:"
+	    echo "Catalogs (configured):"
 	    for catalog in ${catalogs[*]}
 	    do
 		echo "  "[$(basename $catalog)] 
@@ -44,7 +76,16 @@ bandit_search()
 
     	bandit_db_get_catalogs_installed catalogs ${expr}
 	if [ -n "$catalogs" ]; then 
-	    echo "Catalogs installed:"
+	    echo "Catalogs (installed):"
+	    for catalog in ${catalogs[*]}
+	    do
+		echo "  "[$(basename $catalog)] 
+	    done
+	fi
+	
+	bandit_db_get_catalogs_enabled catalogs
+	if [ -n "$catalogs" ]; then 
+	    echo "Catalogs (enabled):"
 	    for catalog in ${catalogs[*]}
 	    do
 		echo "  "[$(basename $catalog)] 
@@ -58,7 +99,7 @@ bandit_search()
     if [[ $options =~ "b" ]] && [[ ! $expr =~ "/" ]]; then 
 	bandit_db_get_bundles_available bundles ${expr}
 	if [ -n "$bundles" ]; then 
-	    echo "Bundles available:"
+	    echo "Bundles (available):"
 	    for bundle in ${bundles[*]}
 	    do
 		catalog=${bundle/$BANDIT_CATALOGS\//}
@@ -75,7 +116,7 @@ bandit_search()
     if [[ $options =~ "i" ]] && [[ ! $expr =~ "/" ]]; then
 	bandit_db_get_bundle_items_available items ${expr}
 	if [ -n "$items" ]; then 
-	    echo "Bundle items available:"
+	    echo "Bundle items (available):"
 	    lines=(${items})
 	    for line in ${lines[*]}
 	    do
@@ -120,7 +161,7 @@ bandit_search()
     if [[ $options =~ "f" ]]; then 
 	bandit_db_get_files_installed files ${expr}
 	if [ -n "$files" ]; then 
-	    echo "Installed files:"
+	    echo "Files (installed):"
 	    lines=(${files})
 	    for line in ${lines[*]}
 	    do

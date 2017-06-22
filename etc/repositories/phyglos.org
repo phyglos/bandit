@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# phyglos.org bandit repository
+#
+
+# Repository mirrors
+REPOSITORY_MIRRORS=(
+    ftp://phyglos.org/mirror
+)
+

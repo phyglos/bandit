@@ -1,0 +1,137 @@
+#!/bin/bash
+#
+# bandit_repository - functions for BANDIT repositories
+#
+# Copyright (C) 2017 Angel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+###------------------------------
+# Repository_command functions
+###------------------------------
+
+bandit_repository_fetch()
+{
+    # $1 = download -> do not use cache, force download
+
+    if [ "$1" == "download" ]; then
+	# Force downloading by removing files in local cache 
+	rm -rf $BANDIT_XREPOSITORIES/$REPOSITORY 2>/dev/null
+    fi
+
+    if [ -r $BANDIT_XREPOSITORIES/$REPOSITORY ]; then
+	# Fetch from local cache if already exists
+	bandit_msg "...fetching repository $repository from repositories cache ..."
+	# just check for MD5 --> TODO: signature
+	###bandit_md5sum $BANDIT_XREPOSITORIES/$REPOSITORY || bandit_exit
+    else
+	for mirror in ${REPOSITORY_MIRRORS[*]}; do
+	    # Download manifest from mirror
+	    bandit_msg "...fetching repository manifest from mirror $mirror..."
+
+	    # Download repository manifest
+	    wget ${mirror}/$REPOSITORY/manifest \
+		 --directory-prefix=$BANDIT_XREPOSITORIES/$REPOSITORY \
+		 --timestamping \
+		 --quiet 
+	    if [[ $? != 0 ]]; then
+		bandit_msg "Connection error to ${mirror}" red;
+	    else
+		# Check signature
+		echo "...checking manifest signature..."
+		MIRROR=$mirror
+		break
+	    fi
+	done
+    fi
+}
+
+bandit_repository_install()
+{
+    ## Install 
+    if [ -r $BANDIT_XREPOSITORIES/$file ]; then 
+	bandit_msg "...installing..."
+
+	bandit_timestamp stamp
+	(
+	    bandit_mkdir $BANDIT_REPOSITORIES/$REPOSITORY
+	    cp -vR $BANDIT_XREPOSITORIES/$REPOSITORY $BANDIT_REPOSITORIES
+	) 2>&1 > $BUILD_LOGS/$REPOSITORY.install-${stamp}.log 
+    fi
+}
+
+bandit_repository_remove()
+{
+    bandit_msg "...removing..."
+
+    ## Remove
+    bandit_timestamp stamp
+
+    rm -vrf $BANDIT_REPOSITORIES/$REPOSITORY \
+       2>&1 > $BUILD_LOGS/$REPOSITORY.remove-${stamp}.log
+}
+
+bandit_repository_upgrade()
+{
+    # Fetch manifest
+    source $BANDIT_REPOSITORIES/$REPOSITORY/manifest
+
+    # Install catalogs
+    let len=${#CATALOGS[*]}
+    for ((i=0; i<len; i++)); do
+	CATALOG=${CATALOGS[i]}
+	CATALOG_MD5=${CATALOGS_MD5[i]}
+	bandit_catalog_do
+    done
+}
+
+###------------------------------
+# Repository DO
+###------------------------------
+
+bandit_repository_do()
+{
+    local stamp
+    bandit_timestamp stamp
+
+    # Source repository configuration
+    if [ -r $BANDIT_HOME/etc/repositories/$REPOSITORY ]; then 
+	source $BANDIT_HOME/etc/repositories/$REPOSITORY
+    else
+	bandit_exit "BANDIT: Cannot find '$REPOSITORY' repository file"
+    fi
+
+    # Set directories 
+    BUILD_LOGS=$BANDIT_LOGS/repositories/$REPOSITORY.$COMMAND-${stamp}
+
+    # Create working directories
+    if [ $COMMAND != "download" ]; then 
+	bandit_mkdir $BUILD_LOGS
+    fi
+
+    case $COMMAND in
+	download)
+	    bandit_repository_fetch download
+	    ;;
+	install)
+	    bandit_repository_fetch 
+	    bandit_repository_install
+	    ;;
+	remove)
+	    bandit_repository_remove
+	    ;;
+	upgrade)
+	    bandit_repository_fetch download
+	    bandit_repository_install
+	    bandit_repository_upgrade
+	    ;;
+    esac
+}
+export -f bandit_repository_do
+

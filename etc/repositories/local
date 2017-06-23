@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# local repository
+#
+
+# Repository mirrors
+REPOSITORY_MIRRORS=(
+    file:$BANDIT_REPOSITORIES
+)
+

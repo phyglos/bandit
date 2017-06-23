@@ -24,24 +24,24 @@ bandit_bundle_do()
     bandit_timestamp stamp
 
     # Make default directories available to the bundle scripts and origins
-    BUILD_BUNDLES=$BANDIT_CATALOGS/$catalog/bundles
-    BUILD_SCRIPTS=$BANDIT_CATALOGS/$catalog/bundles/$bundle.dir
-    BUILD_ORIGINS=$BANDIT_CATALOGS/$catalog/origins
-    BUILD_LOGS=$BANDIT_LOGS/bundles/$bundle.$command-${stamp}
-    BUILD_WORK=$BANDIT_WORK/$bundle-${stamp}
+    BUILD_BUNDLES=$BANDIT_CATALOGS/$CATALOG/bundles
+    BUILD_SCRIPTS=$BANDIT_CATALOGS/$CATALOG/bundles/$BUNDLE.dir
+    BUILD_ORIGINS=$BANDIT_CATALOGS/$CATALOG/origins
+    BUILD_LOGS=$BANDIT_LOGS/bundles/$BUNDLE.$COMMAND-${stamp}
+    BUILD_WORK=$BANDIT_WORK/$BUNDLE-${stamp}
 
     # Source bundle description
-    if [ -r $BUILD_BUNDLES/$bundle.desc ]; then
-	source $BUILD_BUNDLES/$bundle.desc
+    if [ -r $BUILD_BUNDLES/$BUNDLE.desc ]; then
+	source $BUILD_BUNDLES/$BUNDLE.desc
     else
 	bandit_exit "BANDIT: Cannot find $bundle description file"
     fi
 
     # Source bundle configuration
-    if [ -r $BUILD_BUNDLES/$bundle.conf ]; then 
-	source $BUILD_BUNDLES/$bundle.conf
+    if [ -r $BUILD_BUNDLES/$BUNDLE.conf ]; then 
+	source $BUILD_BUNDLES/$BUNDLE.conf
     else
-	bandit_exit "BANDIT: Cannot find $bundle.conf file"
+	bandit_exit "BANDIT: Cannot find $BUNDLE.conf file"
     fi
 
     ## Clobber default variables
@@ -51,18 +51,17 @@ bandit_bundle_do()
     BUILD_SOURCES=$BANDIT_XSOURCES/$BUNDLE_ORIGIN
 
     # Build packs
-    BUILD_DESTDIR=$BANDIT_XBUILDS/$bundle
+    BUILD_DESTDIR=$BANDIT_XBUILDS/$BUNDLE
     BUILD_RELEASE=${BUNDLE_RELEASE:-$BANDIT_BUILD_RELEASE}
 
     # Keep or remove *.la files from libtool?
     BUILD_KEEP_LA=${BUNDLE_KEEP_LA:-$BANDIT_BUILD_KEEP_LA}
-
    
     # Create working directories
     bandit_mkdir $BUILD_SOURCES
     bandit_mkdir $BUILD_DESTDIR 
     bandit_mkdir $BUILD_WORK 
-    if [ $command != "download" -a $command != "fetch" ]; then 
+    if [ $COMMAND != "download" -a $COMMAND != "fetch" ]; then 
 	bandit_mkdir $BUILD_LOGS
     fi
 
@@ -78,9 +77,9 @@ bandit_bundle_do()
 	words=( $line )
 
 	# Ignore all other items, when just one package or script is selected
-	if [ "${item}" != "all" ] && [ "${item}" != "${words[2]}" ]; then continue; fi
+	if [ "${ITEM}" != "all" ] && [ "${ITEM}" != "${words[2]}" ]; then continue; fi
 
-	case $command in 
+	case $COMMAND in 
 	    config)
 		bandit_package_do config ${words[*]:2}
 		;;
@@ -94,8 +93,8 @@ bandit_bundle_do()
 			esac
 			;;
 		    script)
-			if [ $command == "download" ]; then continue; fi
-			if [ $command == "fetch" ]; then continue; fi
+			if [ $COMMAND == "download" ]; then continue; fi
+			if [ $COMMAND == "fetch" ]; then continue; fi
 			case ${words[1]} in
 			    run) 
 				bandit_script_run ${words[*]:2}
@@ -103,8 +102,8 @@ bandit_bundle_do()
 			esac
 			;;
 		    module)
-			if [ $command == "download" ]; then continue; fi
-			if [ $command == "fetch" ]; then continue; fi
+			if [ $COMMAND == "download" ]; then continue; fi
+			if [ $COMMAND == "fetch" ]; then continue; fi
 			case ${words[1]} in
 			    perl5)
 				bandit_module perl5 ${words[*]:2}
@@ -147,7 +146,7 @@ bandit_bundle_do()
     rm -rf $BUILD_WORK 
 
     # Update system databases
-    if [ $command != "download" -a $command != "fetch" ]; then 
+    if [ $COMMAND != "download" -a $COMMAND != "fetch" ]; then 
 	# except for the unprivileged 'bandit' user at HOST
 	if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
 	    echo 

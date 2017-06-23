@@ -45,7 +45,7 @@ bandit_db_get_repositories_installed()
   local expr=$2
   local list=""
 
-  if [ -d $BANDIT_REPOSITORIES/* ]; then
+  if [ -d $BANDIT_REPOSITORIES ]; then
       list=$(find $BANDIT_REPOSITORIES/* -maxdepth 0 -type d -name "${expr}*" )
   fi
   

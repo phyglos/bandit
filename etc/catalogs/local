@@ -1,7 +1,0 @@
-## Local Catalog
-
-MIRROR=file://${BANDIT_CATALOGS}
-REPOSITORY=local
-CATALOG=local
-CATALOG_MD5=none
-

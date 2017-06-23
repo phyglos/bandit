@@ -1,0 +1,9 @@
+#!/bin/bash
+
+BUILD_CMD=(
+# local packages
+#'package	do	package-1.0.0                tar.gz'
+
+# local scripts
+#'script 	run	script'
+)

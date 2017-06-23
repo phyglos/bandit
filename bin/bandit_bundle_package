@@ -131,6 +131,8 @@ bandit_package_fetch_builds()
 	# Download from URL into BUILD_DEST
 	bandit_msg "...fetching $pack from build origin..."
 
+### TO DO####
+	
 	# Temporary download archive
 	local archive
 	archive="ftp://phyglos.org/archive/phyglos-1.8.b2/builds/$bundle"
@@ -325,7 +327,7 @@ bandit_package_do()
     source $BUILD_SCRIPTS/$script.sh
 
     # Source origin file
-    [ -r $BUILD_ORIGINS/$BUNDLE_SOURCES/sources/$package ] || bandit_exit "BANDIT: No origin $package in bundle $catalog/$bundle"
+    [ -r $BUILD_ORIGINS/$BUNDLE_SOURCES/sources/$package ] || bandit_exit "BANDIT: No origin $package in bundle $CATALOG/$BUNDLE"
     source $BUILD_ORIGINS/$BUNDLE_SOURCES/sources/$package
 
     # Set the build pack name
@@ -338,9 +340,9 @@ bandit_package_do()
     # Declare list of package tarball
     declare -a sources_tarball
 
-    case $command in
+    case $COMMAND in
 	download)
-	    case $command_params in
+	    case $COMMAND_PARAMS in
 		"--sources")
 		    bandit_package_get_origins
 		    bandit_package_fetch_sources download
@@ -357,7 +359,7 @@ bandit_package_do()
 	    esac
 	    ;;
 	fetch)
-	    case $command_params in
+	    case $COMMAND_PARAMS in
 		"--sources")
 		    bandit_package_get_origins
 		    bandit_package_fetch_sources

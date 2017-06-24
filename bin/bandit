@@ -12,8 +12,7 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
-#RELEASE=RELEASE_MAJOR_MINOR_REVISION
-RELEASE=1.3.b2
+source $BANDIT_HOME/etc/release.conf
 
 ###----------------------------------------
 # Simple information displaying commands. 

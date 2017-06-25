@@ -30,7 +30,7 @@ bandit_package_get_origins()
     if [ -n $ADD ]; then
 	for payload in ${ADD[*]}; do
 	    unset URL[*], MD5[*] 2>/dev/null
-	    source $BUILD_ORIGIN/sources/$payload
+	    source $BUILD_ORIGINS/$BUNDLE_SOURCES/sources/$payload
 	    sources_fetch_url=(${sources_fetch_url[*]} ${URL[*]})
 	    sources_fetch_md5=(${sources_fetch_md5[*]} ${MD5[*]})
 	done
@@ -99,7 +99,7 @@ bandit_package_fetch_sources()
 bandit_package_prepare_sources()
 {
     # Custom sources preparation
-    if bandit_script_has $BUILD_ORIGIN/sources/$package sources_prepare; then
+    if bandit_script_has $BUILD_ORIGINS/$BUNDLE_SOURCES/sources/$package sources_prepare; then
 	bandit_msg "...preparing sources..."
 	# Refactor or rename tarball and payload
 	sources_prepare $sources_tarball

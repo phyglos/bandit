@@ -89,7 +89,4 @@ ln -sv $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR $BANDIT_BUILDER_DIR
 # Done
 bandit_log "The HOST system is ready..."
 echo
-bandit_msg "You can log as the user $BANDIT_USR to continue: " green
-echo
-bandit_msg "#su - $BANDIT_USR" green
-echo
+lsblk -ip

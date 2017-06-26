@@ -33,7 +33,9 @@ bandit_show_version()
 
 bandit_show_help()
 {
-    echo "Usage for searches:"
+    echo "Usage for bandit:"
+    echo "  bandit edit     Edit BANDIT configuration"
+    echo
     echo "  bandit search [-c|-b|-i|-f|-x] <expression>"
     echo "    -r            Search for repositories"
     echo "    -c            Search for catalogs"
@@ -123,6 +125,10 @@ source $BANDIT_HOME/bin/bandit_bundle
 #---
 
 case $1 in
+    edit)
+	${EDITOR:-vi} $BANDIT_HOME/etc/bandit.conf
+	exit 0
+	;;
     search)
 	shift
 

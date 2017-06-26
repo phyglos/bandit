@@ -73,6 +73,7 @@ bandit_show_help()
     echo "    <bundle>:     Name of the bundle"
     echo "    -i <item>:    Apply the action only to this item in the bundle"
     echo "    <action>:"
+    echo "      edit        Edit the configuration file"
     echo "      download    Download (inconditionally) sources from origins"
     echo "      fetch       Download (when not in cache) sources from origins"
     echo "      config      Only with -i. Interactively configure the bundle item"
@@ -234,8 +235,8 @@ case $object in
         # Start the work on the bundle
 	bandit_mkdir $BANDIT_LOGS/bundles
 	case $COMMAND in
-	    config)
-		# config runs interactively without logging
+	    config | edit)
+		# Run interactively without logging
 		bandit_bundle_do 
 		;;
 	    download | fetch | build | install | raise | remove)

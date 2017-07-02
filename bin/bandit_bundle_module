@@ -47,7 +47,7 @@ bandit_module()
     source $BANDIT_HOME/lib/modules/${module_class}.sh
     
     # Perform module command
-    case $command in
+    case $COMMAND in
 	build)
 	    echo "...no build command defined for modules..."
 	    ;;

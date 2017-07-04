@@ -14,10 +14,13 @@
 Installing BANDIT on the HOST system
 ====================================
 
-Download the latest version of the bandit from phyglos.org
+Download the latest released version of the bandit from phyglos.org
 $ wget ftp://phyglos.org/bandit/bandit-latest.tar.gz 
 $ tar xvf bandit-latest.tar.gz
 $ mv bandit-x.y.z bandit
+
+Alternatively, clone from the github.com repository to get the development master branch.
+$ git clone https://github.com/phyglos/bandit
 
 As root, move the file to /opt and change into that directory
 # mv bandit /opt
@@ -34,6 +37,6 @@ Bandit should work now in the HOST. Test with:
 To get help about all bandit options, issue:
 # bandit --help
 
-Read the included file RAISE to learn how to use the BANDIT to raise a new TARGET system.
+
 
 

@@ -212,7 +212,7 @@ case $object in
 	if [ -z $CATALOG ]; then 
 	    bandit_exit "BANDIT: Bundle $BUNDLE not found in enabled catalogs list"
 	fi
-	echo "Working with catalog $CATALOG"
+	echo "Working with catalog: $CATALOG"
 
 	# Get optional item in the bundle
 	ITEM="all"

@@ -16,8 +16,6 @@
 # Prepare the environment for BANDIT
 ###----------------------------------------
 
-echo
-
 # Remove BANDIT_HOME from PATH
 if [ "$BANDIT_HOME" ] ; then
     echo "Removing old BANDIT_HOME from PATH..."
@@ -44,3 +42,6 @@ export PATH=$PATH:$BANDIT_HOME/bin
 echo "PATH="$PATH
 echo
 
+echo "Now using BANDIT:"
+echo
+bandit --version

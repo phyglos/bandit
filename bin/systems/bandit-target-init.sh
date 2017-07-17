@@ -19,11 +19,11 @@ source $BANDIT_HOME/bin/bandit_common
 # Install BANDIT, from HOST to TARGET
 ###----------------------------------------
 
-bandit_log "Installing the BANDIT in the TARGET system..." 
+bandit_log "Installing BANDIT in the TARGET system..." 
 
 bandit_msg "Copying BANDIT in the TARGET filesystem..."
 bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_HOME
-cp    $BANDIT_HOME/*             $BANDIT_HOST_TGT_MNT$BANDIT_HOME 2&>/dev/null
+cp    $BANDIT_HOME/*             $BANDIT_HOST_TGT_MNT$BANDIT_HOME
 cp -R $BANDIT_HOME/{bin,etc,lib} $BANDIT_HOST_TGT_MNT$BANDIT_HOME 
 
 bandit_msg "Copying repositories in the TARGET filesystem..."

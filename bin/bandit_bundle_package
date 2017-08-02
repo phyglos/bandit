@@ -131,29 +131,23 @@ bandit_package_fetch_builds()
 	# Download from URL into BUILD_DEST
 	bandit_msg "...fetching $pack from build origin..."
 
-### TO DO####
-	
-	# Temporary download archive
-	local archive
-	archive="ftp://phyglos.org/archive/phyglos-1.8.b2/builds/$bundle"
-
+	local mirror
 	local file
-	file=$archive"/$pack"
-
-	wget ${file} \
-	     --directory-prefix=$BUILD_DESTDIR \
-	     --quiet \
-	     --no-clobber
-	if [[ $? != 0 ]]; then
-	    bandit_msg "Connection error to ${file}" red;
-	else
-	    # Temporary MD5 creation
-	    md5sum $BUILD_DESTDIR/${pack} > $BUILD_DESTDIR/${pack}.md5
-	    # Check if MD5 is correct
-#	    echo ${file} > $BUILD_DEST/$file.md5
-#	    bandit_md5sum "$BUILD_DEST/$file" || bandit_exit
-:
-	fi
+	source $BANDIT_HOME/etc/repositories/$REPOSITORY
+	for mirror in ${REPOSITORY_MIRRORS[*]}; do
+	    file=$mirror"/phyglos.org/builds/$CATALOG/$BUNDLE/$pack"
+	    wget ${file}{,.md5} \
+		 --directory-prefix=$BUILD_DESTDIR \
+		 --quiet \
+		 --no-clobber
+	    if [[ $? != 0 ]]; then
+		bandit_msg "Connection error to ${file}" red
+	    else
+		# Check if MD5 is correct
+		bandit_md5sum $BUILD_DESTDIR/${pack} || bandit_exit
+		break
+	    fi
+	done
     fi
 }
 

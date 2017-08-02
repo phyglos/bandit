@@ -214,6 +214,19 @@ case $object in
 	fi
 	echo "Working with catalog: $CATALOG"
 
+	# Find first repository for the catalog
+	for repo in ${BANDIT_REPOSITORY_LIST[*]}; do
+	    grep -sq $CATALOG $BANDIT_REPOSITORIES/$repo/manifest
+	    if [ $? == 0 ]; then
+		REPOSITORY=$repo
+		break
+	    fi		
+	done
+	if [ -z $REPOSITORY ]; then 
+	    bandit_exit "BANDIT: Catalog $CATALOG not found in repositories list"
+	fi
+	echo "Working with repository: $REPOSITORY"
+
 	# Get optional item in the bundle
 	ITEM="all"
 	case $1 in 

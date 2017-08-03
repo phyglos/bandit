@@ -36,7 +36,8 @@ bandit_show_help()
     echo "Usage for bandit:"
     echo "  bandit edit     Edit BANDIT configuration"
     echo
-    echo "  bandit search [-c|-b|-i|-f|-x] <expression>"
+    echo "  bandit search [--no-pager] [-c|-b|-i|-f|-x] <expression>"
+    echo "    --no-pager    Do not page results"
     echo "    -r            Search for repositories"
     echo "    -c            Search for catalogs"
     echo "    -b            Search for bundles"
@@ -132,6 +133,13 @@ case $1 in
     search)
 	shift
 
+	# Determine use of pager
+	pager=yes
+	if [ "$1" == "--no-pager" ]; then
+	    pager=no
+	    shift
+	fi
+	
 	# Get search options
 	options=""
 	while getopts "rcbixfl" opt; do
@@ -149,7 +157,12 @@ case $1 in
 
 	# Skip options so expression is left in $1
 	shift $((OPTIND-1))
-	bandit_search "${1}" "${options}" | more
+	if [ $pager == "yes" ]; then
+	    bandit_search "${1}" "${options}" | less
+	else
+	    bandit_search "${1}" "${options}"
+	fi
+	
 	exit 0
 	;;
 esac

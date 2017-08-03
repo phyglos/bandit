@@ -111,6 +111,24 @@ bandit_db_get_bundles_available()
   eval $retvar="'$list'"
 }
 
+# Get enabled bundles 
+bandit_db_get_bundles_enabled()
+{
+  local retvar=$1
+  local prefix=$2
+  local enabled=""
+  local list=""
+
+  for cat in ${BANDIT_CATALOG_LIST[*]}; do
+      if [ -d $BANDIT_CATALOGS/$cat ]; then 
+	  list=$(find $BANDIT_CATALOGS/$cat/bundles -name *${prefix}*.desc | sort)
+	  enabled+=(${list[*]})
+      fi
+  done
+
+  eval $retvar="'${enabled[*]}'"
+}
+
 
 ###------------------------------
 # Items database 

@@ -96,7 +96,20 @@ bandit_search()
     #---
     # Search bundles
     #---
-    if [[ $options =~ "b" ]] && [[ ! $expr =~ "/" ]]; then 
+    if [[ $options =~ "b" ]] && [[ ! $expr =~ "/" ]]; then
+	
+	bandit_db_get_bundles_enabled bundles ${expr}
+	if [ -n "$bundles" ]; then 
+	    echo "Bundles (enabled):"
+	    for bundle in ${bundles[*]}
+	    do
+		catalog=${bundle/$BANDIT_CATALOGS\//}
+		catalog=${catalog/\/bundles\/*.desc/}
+		name=$(basename $bundle)
+		echo "  "[${catalog}] ${name/\.desc/}
+	    done
+	fi
+
 	bandit_db_get_bundles_available bundles ${expr}
 	if [ -n "$bundles" ]; then 
 	    echo "Bundles (available):"

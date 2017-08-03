@@ -153,7 +153,7 @@ case $1 in
 	    esac
 	done
 	# Set default search
-	if [ -z $options ]; then options="cbix"; fi
+	if [ -z $options ]; then options="rcb"; fi
 
 	# Skip options so expression is left in $1
 	shift $((OPTIND-1))

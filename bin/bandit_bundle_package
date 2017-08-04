@@ -29,7 +29,7 @@ bandit_package_get_origins()
     # Add other included sources 
     if [ -n $ADD ]; then
 	for payload in ${ADD[*]}; do
-	    unset URL[*], MD5[*] 2>/dev/null
+	    unset URL MD5
 	    source $BUILD_ORIGINS/$BUNDLE_SOURCES/sources/$payload
 	    sources_fetch_url=(${sources_fetch_url[*]} ${URL[*]})
 	    sources_fetch_md5=(${sources_fetch_md5[*]} ${MD5[*]})
@@ -37,7 +37,7 @@ bandit_package_get_origins()
     fi
 
     # Clean sourced origins variables
-    unset URL[*], MD5[*], ADD[*] 2>/dev/null
+    unset URL MD5 ADD
 }
 
 #---

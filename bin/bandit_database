@@ -142,7 +142,7 @@ bandit_db_get_bundle_items_available()
   local list=""
 
   if [ -d $BANDIT_CATALOGS ]; then 
-      list=$(find $BANDIT_CATALOGS/**/bundles/*.dir/* -name "${expr}*" )
+      list=$(find $BANDIT_CATALOGS/**/bundles/*.dir/* -name "*${expr}*" )
   fi
   
   eval $retvar="'$list'"

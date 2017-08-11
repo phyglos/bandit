@@ -133,12 +133,24 @@ case $1 in
     search)
 	shift
 
-	# Determine use of pager
-	pager=yes
-	if [ "$1" == "--no-pager" ]; then
+	# Determine the use of a pager
+	if [ $BANDIT_PAGER = none ]; then 
 	    pager=no
-	    shift
+	    # Set defaut pager
+	    BANDIT_PAGER=more
+	else
+	    pager=yes
 	fi
+	case "$1" in 
+	    "--pager")
+		pager=yes
+		shift
+		;;
+	    "--no-pager")
+		pager=no
+		shift
+		;;
+	esac
 	
 	# Get search options
 	options=""
@@ -158,7 +170,7 @@ case $1 in
 	# Skip options so expression is left in $1
 	shift $((OPTIND-1))
 	if [ $pager == "yes" ]; then
-	    bandit_search "${1}" "${options}" | less
+	    bandit_search "${1}" "${options}" | $BANDIT_PAGER
 	else
 	    bandit_search "${1}" "${options}"
 	fi

@@ -22,7 +22,7 @@ bandit_repository_fetch()
 
     if [ "$1" == "download" ]; then
 	# Force downloading by removing files in local cache 
-	rm -rf $BANDIT_XREPOSITORIES/$REPOSITORY 2>/dev/null
+	rm -rf $BANDIT_XREPOSITORIES/$REPOSITORY
     fi
 
     if [ -r $BANDIT_XREPOSITORIES/$REPOSITORY ]; then

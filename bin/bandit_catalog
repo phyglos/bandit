@@ -21,15 +21,15 @@ bandit_catalog_fetch()
     # $1 = download -> do not use cache, force download
 
     # Check if MIRROR is set
-    [ $MIRROR != "none" ]     || bandit_exit "BANDIT: Repository mirror not set"
-    [ $REPOSITORY != "none" ] || bandit_exit "BANDIT: Repository not set"
+    [ "$MIRROR" != "none" ]     || bandit_exit "BANDIT: Repository mirror not set"
+    [ "$REPOSITORY" != "none" ] || bandit_exit "BANDIT: Repository not set"
 
     URL=$MIRROR/$REPOSITORY/catalogs/${CATALOG}.tar.gz
     file=$(basename "${URL}")
 
     if [ "$1" == "download" ]; then
 	# Force downloading by removing files in local cache 
-	rm $BANDIT_XCATALOGS/$file{,.md5} 2>/dev/null
+	rm -f $BANDIT_XCATALOGS/$file{,.md5}
     fi
 
     if [ -r $BANDIT_XCATALOGS/$file ]; then

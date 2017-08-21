@@ -68,7 +68,9 @@ fi
 
 # libs
 case $BANDIT_TARGET_ARCH in
-    x86) 
+    i?86) 
+	mkdir -pv $BANDIT_HOST_TGT_MNT/lib32
+	mkdir -pv $BANDIT_HOST_TGT_MNT/usr/{,local}/lib32
 	ln -sv lib32 $BANDIT_HOST_TGT_MNT/lib
         ln -sv lib32 $BANDIT_HOST_TGT_MNT/usr/lib
         ln -sv lib32 $BANDIT_HOST_TGT_MNT/usr/local/lib

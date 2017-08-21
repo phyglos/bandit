@@ -145,8 +145,10 @@ bandit_bundle_do()
     done
     IFS=$OLD
 
-    # Return from build directory
+    # Return from work directory
     bandit_popd
+    
+    # Clean work directory
     rm -rf $BUILD_WORK 
 
     # Update system databases

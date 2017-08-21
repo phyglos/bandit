@@ -212,10 +212,12 @@ bandit_package_build()
 	bandit_msg "...packing..."
 	bandit_timestamp stamp
 	build_pack 2>&1 > $BUILD_LOGS/$script.pack-${stamp}.log
-	bandit_pushd $BUILD_PACK      
-	tar -c * | xz -1 > ../$pack
-	cd ..
-	md5sum -b $pack > $pack.md5
+	bandit_pushd $BUILD_PACK
+	(
+	    tar -c * | xz -1 > ../$pack
+	    cd ..
+	    md5sum -b $pack > $pack.md5
+	)
 	bandit_popd
     fi
 }
@@ -350,6 +352,7 @@ bandit_package_do()
 		    bandit_package_fetch_sources download
 		    bandit_package_prepare_sources
 		    bandit_package_fetch_builds download
+		    ;;
 	    esac
 	    ;;
 	fetch)
@@ -362,11 +365,12 @@ bandit_package_do()
 		"--builds") 
 		    bandit_package_fetch_builds 
 		    ;;
-		"--all" )
+		"--all")
 		    bandit_package_get_origins
 		    bandit_package_fetch_sources
 		    bandit_package_prepare_sources
-		    bandit_package_fetch_builds 
+		    bandit_package_fetch_builds
+		    ;;
 	    esac
 	    ;;
 	config)

@@ -37,8 +37,7 @@ bandit_script_run()
     function script_run()  { :; } ; export -f script_run
     function script_test() { :; } ; export -f script_test
 
-    bandit_pushd $BUILD_SOURCES 
-
+    bandit_pushd $BUILD_SOURCES
     bandit_mkdir $script
     bandit_pushd $script
     source $BUILD_SCRIPTS/$script.sh
@@ -59,10 +58,7 @@ bandit_script_run()
 
     bandit_popd
     rm -rf $script
-
     bandit_popd
-
-    echo
 }
 export -f bandit_script_run
 
@@ -71,11 +67,24 @@ bandit_script_reverse()
     local script=$1   `# Script name`
     shift
 
+    # Default variables to be overloaded by the script
+    script_test_level=0
+
+    # Set LOG file name
+    if [ -z $1 ]; then 
+	script_log=$script
+    else
+	script_log=$script-$1
+    fi 
+
     bandit_log "$script $@ [$(date)]"
 
     # Default functions to be overloaded by the script
     function script_reverse()  { :; } ; export -f script_reverse
 
+    bandit_pushd $BUILD_SOURCES
+    bandit_mkdir $script
+    bandit_pushd $script
     source $BUILD_SCRIPTS/$script.sh
     
     ## Reversing setup
@@ -84,6 +93,10 @@ bandit_script_reverse()
 	bandit_timestamp stamp
 	script_reverse 2>&1 > $BUILD_LOGS/$script.reverse-${stamp}.log 
     fi
+
+    bandit_popd
+    rm -rf $script
+    bandit_popd
 }
 export -f bandit_script_reverse
 

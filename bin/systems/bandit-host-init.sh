@@ -61,7 +61,9 @@ read CMD
 
 mkdir -pv $BANDIT_HOST_TGT_MNT
 mkfs -v -t $BANDIT_TARGET_PART_TYPE -L ${BANDIT_TARGET_PART_LABEL} $BANDIT_TARGET_PART
-
+if [ $? != 0 ]; then
+    bandit_exit "BANDIT: Unable to initialize TARGET partition"
+fi
 mount -v -t $BANDIT_TARGET_PART_TYPE $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
 
 bandit_log "Preparing TARGET swap area..." 
@@ -73,7 +75,9 @@ read CMD
 [ "$CMD" == "init" ] || bandit_exit "Cancelled "
 
 mkswap -L ${BANDIT_TARGET_SWAP_LABEL} $BANDIT_TARGET_SWAP
-echo
+if [ $? != 0 ]; then
+    bandit_exit "BANDIT: Unable to initialize swap area"
+fi
 /sbin/swapon -v $BANDIT_TARGET_SWAP
 
 

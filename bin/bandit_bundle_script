@@ -56,6 +56,13 @@ bandit_script_run()
 	fi
     fi
 
+    ## Verify the script just run
+    if bandit_script_has $BUILD_SCRIPTS/$script.sh script_verify; then  
+	bandit_msg "...verifying..."
+	bandit_timestamp stamp
+	script_verify 2>&1 > $BUILD_LOGS/$script.verify-${stamp}.log 
+    fi
+
     bandit_popd
     rm -rf $script
     bandit_popd

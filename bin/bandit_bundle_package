@@ -244,13 +244,13 @@ bandit_package_install()
 	# Unpack
 	bandit_timestamp stamp
 	( 
-	CMD="tar -C / --no-overwrite-dir --keep-directory-symlink -xvf $BUILD_DESTDIR/$pack"    
-        ${PRE} "${CMD}"
-	if bandit_script_has $BUILD_SCRIPTS/$script.sh install_unpack; then  
-	    echo "-----"
-	    CMD="install_unpack"
+	    CMD="tar -C / --no-overwrite-dir --keep-directory-symlink -xvf $BUILD_DESTDIR/$pack"    
             ${PRE} "${CMD}"
-        fi
+	    if bandit_script_has $BUILD_SCRIPTS/$script.sh install_unpack; then  
+		echo "-----"
+		CMD="install_unpack"
+		${PRE} "${CMD}"
+            fi
         ) 2>&1 > $BUILD_LOGS/$script.unpack-${stamp}.log 
 
 	# Make new libraries immediately available (except for the bandit user)
@@ -262,29 +262,33 @@ bandit_package_install()
 	if bandit_script_has $BUILD_SCRIPTS/$script.sh install_verify; then  
 	    bandit_msg "...verifying..."
 	    bandit_timestamp stamp
-	    install_verify 2>&1 > $BUILD_LOGS/$script.verify-${stamp}.log 
+	    install_verify 2>&1 > $BUILD_LOGS/$script.install_verify-${stamp}.log 
 	fi
-    fi
-}
 
-bandit_package_setup()
-{
-    ## Set up the installed pack
-    if bandit_script_has $BUILD_SCRIPTS/$script.sh install_setup; then  
-	bandit_msg "...setting up..."
-	bandit_timestamp stamp
-	install_setup 2>&1 > $BUILD_LOGS/$script.setup-${stamp}.log 
+        ## Set up the installed pack
+	if bandit_script_has $BUILD_SCRIPTS/$script.sh install_setup; then  
+	    bandit_msg "...setting up..."
+	    bandit_timestamp stamp
+	    install_setup 2>&1 > $BUILD_LOGS/$script.install_setup-${stamp}.log 
+	fi
     fi
 }
 
 bandit_package_remove()
 {
+    # Set up for removal
+    if bandit_script_has $BUILD_SCRIPTS/$script.sh remove_setup; then  
+	bandit_msg "...setting up..."
+	bandit_timestamp stamp
+	remove_setup 2>&1 > $BUILD_LOGS/$script.remove_setup-${stamp}.log 
+    fi
+
+    # Log files from porg database and then remove the package
     bandit_msg "...removing package files..."
-    # Log files from porg database and remove the package
     bandit_timestamp stamp
     (
-    porg -fx ${script}
-    yes | porg -rx ${script}
+	porg -fx ${script}
+	yes | porg -rx ${script}
     ) 2>&1 > $BUILD_LOGS/$script.remove-${stamp}.log 
 }
 
@@ -310,6 +314,7 @@ bandit_package_do()
     function install_unpack()  { :; } ; export -f install_unpack
     function install_verify()  { :; } ; export -f install_verify
     function install_setup()   { :; } ; export -f install_setup
+    function remove_setup()    { :; } ; export -f remove_setup
     
     # Default variables to be overloaded by the package script
     local build_test_level=0
@@ -393,7 +398,6 @@ bandit_package_do()
 	    bandit_package_fetch_builds
 	    bandit_package_prepare_build
 	    bandit_package_install
-	    bandit_package_setup
 	    bandit_popd 
 	    ;;
 	raise)
@@ -404,7 +408,6 @@ bandit_package_do()
 	    bandit_package_prepare_build
 	    bandit_package_build
 	    bandit_package_install
-	    bandit_package_setup
 	    bandit_popd 
 	    ;;
 	remove)

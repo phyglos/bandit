@@ -1,10 +1,10 @@
 #!/bin/bash
 #
-# local repository
+# localhost repository
 #
 
 # Repository mirrors
 REPOSITORY_MIRRORS=(
-    file:$BANDIT_REPOSITORIES
+    file:$BANDIT_HOME/lib/templates/repositories
 )
 

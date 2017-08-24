@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# localhost repository manifest
+#
+
+CATALOGS=(
+    local
+)
+
+CATALOGS_MD5=(
+    none
+)
+

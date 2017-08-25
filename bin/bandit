@@ -58,27 +58,36 @@ bandit_show_help()
     echo "  bandit -r|--repository <repository> <action>" 
     echo "    <repository>: Name of the repository"
     echo "    <action>:"
-    echo "      download    Download the repository"
-    echo "      install     Install the repository"
-    echo "      remove      Remove the repository"
-    echo "      upgrade     Download and install the repository manifest and catalogs"
+    echo "      download    Download the repository manifest into cache"
+    echo "      install     Install the repository manifest from cache"
+    echo "                  --all for installing catalogs in the manifest"
+    echo "      update      Download and install the repository manifest"
+    echo "                  --all for updating catalogs in the manifest"
+    echo "      remove      Remove the repository manifest"
+    echo "                  --all for removing catalogs in the manifest"
+    echo "      show        List catalogs in the repository manifest"
+    echo "                  --md5 for MD5 checksums"
     echo
     echo "Usage for catalogs: "
     echo "  bandit -c|--catalog <catalog> <action>" 
     echo "    <catalog>:    Name of the catalog"
     echo "    <action>:"
-    echo "      download    Download the catalog"
+    echo "      download    Download (inconditionally) the catalog tarball"
+    echo "      fetch       Download (when not in cache) the catalog tarball"
     echo "      install     Install the catalog"   
     echo "      remove      Remove the catalog"   
     echo
     echo "Usage for bundles: "
-    echo "  bandit [-b|--bundle] <bundle> [-i|-item <item>] <action>" 
+    echo "  bandit [-b|--bundle] <bundle> [-i|--item <item>] <action>" 
     echo "    <bundle>:     Name of the bundle"
     echo "    -i <item>:    Apply the action only to this item in the bundle"
     echo "    <action>:"
     echo "      edit        Edit the configuration file"
-    echo "      download    Download (inconditionally) sources from origins"
-    echo "      fetch       Download (when not in cache) sources from origins"
+    echo "      download    Download (inconditionally) from origins"
+    echo "      fetch       Download (when not in cache) from origins"
+    echo "                  --sources for fetching sources"
+    echo "                  --builds for fetching sources"
+    echo "                  --all for fetching sources and builds"
     echo "      config      Only with -i. Interactively configure the bundle item"
     echo "      build       Only with -i. Build the bundle and save a build pack in local cache"
     echo "      install     Only with -i. Install the build pack from local cache"
@@ -117,9 +126,29 @@ source $BANDIT_HOME/etc/bandit.conf
 source $BANDIT_HOME/bin/bandit_common
 source $BANDIT_HOME/bin/bandit_database
 source $BANDIT_HOME/bin/bandit_search
+source $BANDIT_HOME/bin/bandit_find
 source $BANDIT_HOME/bin/bandit_repository
 source $BANDIT_HOME/bin/bandit_catalog
 source $BANDIT_HOME/bin/bandit_bundle
+
+# Determine the use of a pager
+if [ $BANDIT_PAGER = none ]; then 
+    pager=no
+    # Set defaut pager
+    BANDIT_PAGER=more
+else
+    pager=yes
+fi
+case "$1" in 
+    "--pager")
+	pager=yes
+	shift
+	;;
+    "--no-pager")
+	pager=no
+	shift
+	;;
+esac
 
 #--- 
 # Work with verbs...
@@ -127,30 +156,12 @@ source $BANDIT_HOME/bin/bandit_bundle
 
 case $1 in
     edit)
+	shift;
 	${EDITOR:-vi} $BANDIT_HOME/etc/bandit.conf
 	exit 0
 	;;
     search)
-	shift
-
-	# Determine the use of a pager
-	if [ $BANDIT_PAGER = none ]; then 
-	    pager=no
-	    # Set defaut pager
-	    BANDIT_PAGER=more
-	else
-	    pager=yes
-	fi
-	case "$1" in 
-	    "--pager")
-		pager=yes
-		shift
-		;;
-	    "--no-pager")
-		pager=no
-		shift
-		;;
-	esac
+	shift;
 	
 	# Get search options
 	options=""
@@ -161,20 +172,35 @@ case $1 in
 		    ;;
 		\?)
 		    echo "Invalid option: -$OPTARG"
+		    exit 1
 		    ;;
 	    esac
 	done
-	# Set default search
-	if [ -z $options ]; then options="cbi"; fi
-
 	# Skip options so expression is left in $1
 	shift $((OPTIND-1))
-	if [ $pager == "yes" ]; then
-	    bandit_search "${1}" "${options}" | $BANDIT_PAGER
-	else
-	    bandit_search "${1}" "${options}"
+
+	# Set default search options when none are provided
+	if [ "$options" == "" ]; then
+	    if [ "$@" ]; then
+		# Search the expression in bundles and items
+		options="bi"    
+	    else
+		# No expression. Show repositories and catalogs 
+		options="rc"
+	    fi
 	fi
+
+	# Get search expression
+	expr="all"
+	[ $# -ge 1 ] && expr=$1
 	
+	# Do the search
+	if [ $pager == "yes" ]; then
+	    bandit_search ${expr} ${options} | $BANDIT_PAGER
+	else
+	    bandit_search ${expr} ${options}
+	fi
+
 	exit 0
 	;;
 esac
@@ -193,11 +219,14 @@ case $object in
 
 	# Get repository 
 	REPOSITORY=$1
+	shift
 	
 	# Execute command
-	COMMAND=$2
+	COMMAND=$1
+	shift
+	COMMAND_PARAMS="$@"
 	case $COMMAND in
-	    download | install | upgrade | remove)
+	    download | fetch | install | update | remove | show)
 		bandit_repository_do
 		;;
 	    *) 
@@ -210,11 +239,13 @@ case $object in
 
 	# Get catalog 
 	CATALOG=$1
+	shift
 	
 	# Execute command
-	COMMAND=$2
+	COMMAND=$1; shift
+	COMMAND_PARAMS="$@"
 	case $COMMAND in
-	    download | install | remove)
+	    find | download | fetch | install | remove)
 		bandit_catalog_do
 		;;
 	    *) 
@@ -225,7 +256,9 @@ case $object in
     -b|--bundle | --default)
 	# Get the bundle name
 	if [ $object != "--default" ]; then shift; fi
-	BUNDLE=$1; shift
+
+	BUNDLE=$1
+	shift
 
 	# Find first catalog for the bundle
 	for cat in ${BANDIT_CATALOG_LIST[*]}; do
@@ -272,7 +305,7 @@ case $object in
 		:
 		;;
 	    *)
-		bandit_exit "BANDIT: Command parameter ${command_params} not defined."
+		bandit_exit "BANDIT: Command parameter ${command_params} not defined for bundles."
 		;;
 	esac
 		
@@ -298,10 +331,12 @@ case $object in
 	shift
 
 	# Get package expression
-	package_expr=$1
+	package_expr=$1; shift
 	
 	# Execute command
-	COMMAND=$2
+	COMMAND=$1; shift
+	COMMAND_PARAMS="$@"
+	
 	case $COMMAND in
 	    bundles)
 		bandit_db_get_packages_available packages ${package_expr}

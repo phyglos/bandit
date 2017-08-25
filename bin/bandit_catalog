@@ -18,64 +18,101 @@
 
 bandit_catalog_fetch()
 {
+    local download=false
+    
     # $1 = download -> do not use cache, force download
-
-    # Check if MIRROR is set
-    [ "$MIRROR" != "none" ]     || bandit_exit "BANDIT: Repository mirror not set"
-    [ "$REPOSITORY" != "none" ] || bandit_exit "BANDIT: Repository not set"
-
-    URL=$MIRROR/$REPOSITORY/catalogs/${CATALOG}.tar.gz
-    file=$(basename "${URL}")
-
-    if [ "$1" == "download" ]; then
-	# Force downloading by removing files in local cache 
-	rm -f $BANDIT_XCATALOGS/$file{,.md5}
+    [ $? == 1 ] && [ "$1" == "download" ] && download=true 
+    if [ download == true ]; then
+	# Force downloading by removing catalogs in local cache 
+	rm -f $BANDIT_XCATALOGS/$tarball{,.md5}
     fi
 
-    if [ -r $BANDIT_XCATALOGS/$file ]; then
+    tarball="$CATALOG.tar.gz"
+    if [ -r $BANDIT_XCATALOGS/$tarball ]; then
 	# Fetch from local cache if already exists
-	bandit_msg "...fetching catalog $file from catalogs cache ..."
-	# just check for MD5 
-	bandit_md5sum $BANDIT_XCATALOGS/$file || bandit_exit
+	bandit_msg "...fetching catalog $CATALOG from catalogs cache ..."
+	# Just check for MD5
+	bandit_md5sum "$BANDIT_XCATALOGS/$tarball" || bandit_exit
     else
+	# Check if MIRROR is set
+	[ "$MIRROR" != "none" ]     || bandit_exit "BANDIT: Repository mirror not set"
+	[ "$REPOSITORY" != "none" ] || bandit_exit "BANDIT: Repository not set"
+	
+	URL=$MIRROR/$REPOSITORY/catalogs/$tarball
+	
 	# Download from URL into 
-	bandit_msg "...fetching catalog $file from mirror..."
+	bandit_msg "...fetching catalog $CATALOG from mirror $MIRROR..."
 
-	# Download catalog tarball
-	wget ${URL} \
-	     --directory-prefix=$BANDIT_XCATALOGS \
-	     --no-verbose \
-	     --no-clobber
-	if [[ $? != 0 ]]; then
-	    bandit_msg "Connection error to ${URL}" red;
-	else
-	    # Check if MD5 is correct
-	    echo ${CATALOG_MD5} > $BANDIT_XCATALOGS/$file.md5
-	    bandit_md5sum "$BANDIT_XCATALOGS/$file" || bandit_exit
-	fi
+	case ${MIRROR} in
+	    file*)
+		# Copy from filesystem
+		bandit_mkdir $BANDIT_XCATALOGS
+		cp -v ${mirror#file:}/$REPOSITORY/catalogs/$tarball \
+		      $BANDIT_XCATALOGS
+		;;
+	    ftp*|http*)
+		# Download catalog tarball
+		wget ${URL} \
+		     --directory-prefix=$BANDIT_XCATALOGS \
+		     --no-verbose \
+		     --no-clobber
+		if [[ $? != 0 ]]; then
+		    bandit_msg "Connection error to ${URL}" red;
+		else
+		    # Check if MD5 is correct
+		    echo ${CATALOG_MD5} > $BANDIT_XCATALOGS/$tarball.md5
+		    bandit_md5sum "$BANDIT_XCATALOGS/$tarball" || bandit_exit
+		fi
+		;;
+	esac
     fi
+}
+
+bandit_catalog_find()
+{
+    local repositories=""
+   
+    bandit_db_get_repositories_enabled repositories ${CATALOG}
+    for repo in ${repositories}; do
+	if [ -r $BANDIT_REPOSITORIES/${repo}/manifest ]; then
+	    source $BANDIT_REPOSITORIES/${repo}/manifest
+	    for cat in ${CATALOGS[*]}; do
+		if [ "${CATALOG}" == "${cat}" ]; then
+		    echo "${repo}"
+		    REPOSITORY="${repo}"
+		    break
+		fi	
+	    done
+	fi
+    done
 }
 
 bandit_catalog_install()
 {
-    ## Install 
-    if [ -r $BANDIT_XCATALOGS/$file ]; then 
-	bandit_msg "...unpacking..."
+    if [ -d $BANDIT_XCATALOGS ]; then 
+	bandit_msg "...installing..."
 
-	bandit_timestamp stamp
-	tar -C $BANDIT_CATALOGS -xvf $BANDIT_XCATALOGS/$file \
-	    2>&1 > $BUILD_LOGS/$CATALOG.unpack-${stamp}.log 
+		bandit_timestamp stamp
+		bandit_mkdir $BANDIT_CATALOGS
+		tar -C $BANDIT_CATALOGS -xvf $BANDIT_XCATALOGS/$tarball \
+		    2>&1 > $BUILD_LOGS/$CATALOG.installing-${stamp}.log 
+    else
+	bandit_msg "BANDIT: Catalog $CATALOG not available." red
     fi
 }
 
 bandit_catalog_remove()
 {
-    bandit_msg "...removing..."
+    if [ -d $BANDIT_CATALOGS/$CATALOG ]; then 
+	bandit_msg "...removing catalog $CATALOG..."
 
-    ## Remove
-    bandit_timestamp stamp
-    rm -rvf $BANDIT_CATALOGS/$CATALOG \
-       2>&1 > $BUILD_LOGS/$CATALOG.remove-${stamp}.log 
+	bandit_timestamp stamp
+	(
+	    rm -vrf $BANDIT_CATALOGS/$CATALOG
+	) 2>&1 > $BUILD_LOGS/$CATALOG.remove-${stamp}.log 
+    else
+	bandit_msg "BANDIT: Catalog $CATALOG not available." red
+    fi
 }
 
 ###------------------------------
@@ -84,39 +121,32 @@ bandit_catalog_remove()
 
 bandit_catalog_do()
 {
-    [ $CATALOG != "local" ] || bandit_exit "BANDIT: Command not allowed for 'local' catalog"
-
     local stamp
     bandit_timestamp stamp
     
     # Set directories 
     BUILD_LOGS=$BANDIT_LOGS/catalogs/$CATALOG.$COMMAND-${stamp}
 
-    # Source catalog configuration for configured catalogs
-    if [ $COMMAND != "upgrade" ]; then 
-	if [ -r $BANDIT_HOME/etc/catalogs/$CATALOG ]; then 
-	    source $BANDIT_HOME/etc/catalogs/$CATALOG
-	else
-	    bandit_exit "BANDIT: Cannot find configured catalog $CATALOG"
-	fi
-    fi
-
     # Create working directories
-    bandit_mkdir $BANDIT_XCATALOGS
-    bandit_mkdir $BANDIT_CATALOGS/$CATALOG
-    if [ $COMMAND != "download" ]; then 
+    if [ "$COMMAND" != "download" ]; then 
 	bandit_mkdir $BUILD_LOGS
     fi
 
     case $COMMAND in 
+	find)
+	    bandit_catalog_find
+	    ;;
 	download)
 	    bandit_catalog_fetch download
 	    ;;
+	fetch)
+	    bandit_catalog_fetch
+	    ;;
 	install)
-	    bandit_catalog_fetch 
+	    bandit_catalog_fetch
 	    bandit_catalog_install
 	    ;;
-	upgrade)
+	update)
 	    bandit_catalog_fetch download
 	    bandit_catalog_install
 	    ;;

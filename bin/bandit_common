@@ -170,18 +170,21 @@ export -f bandit_log
 bandit_msg()
 {
     local color=""
+    local seq=""
 
-    case $2 in
-	blue)   color=$BLUE ;;
-	cyan)   color=$BLUE ;;
-	green)  color=$GREEN ;;
-	grey)   color=$GREY ;;
-	red)    color=$RED ;;
-	yellow) color=$YELLOW ;;
+    [ $# == 2 ] && color=$2
+    
+    case $color in
+	blue)   seq=$BLUE ;;
+	cyan)   seq=$CYAN ;;
+	green)  seq=$GREEN ;;
+	grey)   seq=$GREY ;;
+	red)    seq=$RED ;;
+	yellow) seq=$YELLOW ;;
     esac     
 
-    local line=$color"$1"
-    [ -n "$2" ] && line=$line$GREY
+    local line=$seq"$1"
+    [ -n "$color" ] && line=$line$GREY
 
     echo -e $line
 }

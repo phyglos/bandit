@@ -25,82 +25,86 @@ bandit_search()
     local name
     local words
 
-    if [ "$expr" == "all" -o "$expr" == "" ]; then expr='[a-z]'; fi
+    # Replace word for patterns
+    if [ "$expr" == "all" ]; then expr='[a-z]'; fi
 
     #---
     # Search repositories
     #---
     if [[ $options =~ "r" ]]; then
 
+if false; then
 	bandit_db_get_repositories_configured repositories ${expr}
+	echo "Repositories (configured):"
 	if [ -n "$repositories" ]; then 
-	    echo "Repositories (configured):"
 	    for repository in ${repositories[*]}
 	    do
 		echo "  "[$(basename $repository)] 
 	    done
+	else
+	    echo "  none"
+	fi
+fi
+
+	bandit_db_get_repositories_enabled repositories
+	echo "Repositories (enabled):"
+	if [ -n "$repositories" ]; then 
+	    for repository in ${repositories[*]}
+	    do
+		echo "  "[$(basename $repository)] 
+	    done
+	else
+	    echo "  none"
 	fi
 
-    	bandit_db_get_repositories_installed repositories ${expr}
+    	bandit_db_get_repositories_available repositories ${expr}
+	echo "Repositories (available):"
 	if [ -n "$repositories" ]; then 
-	    echo "Repositories (installed):"
 	    for repository in ${repositories[*]}
 	    do
 		echo "  "[$(basename $repository)] 
 	    done
-	fi
-	
-	bandit_db_get_repositories_enabled repositories
-	if [ -n "$repositories" ]; then 
-	    echo "Repositories (enabled):"
-	    for repository in ${repositories[*]}
-	    do
-		echo "  "[$(basename $repository)] 
-	    done
+	else
+	    echo "  none"
 	fi
     fi
-    
+
     #---
     # Search catalogs
     #---
     if [[ $options =~ "c" ]] && [[ ! $expr =~ "/" ]]; then
 
-	bandit_db_get_catalogs_configured catalogs ${expr}
-	if [ -n "$catalogs" ]; then 
-	    echo "Catalogs (configured):"
-	    for catalog in ${catalogs[*]}
-	    do
-		echo "  "[$(basename $catalog)] 
-	    done
-	fi
-
-    	bandit_db_get_catalogs_installed catalogs ${expr}
-	if [ -n "$catalogs" ]; then 
-	    echo "Catalogs (installed):"
-	    for catalog in ${catalogs[*]}
-	    do
-		echo "  "[$(basename $catalog)] 
-	    done
-	fi
-	
 	bandit_db_get_catalogs_enabled catalogs
+	echo "Catalogs (enabled):"
 	if [ -n "$catalogs" ]; then 
-	    echo "Catalogs (enabled):"
 	    for catalog in ${catalogs[*]}
 	    do
 		echo "  "[$(basename $catalog)] 
 	    done
+	else
+	    echo "  none"
+	fi
+    
+    	bandit_db_get_catalogs_available catalogs ${expr}
+	echo "Catalogs (available):"
+	if [ -n "$catalogs" ]; then 
+	    for catalog in ${catalogs[*]}
+	    do
+		echo "  "[$(basename $catalog)] 
+	    done
+	else
+	    echo "  none"
 	fi
     fi
-    
+	
     #---
     # Search bundles
     #---
     if [[ $options =~ "b" ]] && [[ ! $expr =~ "/" ]]; then
 	
 	bandit_db_get_bundles_enabled bundles ${expr}
+	echo "Bundles (enabled):"
 	if [ -n "$bundles" ]; then 
-	    echo "Bundles (enabled):"
 	    for bundle in ${bundles[*]}
 	    do
 		catalog=${bundle/$BANDIT_CATALOGS\//}
@@ -108,11 +112,13 @@ bandit_search()
 		name=$(basename $bundle)
 		echo "  "[${catalog}] ${name/\.desc/}
 	    done
+	else
+	    echo "  none"
 	fi
 
 	bandit_db_get_bundles_available bundles ${expr}
+	echo "Bundles (available):"
 	if [ -n "$bundles" ]; then 
-	    echo "Bundles (available):"
 	    for bundle in ${bundles[*]}
 	    do
 		catalog=${bundle/$BANDIT_CATALOGS\//}
@@ -120,6 +126,8 @@ bandit_search()
 		name=$(basename $bundle)
 		echo "  "[${catalog}] ${name/\.desc/}
 	    done
+	else
+	    echo "  none"
 	fi
     fi
     
@@ -127,9 +135,9 @@ bandit_search()
     # Search items
     #---
     if [[ $options =~ "i" ]] && [[ ! $expr =~ "/" ]]; then
-	bandit_db_get_bundle_items_available items ${expr}
+	bandit_db_get_bundle_items_enabled items ${expr}
+	echo "Bundle items (enabled):"
 	if [ -n "$items" ]; then 
-	    echo "Bundle items (available):"
 	    lines=(${items})
 	    for line in ${lines[*]}
 	    do
@@ -139,7 +147,26 @@ bandit_search()
 		name=$(basename $line)
 		echo "  "[${bundle}] ${name/.sh/}
 	    done
+	else
+	    echo "  none"
 	fi
+
+    	bandit_db_get_bundle_items_available items ${expr}
+	echo "Bundle items (available):"
+	if [ -n "$items" ]; then 
+	    lines=(${items})
+	    for line in ${lines[*]}
+	    do
+	    	bundle=${line/$BANDIT_CATALOGS\//}
+		bundle=${bundle/\/bundles/}
+		bundle=${bundle/\.dir*/}
+		name=$(basename $line)
+		echo "  "[${bundle}] ${name/.sh/}
+	    done
+	else
+	    echo "  none"
+	fi
+
     fi
     
     #---

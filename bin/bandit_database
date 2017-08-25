@@ -23,7 +23,8 @@ bandit_db_get_repositories_configured()
   local expr=$2
   local list=""
 
-  if [ -d $BANDIT_HOME/etc/repositories ]; then
+  if [ -d $BANDIT_HOME/etc/repositories ] && \
+     [ ! -z "$(ls -A $BANDIT_HOME/etc/repositories)" ]; then
       list=$(find $BANDIT_HOME/etc/repositories/* -name "${expr}*" | sort)
   fi
 
@@ -38,14 +39,15 @@ bandit_db_get_repositories_enabled()
   eval $retvar="'${BANDIT_REPOSITORY_LIST[*]}'"
 }
 
-# Get installed repositories
-bandit_db_get_repositories_installed()
+# Get available repositories
+bandit_db_get_repositories_available()
 {
   local retvar=$1
   local expr=$2
   local list=""
-
-  if [ -d $BANDIT_REPOSITORIES ]; then
+  
+  if [ -d $BANDIT_REPOSITORIES ] && \
+     [ ! -z "$(ls -A $BANDIT_REPOSITORIES)" ]; then
       list=$(find $BANDIT_REPOSITORIES/* -maxdepth 0 -type d -name "${expr}*" )
   fi
   
@@ -57,20 +59,6 @@ bandit_db_get_repositories_installed()
 # Catalog database 
 ###------------------------------
 
-# Get configured catalogs
-bandit_db_get_catalogs_configured()
-{
-  local retvar=$1
-  local expr=$2
-  local list=""
-
-  if [ -d $BANDIT_HOME/etc/catalogs ]; then
-      list=$(find $BANDIT_HOME/etc/catalogs/* -name "${expr}*" | sort)
-  fi
-
-  eval $retvar="'$list'"
-}
-
 # Get enabled catalogs
 bandit_db_get_catalogs_enabled()
 {
@@ -79,14 +67,15 @@ bandit_db_get_catalogs_enabled()
   eval $retvar="'${BANDIT_CATALOG_LIST[*]}'"
 }
 
-# Get installed catalogs
-bandit_db_get_catalogs_installed()
+# Get available catalogs
+bandit_db_get_catalogs_available()
 {
   local retvar=$1
   local expr=$2
   local list=""
 
-  if [ -d $BANDIT_CATALOGS ]; then
+  if [ -d $BANDIT_CATALOGS ] && \
+     [ ! -z "$(ls -A $BANDIT_CATALOGS)" ]; then
       list=$(find $BANDIT_CATALOGS/* -maxdepth 0 -type d -name "${expr}*" )
   fi
   
@@ -97,20 +86,6 @@ bandit_db_get_catalogs_installed()
 # Bundles database 
 ###------------------------------
 
-# Get available bundles 
-bandit_db_get_bundles_available()
-{
-  local retvar=$1
-  local prefix=$2
-  local list=""
-
-  if [ -d $BANDIT_CATALOGS ]; then 
-      list=$(find $BANDIT_CATALOGS/**/bundles -name *${prefix}*.desc | sort)
-  fi
-
-  eval $retvar="'$list'"
-}
-
 # Get enabled bundles 
 bandit_db_get_bundles_enabled()
 {
@@ -120,7 +95,8 @@ bandit_db_get_bundles_enabled()
   local list=""
 
   for cat in ${BANDIT_CATALOG_LIST[*]}; do
-      if [ -d $BANDIT_CATALOGS/$cat ]; then 
+      if [ -d $BANDIT_CATALOGS/$cat/bundles ] && \
+	 [ ! -z "$(ls -A $BANDIT_CATALOGS/$cat/bundles)" ]; then
 	  list=$(find $BANDIT_CATALOGS/$cat/bundles -name *${prefix}*.desc | sort)
 	  enabled+=(${list[*]})
       fi
@@ -129,19 +105,62 @@ bandit_db_get_bundles_enabled()
   eval $retvar="'${enabled[*]}'"
 }
 
+# Get available bundles 
+bandit_db_get_bundles_available()
+{
+  local retvar=$1
+  local expr=$2
+  local list=""
+
+  if [ -d $BANDIT_CATALOGS ] && \
+     [ ! -z "$(ls -A $BANDIT_CATALOGS)" ] && \
+     [ ! -z "$(ls -A $BANDIT_CATALOGS/**/bundles)" ]; then
+      list=$(find $BANDIT_CATALOGS/**/bundles -name *${expr}*.desc | sort)
+  fi
+
+  eval $retvar="'$list'"
+}
+
 
 ###------------------------------
 # Items database 
 ###------------------------------
 
-# Get available bundles 
+# Get enabled bundle items
+bandit_db_get_bundle_items_enabled()
+{
+  local retvar=$1
+  local expr=$2
+  local list=""
+  local bundle_list=""
+  local enabled=""
+
+  for cat in ${BANDIT_CATALOG_LIST[*]}; do
+      if [ -d $BANDIT_CATALOGS/$cat/bundles ]; then 
+	  bundle_list=$(find $BANDIT_CATALOGS/$cat/bundles/*.dir)
+	  for bundle in ${bundle_list[*]}; do
+	      if [ -d $bundle ]; then 
+		  list=$(find $bundle/* -name *${expr}*) 
+		  enabled+=(${list[*]})
+	      fi
+	  done  
+      fi
+  done
+
+  eval $retvar="'${enabled[*]}'"
+}
+
+# Get available bundle items
 bandit_db_get_bundle_items_available()
 {
   local retvar=$1
   local expr=$2
   local list=""
 
-  if [ -d $BANDIT_CATALOGS ]; then 
+  if [ -d $BANDIT_CATALOGS ] && \
+     [ ! -z "$(ls -A $BANDIT_CATALOGS)" ] && \
+     [ ! -z "$(ls -A $BANDIT_CATALOGS/**/bundles)" ] && \
+     [ ! -z "$(ls -A $BANDIT_CATALOGS/**/bundles/*.dir/*)" ]; then
       list=$(find $BANDIT_CATALOGS/**/bundles/*.dir/* -name "*${expr}*" )
   fi
   

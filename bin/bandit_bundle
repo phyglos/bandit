@@ -108,11 +108,7 @@ bandit_bundle_do()
 		    module)
 			if [ $COMMAND == "download" ]; then continue; fi
 			if [ $COMMAND == "fetch" ]; then continue; fi
-			case ${words[1]} in
-			    perl5)
-				bandit_module perl5 ${words[*]:2}
-				;;
-			esac
+			bandit_module ${words[1]} ${words[*]:2}
 			;;
 		esac
 		;;
@@ -133,11 +129,7 @@ bandit_bundle_do()
 			esac
 			;;
 		    module)
-			case ${words[1]} in
-			    perl5)
-				bandit_module perl5 ${words[*]:2}
-				;;
-			esac
+			bandit_module ${words[1]} ${words[*]:2}
 			;;
 		esac			
 		;;

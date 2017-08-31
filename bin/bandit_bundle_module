@@ -23,6 +23,14 @@ bandit_module_install()
     module_install ${*} 2>&1 > $BUILD_LOGS/${module_log}.install-${stamp}.log 
 }
 
+bandit_module_remove()
+{
+    ## Remove the module
+    bandit_msg "...removing..."
+    bandit_timestamp stamp
+    module_remove ${*} 2>&1 > $BUILD_LOGS/${module_log}.remve-${stamp}.log 
+}
+
 ###---
 # Module main function
 ###---
@@ -41,7 +49,8 @@ bandit_module()
     bandit_log "${module_name} (${module_class} module) $@ [$(date)]"
 
     # Default functions to be overloaded by the module plugin
-    function module_install()  { :; } ; export -f module_install
+    function module_install() { :; } ; export -f module_install
+    function module_remove()  { :; } ; export -f module_remove
     
     # Source module class tricks
     source $BANDIT_HOME/lib/modules/${module_class}.sh
@@ -53,6 +62,9 @@ bandit_module()
 	    ;;
 	install | raise )
 	    bandit_module_install ${module_name}
+	    ;;
+	remove )
+	    bandit_module_remove ${module_name}
 	    ;;
     esac
 }

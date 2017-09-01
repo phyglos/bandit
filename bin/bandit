@@ -132,20 +132,20 @@ source $BANDIT_HOME/bin/bandit_catalog
 source $BANDIT_HOME/bin/bandit_bundle
 
 # Determine the use of a pager
-if [ $BANDIT_PAGER = none ]; then 
-    pager=no
+if [ "$BANDIT_PAGER" = "none" ]; then 
+    pager="no"
     # Set defaut pager
-    BANDIT_PAGER=more
+    BANDIT_PAGER="more"
 else
     pager=yes
 fi
 case "$1" in 
     "--pager")
-	pager=yes
+	pager="yes"
 	shift
 	;;
     "--no-pager")
-	pager=no
+	pager="no"
 	shift
 	;;
 esac
@@ -195,7 +195,7 @@ case $1 in
 	[ $# -ge 1 ] && expr=$1
 	
 	# Do the search
-	if [ $pager == "yes" ]; then
+	if [ "$pager" == "yes" ]; then
 	    bandit_search ${expr} ${options} | $BANDIT_PAGER
 	else
 	    bandit_search ${expr} ${options}
@@ -224,7 +224,7 @@ case $object in
 	# Execute command
 	COMMAND=$1
 	shift
-	COMMAND_PARAMS="$@"
+	COMMAND_PARAMS=$*
 	case $COMMAND in
 	    download | fetch | install | update | remove | show)
 		bandit_repository_do
@@ -243,7 +243,7 @@ case $object in
 	
 	# Execute command
 	COMMAND=$1; shift
-	COMMAND_PARAMS="$@"
+	COMMAND_PARAMS=$*
 	case $COMMAND in
 	    find | download | fetch | install | remove)
 		bandit_catalog_do
@@ -255,35 +255,10 @@ case $object in
 	;;
     -b|--bundle | --default)
 	# Get the bundle name
-	if [ $object != "--default" ]; then shift; fi
+	if [ "$object" != "--default" ]; then shift; fi
 
 	BUNDLE=$1
 	shift
-
-	# Find first catalog for the bundle
-	for cat in ${BANDIT_CATALOG_LIST[*]}; do
-	    if [ -r $BANDIT_CATALOGS/$cat/bundles/$BUNDLE.desc ]; then
-		CATALOG=$cat
-		break
-	    fi		
-	done
-	if [ -z $CATALOG ]; then 
-	    bandit_exit "BANDIT: Bundle $BUNDLE not found in enabled catalogs list"
-	fi
-	echo "Working with catalog: $CATALOG"
-
-	# Find first repository for the catalog
-	for repo in ${BANDIT_REPOSITORY_LIST[*]}; do
-	    grep -sq $CATALOG $BANDIT_REPOSITORIES/$repo/manifest
-	    if [ $? == 0 ]; then
-		REPOSITORY=$repo
-		break
-	    fi		
-	done
-	if [ -z $REPOSITORY ]; then 
-	    bandit_exit "BANDIT: Catalog $CATALOG not found in repositories list"
-	fi
-	echo "Working with repository: $REPOSITORY"
 
 	# Get optional item in the bundle
 	ITEM="all"

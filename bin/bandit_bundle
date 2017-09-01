@@ -23,6 +23,23 @@ bandit_bundle_do()
     local stamp
     bandit_timestamp stamp
 
+    ## Find first catalog and first repository
+    if [ $COMMAND != "download" -o $COMMAND != "fetch" ]; then
+	# Find first catalog for the bundle
+	CATALOG="$(bandit_find_first_catalog_for_bundle)"
+	if [ -z $CATALOG ]; then 
+	    bandit_exit "BANDIT: Bundle $BUNDLE not found in enabled catalogs list"
+	fi
+	echo "Working with catalog: $CATALOG"
+
+	# Find first repository for the catalog
+	REPOSITORY="$(bandit_find_first_repository_for_catalog)"
+	if [ -z $REPOSITORY ]; then 
+	    bandit_exit "BANDIT: Catalog $CATALOG not found in repositories list"
+	fi
+	echo "Working with repository: $REPOSITORY"
+    fi
+
     # Make default directories available to the bundle scripts and origins
     BUILD_BUNDLES=$BANDIT_CATALOGS/$CATALOG/bundles
     BUILD_SCRIPTS=$BANDIT_CATALOGS/$CATALOG/bundles/$BUNDLE.dir
@@ -61,18 +78,19 @@ bandit_bundle_do()
     # Keep or remove *.la files from libtool?
     BUILD_KEEP_LA=${BUNDLE_KEEP_LA:-$BANDIT_BUILD_KEEP_LA}
    
-    # Create working directories
+    ## Create working directories
     bandit_mkdir $BUILD_SOURCES
     bandit_mkdir $BUILD_DESTDIR 
     bandit_mkdir $BUILD_WORK 
-    if [ $COMMAND != "download" -a $COMMAND != "fetch" -a $COMMAND != "config" -a $COMMAND != "edit" ]; then 
+    if [ $COMMAND != "download" -a $COMMAND != "fetch" \
+       -a $COMMAND != "config" -a $COMMAND != "edit" ]; then 
 	bandit_mkdir $BUILD_LOGS
     fi
 
-    # Build inside work directory
+    ## Build inside work directory
     bandit_pushd $BUILD_WORK
 
-    # Parse bundle command list by lines
+    ## Parse bundle command list by lines
     OLD=$IFS; IFS=$'\n';
     for line in ${BUILD_CMD[*]}; do
 	IFS=$OLD

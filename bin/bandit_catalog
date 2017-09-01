@@ -124,6 +124,15 @@ bandit_catalog_do()
     local stamp
     bandit_timestamp stamp
     
+    # Find first repository for the catalog
+    if [ "$COMMAND" == "find" -o "$COMMAND" == "download" -o "$COMMAND" == "fetch" ]; then   
+	REPOSITORY="$(bandit_find_first_repository_for_catalog)"
+	if [ -z $REPOSITORY ]; then 
+	    bandit_exit "BANDIT: Catalog $CATALOG not found in repositories list"
+	fi
+	echo "Working with repository: $REPOSITORY"
+    fi
+    
     # Set directories 
     BUILD_LOGS=$BANDIT_LOGS/catalogs/$CATALOG.$COMMAND-${stamp}
 

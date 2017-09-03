@@ -25,21 +25,19 @@ bandit_script_run()
     script_test_level=0
 
     # Set LOG file name
-    if [ -z $1 ]; then 
+    if [ -z "$1" ]; then 
 	script_log=$script
     else
 	script_log=$script-$1
     fi 
 
-    bandit_log "$script $@ [$(date)]"
+    bandit_log "$script $@ (script) [$(date)]"
 
     # Default functions to be overloaded by the script
-    function script_run()  { :; } ; export -f script_run
-    function script_test() { :; } ; export -f script_test
+    function script_run()     { :; } ; export -f script_run
+    function script_test()    { :; } ; export -f script_test
+    function script_verify()  { :; } ; export -f script_verify
 
-    bandit_pushd $BUILD_SOURCES
-    bandit_mkdir $script
-    bandit_pushd $script
     source $BUILD_SCRIPTS/$script.sh
 
     ## Run the script 
@@ -62,10 +60,6 @@ bandit_script_run()
 	bandit_timestamp stamp
 	script_verify 2>&1 > $BUILD_LOGS/$script.verify-${stamp}.log 
     fi
-
-    bandit_popd
-    rm -rf $script
-    bandit_popd
 }
 export -f bandit_script_run
 
@@ -74,36 +68,26 @@ bandit_script_reverse()
     local script=$1   `# Script name`
     shift
 
-    # Default variables to be overloaded by the script
-    script_test_level=0
-
     # Set LOG file name
-    if [ -z $1 ]; then 
+    if [ -z "$1" ]; then 
 	script_log=$script
     else
 	script_log=$script-$1
     fi 
 
-    bandit_log "$script $@ [$(date)]"
+    bandit_log "$script $@ (script) [$(date)]"
 
     # Default functions to be overloaded by the script
     function script_reverse()  { :; } ; export -f script_reverse
 
-    bandit_pushd $BUILD_SOURCES
-    bandit_mkdir $script
-    bandit_pushd $script
     source $BUILD_SCRIPTS/$script.sh
     
-    ## Reversing setup
+    ## Reversing script
     if bandit_script_has $BUILD_SCRIPTS/$script.sh script_reverse; then  
-	bandit_msg "...reversing set up..."
+	bandit_msg "...reversing..."
 	bandit_timestamp stamp
 	script_reverse 2>&1 > $BUILD_LOGS/$script.reverse-${stamp}.log 
     fi
-
-    bandit_popd
-    rm -rf $script
-    bandit_popd
 }
 export -f bandit_script_reverse
 

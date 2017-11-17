@@ -108,7 +108,7 @@ bandit_package_prepare_sources()
     fi
 
     # Untar main source tarball
-    tar -xf ${sources_tarball[0]}
+    tar --no-same-owner -xf  ${sources_tarball[0]}
 }
 
 #---

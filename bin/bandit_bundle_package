@@ -49,13 +49,13 @@ bandit_package_fetch_sources()
     local download=false
     
     # $1 = download -> do not use cache, force download
-    [ $? == 1 ] && [ "$1" == "download" ] && download=true 
+    [ "$1" == "download" ] && download=true 
 
     let len=${#sources_fetch_url[*]}
     for ((i=0; i<len; i++)); do
 	file=$(basename "${sources_fetch_url[i]}")
 	
-	if [ download == true ]; then
+	if [ $download == true ]; then
 	    # Force downloading by removing files in local cache 
 	    rm $BUILD_SOURCES/$file{,.md5} 2>/dev/null
 	fi

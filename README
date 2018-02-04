@@ -1,7 +1,7 @@
 #
 # README - General description of the contents of the tarball
 #
-# Copyright (C) 2015-2017 Angel Linares Zapater
+# Copyright (C) 2015-2018 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -20,6 +20,6 @@ The COPYING file contains the GNU License for this software.
 The INSTALL file describes how to install BANDIT in the HOST system. 
 The RELEASE file contains the release notes.
 
-Visit http://phy.wiki for more information and other installation methods.
+Visit https://phy.wiki for more information and other installation methods.
 
 

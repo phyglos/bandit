@@ -2,7 +2,7 @@
 #
 # bandit-target-init.sh - Initialize the TARGET system
 #
-# Copyright (C) 2015-2017 Angel Linares Zapater
+# Copyright (C) 2015-2018 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -146,7 +146,7 @@ if [ -z "\$mounted" ]; then
 fi
 
 mount --bind /dev      $BANDIT_HOST_TGT_MNT/dev
-mount -t devpts devpts $BANDIT_HOST_TGT_MNT/dev/pts -o gid=5,mode=620
+mount --bind /dev/pts  $BANDIT_HOST_TGT_MNT/dev/pts -o gid=5,mode=620
 mount -t proc  proc    $BANDIT_HOST_TGT_MNT/proc
 mount -t sysfs sysfs   $BANDIT_HOST_TGT_MNT/sys
 mount -t tmpfs tmpfs   $BANDIT_HOST_TGT_MNT/run
@@ -190,7 +190,7 @@ if [ -z "\$mounted" ]; then
 fi
 
 mount --bind /dev      $BANDIT_HOST_TGT_MNT/dev
-mount -t devpts devpts $BANDIT_HOST_TGT_MNT/dev/pts -o gid=5,mode=620
+mount --bind /dev/pts  $BANDIT_HOST_TGT_MNT/dev/pts -o gid=5,mode=620
 mount -t proc  proc    $BANDIT_HOST_TGT_MNT/proc
 mount -t sysfs sysfs   $BANDIT_HOST_TGT_MNT/sys
 mount -t tmpfs tmpfs   $BANDIT_HOST_TGT_MNT/run

@@ -2,7 +2,7 @@
 #
 # bandit - the Build AND Install Toolkit
 #
-# Copyright (C) 2015-2107 Angel Linares Zapater
+# Copyright (C) 2015-2018 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -23,7 +23,7 @@ bandit_show_version()
 {
     echo "bandit $RELEASE - The Build AND Install Toolkit"
     echo
-    echo " Copyright (C) 2015-2017 Angel Linares Zapater"
+    echo " Copyright (C) 2015-2018 Angel Linares Zapater"
     echo " BANDIT comes with ABSOLUTELY NO WARRANTY." 
     echo
     echo "This is free software, and you are welcome to redistribute it"

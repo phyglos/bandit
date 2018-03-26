@@ -2,7 +2,7 @@
 #
 # bandit_database - BANDIT database functions
 #
-# Copyright (C) 2016-2017 Angel Linares Zapater
+# Copyright (C) 2016-2018 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -139,8 +139,8 @@ bandit_db_get_bundle_items_enabled()
       if [ -d $BANDIT_CATALOGS/$cat/bundles ]; then 
 	  bundle_list=$(find $BANDIT_CATALOGS/$cat/bundles/*.dir)
 	  for bundle in ${bundle_list[*]}; do
-	      if [ -d $bundle ]; then 
-		  list=$(find $bundle/* -name *${expr}*) 
+	      if [ -d $BANDIT_CATALOGS/$cat/$bundle ]; then 
+		  list=$(find $BANDIT_CATALOGS/$cat/$bundle/* -name *${expr}*) 
 		  enabled+=(${list[*]})
 	      fi
 	  done  

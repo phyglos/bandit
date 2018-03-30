@@ -31,55 +31,11 @@ bandit_show_version()
     echo
 }
 
-bandit_show_help()
+bandit_show_help_bundles()
 {
-    echo "Usage for bandit:"
-    echo "  bandit edit     Edit BANDIT configuration"
     echo
-    echo "  bandit search [--no-pager] [-r|-c|-b|-i|-f|-l|-x] [<expression>|all]"
-    echo "    --no-pager    Do not page results"
-    echo "    -r            Search for repositories"
-    echo "    -c            Search for catalogs"
-    echo "    -b            Search for bundles"
-    echo "    -i            Search for items in bundles"
-    echo "    -f            Search for installed files"
-    echo "    -l            Search in logs"
-    echo "    -x            Search in source and build caches"
-    echo "    <expression>  partial expression to search for"
-    echo "                  or 'all' for everything"
-    echo
-    echo "Usage for systems: "
-    echo "  bandit -s|--system <system> <action>" 
-    echo "     host check   Checks the building requiremts of the HOST"
-    echo "     host init    Creates users and partitions on the HOST"
-    echo "     host clean   Cleans the HOST from previous installations"
-    echo "     target init  Initialize the TARGET filesystem"
-    echo
-    echo "Usage for repositories: "
-    echo "  bandit -r|--repository <repository> <action>" 
-    echo "    <repository>: Name of the repository"
-    echo "    <action>:"
-    echo "      download    Download the repository manifest into cache"
-    echo "      install     Install the repository manifest from cache"
-    echo "                  --all for installing catalogs in the manifest"
-    echo "      update      Download and install the repository manifest"
-    echo "                  --all for updating catalogs in the manifest"
-    echo "      remove      Remove the repository manifest"
-    echo "                  --all for removing catalogs in the manifest"
-    echo "      show        List catalogs in the repository manifest"
-    echo "                  --md5 for MD5 checksums"
-    echo
-    echo "Usage for catalogs: "
-    echo "  bandit -c|--catalog <catalog> <action>" 
-    echo "    <catalog>:    Name of the catalog"
-    echo "    <action>:"
-    echo "      download    Download (inconditionally) the catalog tarball"
-    echo "      fetch       Download (when not in cache) the catalog tarball"
-    echo "      install     Install the catalog"   
-    echo "      remove      Remove the catalog"   
-    echo
-    echo "Usage for bundles: "
     echo "  bandit [-b|--bundle] <bundle> [-i|--item <item>] <action>" 
+    echo
     echo "    <bundle>:     Name of the bundle"
     echo "    -i <item>:    Apply the action only to this item in the bundle"
     echo "    <action>:"
@@ -95,7 +51,32 @@ bandit_show_help()
     echo "      raise       Build first and then install"
     echo "      remove      Remove the bundle from the system"
     echo
-    echo "Usage for packages: "
+}
+
+bandit_show_help_catalogs()
+{
+    echo
+    echo "  bandit -c|--catalog <catalog> <action>" 
+    echo
+    echo "    <catalog>:    Name of the catalog"
+    echo "    <action>:"
+    echo "      download    Download (inconditionally) the catalog tarball"
+    echo "      fetch       Download (when not in cache) the catalog tarball"
+    echo "      install     Install the catalog"   
+    echo "      remove      Remove the catalog"   
+    echo
+}
+
+bandit_show_help_edit()
+{
+    echo
+    echo "  bandit edit    Edit the global BANDIT configuration file "
+    echo
+}
+
+bandit_show_help_packages()
+{
+    echo
     echo "  bandit -p|--package <package> <action>" 
     echo "    <package>:    Name of the package(s)."
     echo "                  Use <package*> for multiple packages."
@@ -106,10 +87,98 @@ bandit_show_help()
     echo
 }
 
+bandit_show_help_repositories()
+{
+    echo
+    echo "  bandit -r|--repository <repository> <action>" 
+    echo
+    echo "    <repository>: Name of the repository"
+    echo "    <action>:"
+    echo "      download    Download the repository manifest into cache"
+    echo "      install     Install the repository manifest from cache"
+    echo "                  --all for installing catalogs in the manifest"
+    echo "      update      Download and install the repository manifest"
+    echo "                  --all for updating catalogs in the manifest"
+    echo "      remove      Remove the repository manifest"
+    echo "                  --all for removing catalogs in the manifest"
+    echo "      show        List catalogs in the repository manifest"
+    echo "                  --md5 for MD5 checksums"
+    echo
+}
+
+bandit_show_help_search()
+{
+    echo
+    echo "  bandit search [--no-pager] [-r|-c|-b|-i|-f|-l|-x] [<expression>|all]"
+    echo
+    echo "    --no-pager    Do not page results"
+    echo "    -r            Search for repositories"
+    echo "    -c            Search for catalogs"
+    echo "    -b            Search for bundles"
+    echo "    -i            Search for items in bundles"
+    echo "    -f            Search for installed files"
+    echo "    -l            Search in logs"
+    echo "    -x            Search in source and build caches"
+    echo "    <expression>  partial expression to search for"
+    echo "                  or 'all' for everything"
+    echo
+}
+
+bandit_show_help_systems()
+{
+    echo
+    echo "  bandit -s|--system <system> <action>" 
+    echo
+    echo "     host check   Checks the building requiremts of the HOST"
+    echo "     host init    Creates users and partitions on the HOST"
+    echo "     host clean   Cleans the HOST from previous installations"
+    echo "     target init  Initialize the TARGET filesystem"
+    echo
+}
+
+bandit_show_help()
+{
+    echo "Usage for bandit help:"
+    echo
+    echo "  bandit help edit          Help on editing BANDIT configuration"
+    echo "  bandit help search        Help on dearching for catalogs, bundles, files, etc."
+    echo "  bandit help systems       Help on working with systems"
+    echo "  bandit help repositories  Help on working with repositories"
+    echo "  bandit help catalogs      Help on working with catalogs"
+    echo "  bandit help bundles       Help on working with bundles"
+    echo "  bandit help packages      Help on working with packages"
+    echo
+}
+
 case $1 in 
-    -h|--help | "")
-	bandit_show_version
-	bandit_show_help
+    -h|--help | help | "")
+	case $2 in
+	    edit)
+		bandit_show_help_edit
+		;;
+	    search)
+		bandit_show_help_search
+		;;
+	    systems)
+		bandit_show_help_systems
+		;;
+	    repositories)
+		bandit_show_help_repositories
+		;;
+	    catalogs)
+		bandit_show_help_catalogs
+		;;
+	    bundles)
+		bandit_show_help_bundles
+		;;
+	    packages)
+		bandit_show_help_packages
+		;;
+	    *)
+		bandit_show_version
+		bandit_show_help
+		;;
+	esac
 	exit 0
 	;;
     -v|--version)

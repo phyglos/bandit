@@ -36,14 +36,15 @@ bandit_show_help()
     echo "Usage for bandit:"
     echo "  bandit edit     Edit BANDIT configuration"
     echo
-    echo "  bandit search [--no-pager] [-c|-b|-i|-f|-x] <expression>"
+    echo "  bandit search [--no-pager] [-r|-c|-b|-i|-f|-l|-x] [<expression>|all]"
     echo "    --no-pager    Do not page results"
     echo "    -r            Search for repositories"
     echo "    -c            Search for catalogs"
     echo "    -b            Search for bundles"
     echo "    -i            Search for items in bundles"
     echo "    -f            Search for installed files"
-    echo "    -x            Search cache for sources and builds"
+    echo "    -l            Search in logs"
+    echo "    -x            Search in source and build caches"
     echo "    <expression>  partial expression to search for"
     echo "                  or 'all' for everything"
     echo
@@ -167,7 +168,7 @@ case $1 in
 	options=""
 	while getopts "rcbixfl" opt; do
 	    case $opt in
-		r|c|b|i|x|f|l)
+		r|c|b|i|f|l|x)
 		    options+=$opt
 		    ;;
 		\?)

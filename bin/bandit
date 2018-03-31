@@ -109,9 +109,10 @@ bandit_show_help_repositories()
 bandit_show_help_search()
 {
     echo
-    echo "  bandit search [--no-pager] [-r|-c|-b|-i|-f|-l|-x] [<expression>|all]"
+    echo "  bandit search [--no-pager|--pager] [-r|-c|-b|-i|-f|-l|-x] [<expression>|all]"
     echo
     echo "    --no-pager    Do not page results"
+    echo "    --pager       Do page results"
     echo "    -r            Search for repositories"
     echo "    -c            Search for catalogs"
     echo "    -b            Search for bundles"
@@ -209,16 +210,6 @@ if [ "$BANDIT_PAGER" = "none" ]; then
 else
     pager=yes
 fi
-case "$1" in 
-    "--pager")
-	pager="yes"
-	shift
-	;;
-    "--no-pager")
-	pager="no"
-	shift
-	;;
-esac
 
 #--- 
 # Work with verbs...
@@ -233,6 +224,18 @@ case $1 in
     search)
 	shift;
 	
+	# Change default pager
+	case $1 in 
+	    "--pager")
+		pager="yes"
+		shift;
+		;;
+	    "--no-pager")
+		pager="no"
+		shift;
+		;;
+	esac
+
 	# Get search options
 	options=""
 	while getopts "rcbixfl" opt; do

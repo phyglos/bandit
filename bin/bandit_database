@@ -180,7 +180,7 @@ bandit_db_get_packages_available()
   local list=""
 
   if [ -d $BANDIT_CATALOGS ]; then 
-      list=$(find $BANDIT_CATALOGS/**/bundles/* -name ${prefix}.sh)
+      list=$(find $BANDIT_CATALOGS/**/bundles/* -name "${prefix}*.sh")
   fi
 
   eval $retvar="'$list'"
@@ -194,7 +194,7 @@ bandit_db_get_packages_installed()
   local list=""
 
   if [ -r /var/log/porg ]; then 
-      local list=$(find /var/log/porg -name ${prefix})
+      local list=$(find /var/log/porg -name "${prefix}*")
   fi
   
   eval $retvar="'$list'"

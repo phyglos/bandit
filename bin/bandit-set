@@ -18,7 +18,6 @@
 
 # Remove BANDIT_HOME from PATH
 if [ "$BANDIT_HOME" ] ; then
-    echo "Removing old BANDIT_HOME from PATH..."
     NEW=""
     OLDIFS=$IFS
     IFS=':'
@@ -31,17 +30,19 @@ if [ "$BANDIT_HOME" ] ; then
     PATH=$NEW
 fi
 
-#Define BANDIT_HOME and add it to PATH   
-echo
-echo "Setting BANDIT_HOME..."
+# Define BANDIT_HOME and add it to PATH   
 export BANDIT_HOME=`pwd`
-echo "BANDIT_HOME="$BANDIT_HOME
-echo
-echo "Adding BANDIT_HOME/bin to PATH..."
 export PATH=$PATH:$BANDIT_HOME/bin
-echo "PATH="$PATH
-echo
 
-echo "Now using BANDIT:"
-echo
-bandit --version
+# Source the proper bandit bash completion shell
+ln -sf $BANDIT_HOME/bin/bandit_bash_completion /etc/bash_completion.d/
+source /etc/bash_completion.d/bandit_bash_completion 
+
+# Display new enviroment
+if [ "$1" != "--silent" ]; then 
+    bandit --version
+    echo "BANDIT environment set to:"
+    echo " BANDIT_HOME=$BANDIT_HOME"
+    echo " PATH="$PATH
+    echo
+fi

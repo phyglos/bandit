@@ -1,0 +1,135 @@
+#!/bin/bash
+#
+# bandit_bash_completion - bash completion script for BANDIT
+#
+# Copyright (C) 2018 Angel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+source $BANDIT_HOME/etc/bandit.conf
+source $BANDIT_HOME/bin/bandit_common
+source $BANDIT_HOME/bin/bandit_database
+
+# Main completion function
+_bandit()
+{
+   
+    # Define BANDIT commands and options
+    local commands=' help edit search - --'
+
+    local help_options=' edit search systems repositories catalogs bundles items packages'
+    local search_options='--no-pager --pager -r -c -b -i -f -l -x all'
+    local systems_options='host target'
+    local system_host_options='check init clean'
+    local system_target_options='init'
+    local repository_actions='download install update remove show'
+    local catalog_actions='download fetch install remove'
+    local bundle_actions='edit download fetch config build install raise remove'
+    local package_actions='bundles info files'
+    
+    # Define BANDIT short options
+    local short_options='-h -s -r -c -b -p'
+
+    # Define BANDIT long options
+    local long_options='--help --system --repository --catalog --bundle --package'
+
+    # Program the autocompletion 
+    COMPREPLY=()
+    local current=${COMP_WORDS[COMP_CWORD]}
+    local previous=${COMP_WORDS[COMP_CWORD-1]}
+    local previous2=${COMP_WORDS[COMP_CWORD-2]}
+    local previous3=${COMP_WORDS[COMP_CWORD-3]}
+
+    ##---
+    ## Complete next words
+    ##---
+    
+    # Complete the second word
+    if [ $COMP_CWORD -eq 1 ]; then
+	if [[ "$current" == --* ]]; then
+	    COMPREPLY=( $(compgen -W "$long_options" -- $current) )
+	    return 0
+	elif [[ "$current" == -* ]]; then
+	    COMPREPLY=( $(compgen -W "$short_options $long_options" -- $current) )
+	    return 0
+	else
+	    COMPREPLY=( $(compgen -W "$commands" $current) )
+	    return 0
+	fi
+    fi
+
+    # Complete the third word
+    if [ $COMP_CWORD -eq 2 ]; then
+	case $previous in
+	    help)
+		COMPREPLY=( $(compgen -W "$help_options" -- $current) )
+		return 0
+		;;
+	    search)
+		COMPREPLY=( $(compgen -W "$search_options" -- $current) )
+		return 0
+		;;
+	    -s | --system)
+		COMPREPLY=( $(compgen -W "$systems_options" -- $current) )
+		return 0
+		;;
+	    -r | --repository)
+		local repositories=""
+		bandit_db_get_repositories_enabled repositories
+		COMPREPLY=( $(compgen -W "$repositories" -- $current) )
+		return 0
+		;;
+	    -c | --catalog)
+		local catalogs=""
+		bandit_db_get_catalogs_enabled catalogs
+		COMPREPLY=( $(compgen -W "$catalogs" -- $current) )
+		return 0
+		;;
+	esac
+    fi
+
+    # Complete the fourth word
+    if [ $COMP_CWORD -eq 3 ]; then
+	case $previous2 in
+	    -s| --system)
+		case $previous in
+		    host)
+			COMPREPLY=( $(compgen -W "$system_host_options" -- $current) )
+			return 0
+			;;
+		    target)
+			COMPREPLY=( $(compgen -W "$system_target_options" -- $current) )
+			return 0
+			;;
+		esac
+		;;    
+	    -r | --repository)
+		COMPREPLY=( $(compgen -W "$repository_actions" -- $current) )
+		return 0
+		;;
+	    -c | --catalog)
+		COMPREPLY=( $(compgen -W "$catalog_actions" -- $current) )
+		return 0
+		;;
+	    -b| --bundle)
+		COMPREPLY=( $(compgen -W "$bundle_actions" -- $current) )
+		return 0
+		;;
+	    -p| --package)
+		COMPREPLY=( $(compgen -W "$package_actions" -- $current) )
+		return 0
+		;;
+	esac
+    fi
+
+}
+
+# Set the completion function for BANDIT
+complete -F _bandit bandit 
+

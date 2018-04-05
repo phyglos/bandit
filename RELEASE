@@ -14,7 +14,17 @@
 RELEASE NOTES for BANDIT
 ========================
 
-This is the release "1.3.z" of the BANDIT toolkit.
+This is the release "1.4.z" of the BANDIT toolkit.
 This is a "DEVELOPMENT" release.
 
 Visit https://phy.wiki for more information.
+
+
+MAJOR CHANGES in 1.4
+====================
+
+* Refactored "bandit help"
+* Added support for Bash completion
+* Add bandit.env in BANDIT_HOME
+  To change the active BANDIT instance issue "source bandit.env" instead of "source bin/bandit-set"
+  

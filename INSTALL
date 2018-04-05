@@ -29,7 +29,7 @@ As root, move the file to /opt and change into that directory
 
 Initialize the HOST environment for BANDIT from the bandit home directory:
 # cd bandit
-# source bin/bandit-set
+# source bandit.env
 
 Bandit should work now in the HOST. Test with:
 # bandit --version

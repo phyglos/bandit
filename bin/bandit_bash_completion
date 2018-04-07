@@ -12,6 +12,9 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
+# Do not load autocompletion when $BANDIT_HOME is not set
+[ "X$BANDIT_HOME" == X ] && return 1
+
 source $BANDIT_HOME/etc/bandit.conf
 source $BANDIT_HOME/bin/bandit_common
 source $BANDIT_HOME/bin/bandit_database

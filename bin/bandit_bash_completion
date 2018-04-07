@@ -22,7 +22,8 @@ _bandit()
    
     # Define BANDIT commands and options
     local commands=' help edit search - --'
-
+    local short_options='-h -s -r -c -b -p -v'
+    local long_options='--help --system --repository --catalog --bundle --package --version'
     local help_options=' edit search systems repositories catalogs bundles items packages'
     local search_options='--no-pager --pager -r -c -b -i -f -l -x all'
     local systems_options='host target'
@@ -33,12 +34,6 @@ _bandit()
     local bundle_actions='edit download fetch config build install raise remove'
     local package_actions='bundles info files'
     
-    # Define BANDIT short options
-    local short_options='-h -s -r -c -b -p'
-
-    # Define BANDIT long options
-    local long_options='--help --system --repository --catalog --bundle --package'
-
     # Program the autocompletion 
     COMPREPLY=()
     local current=${COMP_WORDS[COMP_CWORD]}

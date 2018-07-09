@@ -77,6 +77,9 @@ bandit_bundle_do()
 
     # Keep or remove *.la files from libtool?
     BUILD_KEEP_LA=${BUNDLE_KEEP_LA:-$BANDIT_BUILD_KEEP_LA}
+    
+    # Update system databases?
+    BUILD_UPDATE_SYSTEM_DB=${BUNDLE_UPDATE_SYSTEM_DB:-$BANDIT_UPDATE_SYSTEM_DB}
    
     ## Create working directories
     bandit_mkdir $BUILD_SOURCES
@@ -161,15 +164,18 @@ bandit_bundle_do()
     # Clean work directory
     rm -rf $BUILD_WORK 
 
-    # Update system databases
-    if [ $COMMAND == "install" -o $COMMAND == "raise" -o $COMMAND == "remove" ]; then 
-	# except for the unprivileged 'bandit' user at HOST
-	if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
-	    echo 
-	    echo "Updating system database..."
-	    [ -x /usr/bin/updatedb ] && updatedb
-	    echo "Updating man pages database..."
-	    [ -x /usr/bin/mandb ]    && mandb &> /dev/null
+    # Update system databases after the bundle work is done
+    if [ "$BUILD_UPDATE_SYSTEM_DB" == "yes" ]; then 
+	# When the command alters the system databases
+	if [ $COMMAND == "install" -o $COMMAND == "raise" -o $COMMAND == "remove" ]; then 
+	    # except for the unprivileged 'bandit' user at HOST
+	    if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
+		echo 
+		echo "Updating system database..."
+		[ -x /usr/bin/updatedb ] && updatedb
+		echo "Updating man pages database..."
+		[ -x /usr/bin/mandb ]    && mandb &> /dev/null
+	    fi
 	fi
     fi
 }

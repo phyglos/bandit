@@ -27,7 +27,7 @@ bandit_show_version()
     echo " BANDIT comes with ABSOLUTELY NO WARRANTY." 
     echo
     echo "This is free software, and you are welcome to redistribute it"
-    echo "under certain conditions. Visit http://phy.wiki/doc/bandit"
+    echo "under certain conditions. Visit https://phy.wiki/doc/bandit"
     echo
 }
 
@@ -141,8 +141,8 @@ bandit_show_help()
 {
     echo "Usage for bandit help:"
     echo
-    echo "  bandit help edit          Help on editing BANDIT configuration"
-    echo "  bandit help search        Help on dearching for catalogs, bundles, files, etc."
+    echo "  bandit help edit          Help on editing the BANDIT configuration file"
+    echo "  bandit help search        Help on searching for catalogs, bundles, files, etc."
     echo "  bandit help systems       Help on working with systems"
     echo "  bandit help repositories  Help on working with repositories"
     echo "  bandit help catalogs      Help on working with catalogs"

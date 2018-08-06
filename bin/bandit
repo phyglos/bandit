@@ -39,12 +39,14 @@ bandit_show_help_bundles()
     echo "    <bundle>:     Name of the bundle"
     echo "    -i <item>:    Apply the action only to this item in the bundle"
     echo "    <action>:"
-    echo "      edit        Edit the configuration file"
+    echo "      edit        Edit the configuration files for the bundle"
+    echo "                  --conf for editing the configuration file (default)"
+    echo "                  --desc for editing the description file"
     echo "      download    Download (inconditionally) from origins"
     echo "      fetch       Download (when not in cache) from origins"
     echo "                  --sources for fetching sources"
     echo "                  --builds for fetching sources"
-    echo "                  --all for fetching sources and builds"
+    echo "                  --all for fetching sources and builds (default)"
     echo "      config      Only with -i. Interactively configure the bundle item"
     echo "      build       Only with -i. Build the bundle and save a build pack in local cache"
     echo "      install     Only with -i. Install the build pack from local cache"
@@ -346,17 +348,28 @@ case $object in
 	COMMAND=$1; shift
 
 	# Get optional command parameters
-	COMMAND_PARAMS="--all"
-	if [[ $1 == -* ]]; then COMMAND_PARAMS="$1"; fi # Capture also one dash params to warn
+	COMMAND_PARAMS=$1; shift
+	
+	# Set default parameter, if nothing provided
+	if [ -z "$COMMAND_PARAMS" ]; then
+	    case $COMMAND in
+		edit)
+		    COMMAND_PARAMS="--conf"
+		    ;;
+		*)
+		    COMMAND_PARAMS="--all"
+		    ;;
+	    esac
+	fi
 	case $COMMAND_PARAMS in
-	    --all | --sources | --builds)
+	    --all | --sources | --builds | --desc | --conf)
 		:
 		;;
 	    *)
-		bandit_exit "BANDIT: Command parameter ${command_params} not defined for bundles."
+		bandit_exit "BANDIT: Parameter ${COMMAND_PARAMS} not defined for bundle commands."
 		;;
 	esac
-		
+
         # Start the work on the bundle
 	bandit_mkdir $BANDIT_LOGS/bundles
 	case $COMMAND in

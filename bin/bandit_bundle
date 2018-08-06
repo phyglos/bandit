@@ -47,6 +47,25 @@ bandit_bundle_do()
     BUILD_LOGS=$BANDIT_LOGS/bundles/$BUNDLE.$COMMAND-${stamp}
     BUILD_WORK=$BANDIT_WORK/$BUNDLE-${stamp}
 
+    ## Edit bundle files
+    if [ $COMMAND == "edit" ]; then
+	ext=""
+	case $COMMAND_PARAMS in
+	    --conf )
+		ext="conf"
+		;;
+	    --desc )
+		ext="desc"
+		;;
+	    *)
+		bandit_exit "BANDIT: Parameter ${COMMAND_PARAMS} not defined for bundle editing"
+	esac
+	
+	${EDITOR:-vi} $BUILD_BUNDLES/$BUNDLE.$ext
+    fi
+
+    ## Source bundle configuration files
+
     # Source bundle description
     if [ -r $BUILD_BUNDLES/$BUNDLE.desc ]; then
 	source $BUILD_BUNDLES/$BUNDLE.desc
@@ -54,13 +73,9 @@ bandit_bundle_do()
 	bandit_exit "BANDIT: Cannot find $bundle description file"
     fi
 
-    # Edit or source the bundle configuration file
+    # Source the bundle configuration file
     if [ -r $BUILD_BUNDLES/$BUNDLE.conf ]; then 
-	if [ $COMMAND == "edit" ]; then
-	    ${EDITOR:-vi} $BUILD_BUNDLES/$BUNDLE.conf
-	else
-    	    source $BUILD_BUNDLES/$BUNDLE.conf
-	fi
+    	source $BUILD_BUNDLES/$BUNDLE.conf
     else
 	bandit_exit "BANDIT: Cannot find $BUNDLE.conf file"
     fi

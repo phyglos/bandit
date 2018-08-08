@@ -349,7 +349,6 @@ bandit_package_do()
 		"--sources")
 		    bandit_package_get_origins
 		    bandit_package_fetch_sources download
-		    bandit_package_prepare_sources
 		    ;;
 		"--builds") 
 		    bandit_package_fetch_builds download
@@ -357,7 +356,6 @@ bandit_package_do()
 		"--all" )
 		    bandit_package_get_origins
 		    bandit_package_fetch_sources download
-		    bandit_package_prepare_sources
 		    bandit_package_fetch_builds download
 		    ;;
 	    esac
@@ -367,7 +365,6 @@ bandit_package_do()
 		"--sources")
 		    bandit_package_get_origins
 		    bandit_package_fetch_sources
-		    bandit_package_prepare_sources
 		    ;;
 		"--builds") 
 		    bandit_package_fetch_builds 
@@ -375,7 +372,6 @@ bandit_package_do()
 		"--all")
 		    bandit_package_get_origins
 		    bandit_package_fetch_sources
-		    bandit_package_prepare_sources
 		    bandit_package_fetch_builds
 		    ;;
 	    esac

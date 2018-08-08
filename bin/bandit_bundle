@@ -116,8 +116,14 @@ bandit_bundle_do()
 	# Parse line into parameters
 	words=( $line )
 
-	# Ignore all other items, when just one package or script is selected
-	if [ "${ITEM}" != "all" ] && [ "${ITEM}" != "${words[2]}" ]; then continue; fi
+	# Get the item from the command list
+	local bundle_item=${words[2]}
+	# Take the variant of the item into account
+	if [ ${words[4]} ]; then
+	   bundle_item=${bundle_item}-${words[4]}
+	fi
+	# Ignore all other items, when one specific item was selected
+	if [ "${ITEM}" != "all" ] && [ "${ITEM}" != "${bundle_item}" ]; then continue; fi
 
 	case $COMMAND in 
 	    config)

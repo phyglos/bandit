@@ -193,9 +193,9 @@ bandit_bundle_do()
 	    if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
 		echo 
 		echo "Updating system database..."
-		[ -x /usr/bin/updatedb ] && updatedb
+		[ -x /usr/bin/updatedb ] && ( setsid updatedb &> /dev/null & ) 
 		echo "Updating man pages database..."
-		[ -x /usr/bin/mandb ]    && mandb &> /dev/null
+		[ -x /usr/bin/mandb ]    && ( setsid mandb &> /dev/null & )
 	    fi
 	fi
     fi

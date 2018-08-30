@@ -47,6 +47,23 @@ bandit_bundle_do()
     BUILD_LOGS=$BANDIT_LOGS/bundles/$BUNDLE.$COMMAND-${stamp}
     BUILD_WORK=$BANDIT_WORK/$BUNDLE-${stamp}
 
+    ## Copy a bundle 
+    if [ $COMMAND == "copy" ]; then
+	dest="${COMMAND_PARAMS[0]}"
+	if [ "${dest}" == "" ]; then
+	    bandit_exit "BANDIT: Destination bundle not set for bundle copying"    
+	fi
+	if [ -d $BUILD_BUNDLES/${dest}.dir ]; then
+	    bandit_exit "BANDIT: Destination bundle ${dest} already exists in catalog ${CATALOG}"    
+	fi
+	cp $BUILD_BUNDLES/$BUNDLE.conf $BUILD_BUNDLES/${dest}.conf
+	cp $BUILD_BUNDLES/$BUNDLE.desc $BUILD_BUNDLES/${dest}.desc
+	mkdir -p $BUILD_BUNDLES/${dest}.dir
+	cp -R $BUILD_BUNDLES/$BUNDLE.dir/*  $BUILD_BUNDLES/${dest}.dir
+
+	bandit_exit "BANDIT: Created new bundle ${dest} in catalog ${CATALOG}" green
+    fi
+    
     ## Edit bundle files
     if [ $COMMAND == "edit" ]; then
 	ext=""

@@ -34,11 +34,13 @@ bandit_show_version()
 bandit_show_help_bundles()
 {
     echo
-    echo "  bandit [-b|--bundle] <bundle> [-i|--item <item>] <action>" 
+    echo "  bandit [-b|--bundle] <bundle> [-i|--item <item>] <action> <params>" 
     echo
     echo "    <bundle>:     Name of the bundle"
     echo "    -i <item>:    Apply the action only to this item in the bundle"
     echo "    <action>:"
+    echo "      copy        Copy an existing bundle into new one"
+    echo "                  <dest>  name for the new bundle"
     echo "      edit        Edit the configuration files for the bundle"
     echo "                  --conf for editing the configuration file (default)"
     echo "                  --desc for editing the description file"
@@ -348,7 +350,7 @@ case $object in
 	COMMAND=$1; shift
 
 	# Get optional command parameters
-	COMMAND_PARAMS=$1; shift
+	COMMAND_PARAMS=$*;
 	
 	# Set default parameter, if nothing provided
 	if [ -z "$COMMAND_PARAMS" ]; then
@@ -365,7 +367,7 @@ case $object in
 	    --all | --sources | --builds | --desc | --conf)
 		:
 		;;
-	    *)
+	    --*)
 		bandit_exit "BANDIT: Parameter ${COMMAND_PARAMS} not defined for bundle commands."
 		;;
 	esac
@@ -373,7 +375,7 @@ case $object in
         # Start the work on the bundle
 	bandit_mkdir $BANDIT_LOGS/bundles
 	case $COMMAND in
-	    config | edit)
+	    config | copy | edit)
 		# Run interactively without logging
 		bandit_bundle_do 
 		;;

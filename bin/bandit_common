@@ -105,10 +105,11 @@ export -f bandit_system_has
 # Script helpers
 ###------------------------------
 
+# Exit after printing a message $1 in some color $2
 bandit_exit()
-{  
-    bandit_msg "$1" red
-    exit 1
+{
+    bandit_msg "$1" "${2:-red}"
+    exit 0
 }
 
 # Finds a function $2 in a script shell S1

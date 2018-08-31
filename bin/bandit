@@ -206,6 +206,16 @@ source $BANDIT_HOME/bin/bandit_repository
 source $BANDIT_HOME/bin/bandit_catalog
 source $BANDIT_HOME/bin/bandit_bundle
 
+# Check permissions to write files...
+[ -w $BANDIT_TMP ]           || bandit_exit "BANDIT: Permission denied to write in work directory ."
+[ -w $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to write in logs directory."
+[ -w $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to write in builds cache."
+[ -w $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to write in sources cache."
+[ -w $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to write in catalogs cache."
+[ -w $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to write in repositories cache."
+[ -w $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to write in catalogs directory."
+[ -w $BANDIT_REPOSITORIES ]  || bandit_exit "BANDIT: Permission denied to write in repositories directory."
+
 # Determine the use of a pager
 if [ "$BANDIT_PAGER" = "none" ]; then 
     pager="no"

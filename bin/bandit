@@ -12,152 +12,58 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
-source $BANDIT_HOME/etc/release.conf
+source $BANDIT_HOME/etc/bandit.conf
+source $BANDIT_HOME/bin/bandit_common
+source $BANDIT_HOME/bin/bandit_database
 
 ###----------------------------------------
-# Simple information displaying commands. 
-# Do not source scripts yet. Just show and quit.
+# Display information commands. 
+# Do not source all scripts yet. Just show info and quit.
 ###----------------------------------------
 
-bandit_show_version()
-{
-    echo "bandit $RELEASE - The Build AND Install Toolkit"
-    echo
-    echo " Copyright (C) 2015-2018 Angel Linares Zapater"
-    echo " BANDIT comes with ABSOLUTELY NO WARRANTY." 
-    echo
-    echo "This is free software, and you are welcome to redistribute it"
-    echo "under certain conditions. Visit https://phy.wiki/doc/bandit"
-    echo
-}
+source $BANDIT_HOME/bin/bandit_help
+source $BANDIT_HOME/bin/bandit_search
 
-bandit_show_help_bundles()
-{
-    echo
-    echo "  bandit [-b|--bundle] <bundle> [-i|--item <item>] <action> <params>" 
-    echo
-    echo "    <bundle>:     Name of the bundle"
-    echo "    -i <item>:    Apply the action only to this item in the bundle"
-    echo "    <action>:"
-    echo "      copy        Copy an existing bundle into new one"
-    echo "                  <dest>  name for the new bundle"
-    echo "      edit        Edit the configuration files for the bundle"
-    echo "                  --conf for editing the configuration file (default)"
-    echo "                  --desc for editing the description file"
-    echo "      download    Download (inconditionally) from origins"
-    echo "      fetch       Download (when not in cache) from origins"
-    echo "                  --sources for fetching sources"
-    echo "                  --builds for fetching sources"
-    echo "                  --all for fetching sources and builds (default)"
-    echo "      config      Only with -i. Interactively configure the bundle item"
-    echo "      build       Only with -i. Build the bundle and save a build pack in local cache"
-    echo "      install     Only with -i. Install the build pack from local cache"
-    echo "      raise       Build first and then install"
-    echo "      remove      Remove the bundle from the system"
-    echo
-}
+# Check permissions to read files...
+[ -r $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to read from logs directory."
+[ -r $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to read from builds cache."
+[ -r $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to read from sources cache."
+[ -r $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to read from catalogs cache."
+[ -r $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to read from repositories cache."
+[ -r $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to read from catalogs directory."
+[ -r $BANDIT_REPOSITORIES ]  || bandit_exit "BANDIT: Permission denied to read from repositories directory."
 
-bandit_show_help_catalogs()
-{
-    echo
-    echo "  bandit -c|--catalog <catalog> <action>" 
-    echo
-    echo "    <catalog>:    Name of the catalog"
-    echo "    <action>:"
-    echo "      download    Download (inconditionally) the catalog tarball"
-    echo "      fetch       Download (when not in cache) the catalog tarball"
-    echo "      install     Install the catalog"   
-    echo "      remove      Remove the catalog"   
-    echo
-}
+# Determine the use of a pager
+if [ "$BANDIT_PAGER" = "none" ]; then 
+    pager="no"
+    # Set defaut pager
+    BANDIT_PAGER="more"
+else
+    pager=yes
+fi
 
-bandit_show_help_edit()
-{
-    echo
-    echo "  bandit edit    Edit the global BANDIT configuration file "
-    echo
-}
+# Change default pager
+case $1 in 
+    "--pager")
+	pager="yes"
+	shift;
+	;;
+    "--no-pager")
+	pager="no"
+	shift;
+	;;
+esac
 
-bandit_show_help_packages()
-{
-    echo
-    echo "  bandit -p|--package <package> <action>" 
-    echo "    <package>:    Name of the package(s)."
-    echo "                  Use <package*> for multiple packages."
-    echo "    <action>:"
-    echo "      info        Provides information about the package"
-    echo "      bundles     List bundles that install this package"
-    echo "      files       List installed files for that package"
-    echo
-}
 
-bandit_show_help_repositories()
-{
-    echo
-    echo "  bandit -r|--repository <repository> <action>" 
-    echo
-    echo "    <repository>: Name of the repository"
-    echo "    <action>:"
-    echo "      download    Download the repository manifest into cache"
-    echo "      install     Install the repository manifest from cache"
-    echo "                  --all for installing catalogs in the manifest"
-    echo "      update      Download and install the repository manifest"
-    echo "                  --all for updating catalogs in the manifest"
-    echo "      remove      Remove the repository manifest"
-    echo "                  --all for removing catalogs in the manifest"
-    echo "      show        List catalogs in the repository manifest"
-    echo "                  --md5 for MD5 checksums"
-    echo
-}
-
-bandit_show_help_search()
-{
-    echo
-    echo "  bandit search [--no-pager|--pager] [-r|-c|-b|-i|-f|-l|-x] [<expression>|all]"
-    echo
-    echo "    --no-pager    Do not page results"
-    echo "    --pager       Do page results"
-    echo "    -r            Search for repositories"
-    echo "    -c            Search for catalogs"
-    echo "    -b            Search for bundles"
-    echo "    -i            Search for items in bundles"
-    echo "    -f            Search for installed files"
-    echo "    -l            Search in logs"
-    echo "    -x            Search in source and build caches"
-    echo "    <expression>  partial expression to search for"
-    echo "                  or 'all' for everything"
-    echo
-}
-
-bandit_show_help_systems()
-{
-    echo
-    echo "  bandit -s|--system <system> <action>" 
-    echo
-    echo "     host check   Checks the building requiremts of the HOST"
-    echo "     host init    Creates users and partitions on the HOST"
-    echo "     host clean   Cleans the HOST from previous installations"
-    echo "     target init  Initialize the TARGET filesystem"
-    echo
-}
-
-bandit_show_help()
-{
-    echo "Usage for bandit help:"
-    echo
-    echo "  bandit help edit          Help on editing the BANDIT configuration file"
-    echo "  bandit help search        Help on searching for catalogs, bundles, files, etc."
-    echo "  bandit help systems       Help on working with systems"
-    echo "  bandit help repositories  Help on working with repositories"
-    echo "  bandit help catalogs      Help on working with catalogs"
-    echo "  bandit help bundles       Help on working with bundles"
-    echo "  bandit help packages      Help on working with packages"
-    echo
-}
+#---
+# Work with read only commands
+#---
 
 case $1 in 
     -h|--help | help | "")
-	case $2 in
+	shift;
+	
+	case $1 in
 	    edit)
 		bandit_show_help_edit
 		;;
@@ -186,70 +92,9 @@ case $1 in
 	esac
 	exit 0
 	;;
-    -v|--version)
-	bandit_show_version
-	exit 0
-	;;
-esac
-
-###----------------------------------------
-# Working with verbs and objects...
-# Source files now.
-###----------------------------------------
-
-source $BANDIT_HOME/etc/bandit.conf
-source $BANDIT_HOME/bin/bandit_common
-source $BANDIT_HOME/bin/bandit_database
-source $BANDIT_HOME/bin/bandit_search
-source $BANDIT_HOME/bin/bandit_find
-source $BANDIT_HOME/bin/bandit_repository
-source $BANDIT_HOME/bin/bandit_catalog
-source $BANDIT_HOME/bin/bandit_bundle
-
-# Check permissions to write files...
-[ -w $BANDIT_TMP ]           || bandit_exit "BANDIT: Permission denied to write in work directory ."
-[ -w $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to write in logs directory."
-[ -w $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to write in builds cache."
-[ -w $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to write in sources cache."
-[ -w $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to write in catalogs cache."
-[ -w $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to write in repositories cache."
-[ -w $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to write in catalogs directory."
-[ -w $BANDIT_REPOSITORIES ]  || bandit_exit "BANDIT: Permission denied to write in repositories directory."
-
-# Determine the use of a pager
-if [ "$BANDIT_PAGER" = "none" ]; then 
-    pager="no"
-    # Set defaut pager
-    BANDIT_PAGER="more"
-else
-    pager=yes
-fi
-
-#--- 
-# Work with verbs...
-#---
-
-case $1 in
-    edit)
-	shift;
-	${EDITOR:-vi} $BANDIT_HOME/etc/bandit.conf
-	exit 0
-	;;
     search)
 	shift;
 	
-	# Change default pager
-	case $1 in 
-	    "--pager")
-		pager="yes"
-		shift;
-		;;
-	    "--no-pager")
-		pager="no"
-		shift;
-		;;
-	esac
-
 	# Get search options
 	options=""
 	while getopts "rcbixfl" opt; do
@@ -287,7 +132,43 @@ case $1 in
 	else
 	    bandit_search ${expr} ${options}
 	fi
+	
+	exit 0
+	;;
+    -v|--version)
+	bandit_show_version
+	exit 0
+	;;
+esac
 
+###----------------------------------------
+# Working with verbs and objects...
+# Source files now.
+###----------------------------------------
+
+source $BANDIT_HOME/bin/bandit_find
+source $BANDIT_HOME/bin/bandit_repository
+source $BANDIT_HOME/bin/bandit_catalog
+source $BANDIT_HOME/bin/bandit_bundle
+
+# Check permissions to write files...
+[ -w $BANDIT_TMP ]           || bandit_exit "BANDIT: Permission denied to write in the work directory ."
+[ -w $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to write in the logs directorys."
+[ -w $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to write in the builds cache."
+[ -w $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to write in the sources cache."
+[ -w $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to write in the catalogs cache."
+[ -w $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to write in the repositories cache."
+[ -w $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to write in the catalogs directory."
+[ -w $BANDIT_REPOSITORIES ]  || bandit_exit "BANDIT: Permission denied to write in the repositories directory."
+
+#--- 
+# Work with verbs...
+#---
+
+case $1 in
+    edit)
+	shift;
+	${EDITOR:-vi} $BANDIT_HOME/etc/bandit.conf
 	exit 0
 	;;
 esac

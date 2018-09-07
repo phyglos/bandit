@@ -37,16 +37,16 @@ bandit_show_help_bundles()
     echo "      edit        Edit the configuration files for the bundle"
     echo "                  --conf for editing the configuration file (default)"
     echo "                  --desc for editing the description file"
-    echo "      download    Download (inconditionally) from origins"
+    echo "      download    Download (inconditionally) from origins into the corresponding caches"
     echo "      fetch       Download (when not in cache) from origins"
     echo "                  --sources for fetching sources"
-    echo "                  --builds for fetching sources"
-    echo "                  --all for fetching sources and builds (default)"
-    echo "      config      Only with -i. Interactively configure the bundle item"
-    echo "      build       Only with -i. Build the bundle and save a build pack in local cache"
-    echo "      install     Only with -i. Install the build pack from local cache"
-    echo "      raise       Build first and then install"
-    echo "      remove      Remove the bundle from the system"
+    echo "                  --builds for fetching build packs"
+    echo "                  --all for fetching sources and build packs (default)"
+    echo "      config      Interactively configure the bundle"
+    echo "      build       Build the bundle and save a build pack in the builds cache"
+    echo "      install     Install the build pack from the builds cache"
+    echo "      raise       Build and install packages or run scripts in the bundle"
+    echo "      remove      Remove the bundle installed files from the system"
     echo
 }
 
@@ -76,7 +76,7 @@ bandit_show_help_packages()
     echo
     echo "  bandit -p|--package <package> <action>" 
     echo "    <package>:    Name of the package(s)."
-    echo "                  Use <package*> for multiple packages."
+    echo "                  Use expressions like <package>* for multiple packages."
     echo "    <action>:"
     echo "      info        Provides information about the package"
     echo "      bundles     List bundles that install this package"
@@ -87,17 +87,17 @@ bandit_show_help_packages()
 bandit_show_help_repositories()
 {
     echo
-    echo "  bandit -r|--repository <repository> <action>" 
+    echo "  bandit -r|--repository <repository> <action> <params>" 
     echo
     echo "    <repository>: Name of the repository"
     echo "    <action>:"
     echo "      download    Download the repository manifest into cache"
     echo "      install     Install the repository manifest from cache"
-    echo "                  --all for installing catalogs in the manifest"
+    echo "                  --all for installing the catalogs in the manifest"
     echo "      update      Download and install the repository manifest"
-    echo "                  --all for updating catalogs in the manifest"
+    echo "                  --all for updating the catalogs in the manifest"
     echo "      remove      Remove the repository manifest"
-    echo "                  --all for removing catalogs in the manifest"
+    echo "                  --all for removing the catalogs in the manifest"
     echo "      show        List catalogs in the repository manifest"
     echo "                  --md5 for MD5 checksums"
     echo

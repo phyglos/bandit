@@ -34,9 +34,11 @@ fi
 export BANDIT_HOME=`pwd`
 export PATH=$PATH:$BANDIT_HOME/bin
 
-# Source the proper bandit bash completion shell
-ln -sf $BANDIT_HOME/bin/bandit_bash_completion /etc/bash_completion.d/
-source /etc/bash_completion.d/bandit_bash_completion 
+# Source the new bandit bash completion script
+if [ -w /etc/bash_completion.d ]; then
+    ln -sf $BANDIT_HOME/bin/bandit_bash_completion /etc/bash_completion.d/
+    source /etc/bash_completion.d/bandit_bash_completion 
+fi
 
 # Display new enviroment
 if [ "$1" != "--silent" ]; then 

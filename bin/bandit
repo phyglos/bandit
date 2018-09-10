@@ -24,39 +24,8 @@ source $BANDIT_HOME/bin/bandit_database
 source $BANDIT_HOME/bin/bandit_help
 source $BANDIT_HOME/bin/bandit_search
 
-# Check permissions to read files...
-[ -r $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to read from logs directory."
-[ -r $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to read from builds cache."
-[ -r $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to read from sources cache."
-[ -r $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to read from catalogs cache."
-[ -r $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to read from repositories cache."
-[ -r $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to read from catalogs directory."
-[ -r $BANDIT_REPOSITORIES ]  || bandit_exit "BANDIT: Permission denied to read from repositories directory."
-
-# Determine the use of a pager
-if [ "$BANDIT_PAGER" = "none" ]; then 
-    pager="no"
-    # Set defaut pager
-    BANDIT_PAGER="more"
-else
-    pager=yes
-fi
-
-# Change default pager
-case $1 in 
-    "--pager")
-	pager="yes"
-	shift;
-	;;
-    "--no-pager")
-	pager="no"
-	shift;
-	;;
-esac
-
-
 #---
-# Work with read only commands
+# Work with display-only commands
 #---
 
 case $1 in 
@@ -92,6 +61,62 @@ case $1 in
 	esac
 	exit 0
 	;;
+    -v|--version)
+	bandit_show_version
+	exit 0
+	;;
+esac
+
+#---
+# Work with write-only commands
+#---
+
+# Check permissions to write bandit.conf file
+[ -w $BANDIT_HOME/etc/bandit.conf ] || bandit_exit "BANDIT: Permission denied to write bandit.conf file."
+
+case $1 in
+    edit)
+	shift;
+	${EDITOR:-vi} $BANDIT_HOME/etc/bandit.conf
+	exit 0
+	;;
+esac
+
+#---
+# Work with read-only commands
+#---
+
+# Check permissions to read files...
+[ -r $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to read from logs directory."
+[ -r $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to read from builds cache."
+[ -r $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to read from sources cache."
+[ -r $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to read from catalogs cache."
+[ -r $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to read from repositories cache."
+[ -r $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to read from catalogs directory."
+[ -r $BANDIT_REPOSITORIES ]  || bandit_exit "BANDIT: Permission denied to read from repositories directory."
+
+# Determine the use of a pager
+if [ "$BANDIT_PAGER" = "none" ]; then 
+    pager="no"
+    # Set defaut pager
+    BANDIT_PAGER="more"
+else
+    pager=yes
+fi
+
+# Change default pager
+case $1 in 
+    "--pager")
+	pager="yes"
+	shift;
+	;;
+    "--no-pager")
+	pager="no"
+	shift;
+	;;
+esac
+
+case $1 in 
     search)
 	shift;
 	
@@ -135,15 +160,10 @@ case $1 in
 	
 	exit 0
 	;;
-    -v|--version)
-	bandit_show_version
-	exit 0
-	;;
 esac
 
 ###----------------------------------------
-# Working with verbs and objects...
-# Source files now.
+# Working with commands and objects...
 ###----------------------------------------
 
 source $BANDIT_HOME/bin/bandit_find
@@ -160,22 +180,6 @@ source $BANDIT_HOME/bin/bandit_bundle
 [ -w $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to write in the repositories cache."
 [ -w $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to write in the catalogs directory."
 [ -w $BANDIT_REPOSITORIES ]  || bandit_exit "BANDIT: Permission denied to write in the repositories directory."
-
-#--- 
-# Work with verbs...
-#---
-
-case $1 in
-    edit)
-	shift;
-	${EDITOR:-vi} $BANDIT_HOME/etc/bandit.conf
-	exit 0
-	;;
-esac
-
-#---
-# Work with objects...
-#---
 
 # Check if any type of object is set or set default 
 object="--default"

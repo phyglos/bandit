@@ -16,6 +16,16 @@
 # Prepare the environment for BANDIT
 ###----------------------------------------
 
+# Check that PWD is a valid BANDIT_HOME directory
+if [ ! -r ./bandit.env ]; then
+    echo "BANDIT: Change to valid BANDIT_HOME directory to set a new environment."
+    return
+fi
+if [ ! -w $(pwd) ]; then
+    echo "BANDIT: Permission denied to write in this directory."
+    return
+fi
+
 # Remove BANDIT_HOME from PATH
 if [ "$BANDIT_HOME" ] ; then
     NEW=""
@@ -33,6 +43,18 @@ fi
 # Define BANDIT_HOME and add it to PATH   
 export BANDIT_HOME=`pwd`
 export PATH=$PATH:$BANDIT_HOME/bin
+
+source $BANDIT_HOME/bin/bandit_common
+
+# Create the working directories 
+[ -d $BANDIT_TMP ]           || bandit_mkdir $BANDIT_TMP
+[ -d $BANDIT_LOGS ]          || bandit_mkdir $BANDIT_LOGS
+[ -d $BANDIT_XBUILDS ]       || bandit_mkdir $BANDIT_XBUILDS
+[ -d $BANDIT_XSOURCES ]      || bandit_mkdir $BANDIT_XSOURCES
+[ -d $BANDIT_XCATALOGS ]     || bandit_mkdir $BANDIT_XCATALOGS
+[ -d $BANDIT_XREPOSITORIES ] || bandit_mkdir $BANDIT_XREPOSITORIES
+[ -d $BANDIT_CATALOGS ]      || bandit_mkdir $BANDIT_CATALOGS
+[ -d $BANDIT_REPOSITORIES ]  || bandit_mkdir $BANDIT_REPOSITORIES
 
 # Source the new bandit bash completion script
 if [ -w /etc/bash_completion.d ]; then

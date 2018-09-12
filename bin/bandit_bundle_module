@@ -28,7 +28,7 @@ bandit_module_remove()
     ## Remove the module
     bandit_msg "...removing..."
     bandit_timestamp stamp
-    module_remove ${*} 2>&1 > $BUILD_LOGS/${module_log}.remve-${stamp}.log 
+    module_remove ${*} 2>&1 > $BUILD_LOGS/${module_log}.remove-${stamp}.log 
 }
 
 ###---

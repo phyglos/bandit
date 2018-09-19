@@ -14,17 +14,16 @@
 RELEASE NOTES for BANDIT
 ========================
 
-This is the release "1.4.z" of the BANDIT toolkit.
-This is a "DEVELOPMENT" release.
+This is the release "1.4.2" of the BANDIT toolkit.
+This is a "STABLE" release.
 
 Visit https://phy.wiki for more information.
 
 
-MAJOR CHANGES in 1.4
-====================
+MAJOR CHANGES in 1.4.2
+======================
 
-* Refactored "bandit help"
-* Added support for Bash completion
-* Add bandit.env in BANDIT_HOME
-  To change the active BANDIT instance issue "source bandit.env" instead of "source bin/bandit-set"
-  
+* Fixed error when searching for enabled bundles
+* Check permissions to write files. Allow to search when the user has read permissions.
+* Added a new action to copy a bundle
+* Launch system databases updates in parallel 

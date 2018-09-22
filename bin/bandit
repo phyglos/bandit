@@ -335,7 +335,8 @@ case $object in
 
 	bandit_mkdir $BANDIT_LOGS/systems
 	bandit_timestamp stamp
-	(time sh $BANDIT_HOME/bin/systems/bandit-"$1"-"$2".sh) 2>&1 \
+	# Ensure that systems related command shells are run using /bin/bash
+	(time /bin/bash $BANDIT_HOME/bin/systems/bandit-"$1"-"$2".sh) 2>&1 \
             | tee $BANDIT_LOGS/systems/bandit-"$1"."$2"-${stamp}.log
 	;;
     *)

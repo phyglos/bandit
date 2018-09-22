@@ -44,6 +44,7 @@ fi
 export BANDIT_HOME=`pwd`
 export PATH=$PATH:$BANDIT_HOME/bin
 
+source $BANDIT_HOME/etc/bandit.conf
 source $BANDIT_HOME/bin/bandit_common
 
 # Create the working directories 

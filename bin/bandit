@@ -78,6 +78,7 @@ case $1 in
     edit)
 	shift;
 	${EDITOR:-vi} $BANDIT_HOME/etc/bandit.conf
+	source $BANDIT_HOME/etc/bandit.conf
 	exit 0
 	;;
 esac

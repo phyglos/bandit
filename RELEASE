@@ -14,14 +14,14 @@
 RELEASE NOTES for BANDIT
 ========================
 
-This is the release "latest" of the BANDIT toolkit.
+This is the release "1.4.3" of the BANDIT toolkit.
 This is a "DEVELOPMENT" release.
 
 Visit https://phy.wiki for more information.
 
 
-MAJOR CHANGES in "latest"
+MAJOR CHANGES in "1.4.3"
 =========================
 
-*
+* Fixed issues with permissions on a fresh installation of BANDIT
 

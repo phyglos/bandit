@@ -72,13 +72,13 @@ esac
 #---
 
 # Check permissions to read files...
-[ -r $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to read from logs directory."
-[ -r $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to read from builds cache."
-[ -r $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to read from sources cache."
-[ -r $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to read from catalogs cache."
-[ -r $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to read from repositories cache."
-[ -r $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to read from catalogs directory."
 [ -r $BANDIT_REPOSITORIES ]  || bandit_exit "BANDIT: Permission denied to read from repositories directory."
+[ -r $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to read from catalogs directory."
+[ -r $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to read from repositories cache."
+[ -r $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to read from catalogs cache."
+[ -r $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to read from sources cache."
+[ -r $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to read from builds cache."
+[ -r $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to read from logs directory."
 
 # Determine the use of a pager
 if [ "$BANDIT_PAGER" = "none" ]; then 
@@ -151,12 +151,14 @@ esac
 # Work with write-only commands
 #---
 
-# Check permissions to write bandit.conf file
-[ -w $BANDIT_HOME/etc/bandit.conf ] || bandit_exit "BANDIT: Permission denied to write bandit.conf file."
-
 case $1 in
     edit)
 	shift;
+
+	# Check permissions to write bandit.conf file
+	[ -w $BANDIT_HOME/etc/bandit.conf ] || bandit_exit "BANDIT: Permission denied to write bandit.conf file."
+
+	
 	${EDITOR:-vi} $BANDIT_HOME/etc/bandit.conf
 	source $BANDIT_HOME/etc/bandit.conf
 	exit 0

@@ -22,18 +22,30 @@ source $BANDIT_HOME/bin/bandit_common
 bandit_log "Installing BANDIT in the TARGET system..." 
 
 bandit_msg "Copying BANDIT in the TARGET filesystem..."
-bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_HOME
-cp    $BANDIT_HOME/*             $BANDIT_HOST_TGT_MNT$BANDIT_HOME
-cp -R $BANDIT_HOME/{bin,etc,lib} $BANDIT_HOST_TGT_MNT$BANDIT_HOME 
 
-bandit_msg "Copying repositories in the TARGET filesystem..."
+bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_HOME
+# Copy BANDIT regular files
+find $BANDIT_HOME -maxdepth 1 -type f  -exec cp {} $BANDIT_HOST_TGT_MNT$BANDIT_HOME/ \;
+# Copy BANDIT directories
+cp -R $BANDIT_HOME/{bin,etc,lib} $BANDIT_HOST_TGT_MNT$BANDIT_HOME
+# Only create the log directories structure with no actual HOST content
+bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_LOGS/repositories
+bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_LOGS/catalogs
+bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_LOGS/bundles
+
+bandit_msg "Copying HOST repositories in the TARGET filesystem..."
 bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_REPOSITORIES
 cp -R $BANDIT_REPOSITORIES/* $BANDIT_HOST_TGT_MNT$BANDIT_REPOSITORIES
-bandit_msg "Copying catalogs in the TARGET filesystem..."
+
+bandit_msg "Copying HOST catalogs in the TARGET filesystem..."
 bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_CATALOGS
 cp -R $BANDIT_CATALOGS/* $BANDIT_HOST_TGT_MNT$BANDIT_CATALOGS
 
-bandit_msg "Copying caches in the TARGET filesystem..."
+bandit_msg "Copying HOST caches in the TARGET filesystem..."
+bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XREPOSITORIES
+cp -R $BANDIT_XREPOSITORIES/* $BANDIT_HOST_TGT_MNT$BANDIT_XREPOSITORIES
+bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XCATALOGS
+cp -R $BANDIT_XCATALOGS/* $BANDIT_HOST_TGT_MNT$BANDIT_XCATALOGS
 bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XSOURCES
 cp -R $BANDIT_XSOURCES/* $BANDIT_HOST_TGT_MNT$BANDIT_XSOURCES
 bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XBUILDS

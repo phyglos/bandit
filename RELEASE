@@ -14,8 +14,8 @@
 RELEASE NOTES for BANDIT
 ========================
 
-This is the release "latest" of the BANDIT toolkit.
-This is a "DEVELOPMENT" release.
+This is the release "1.4.4" of the BANDIT toolkit.
+This is a "STABLE" release.
 
 Visit https://phy.wiki for more information.
 
@@ -23,5 +23,5 @@ Visit https://phy.wiki for more information.
 MAJOR CHANGES in "latest"
 =========================
 
-*
+* Some fixes for TARGET systems installation
 

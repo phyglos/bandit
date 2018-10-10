@@ -24,8 +24,9 @@ bandit_log "Installing BANDIT in the TARGET system..."
 bandit_msg "Copying BANDIT in the TARGET filesystem..."
 
 bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_HOME
-# Copy BANDIT regular files
-find $BANDIT_HOME -maxdepth 1 -type f  -exec cp {} $BANDIT_HOST_TGT_MNT$BANDIT_HOME/ \;
+# Copy BANDIT regular files and links
+find $BANDIT_HOME -maxdepth 1 -type f -exec cp {} $BANDIT_HOST_TGT_MNT$BANDIT_HOME/ \;
+find $BANDIT_HOME -maxdepth 1 -type l -exec cp {} $BANDIT_HOST_TGT_MNT$BANDIT_HOME/ \;
 # Copy BANDIT directories
 cp -R $BANDIT_HOME/{bin,etc,lib} $BANDIT_HOST_TGT_MNT$BANDIT_HOME
 # Only create the log directories structure with no actual HOST content

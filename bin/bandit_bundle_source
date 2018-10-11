@@ -64,7 +64,7 @@ bandit_source_repackage_into()
     bandit_mkdir $tmp
     cd $tmp
 
-    # Untar into the new director
+    # Untar into the new directory
     bandit_mkdir $directory
     cd $directory
     tar -xf $BUILD_SOURCES/$tarball
@@ -97,3 +97,44 @@ bandit_source_repackage_into()
     bandit_popd
 }
 export -f bandit_source_repackage_into
+
+bandit_source_repackage_top()
+{
+    # Replace the top level directory abc with a new top level xyz directory
+    # Then repackage abc.tar.xz tarball as xyz.tar.xz
+
+    local tarball=$1         `# Package original tarball`
+    local directory=$2       `# Directory to replace the top level one`
+
+    bandit_pushd $BUILD_SOURCES
+
+    # Check if tarball exists
+    [ -r $tarball ] || bandit_exit "BANDIT: $tarball not found in local cache"
+    # Check if MD5 is correct
+    bandit_md5sum "$tarball" || bandit_exit
+
+    # Untar second level files into the new top directory
+    mkdir $directory
+    cd $directory
+    tar --strip 1 -xf $BUILD_SOURCES/$tarball
+    
+    # Build the new temporary tarball 
+    cd ..
+    tar -c $directory | xz > $BUILD_SOURCES/$directory.tar.xz 
+    md5sum -b $directory.tar.xz > $BUILD_SOURCES/$directory.tar.xz.md5
+
+    # Remove temporary directory 
+    rm -rf $directory
+
+    # Change file name in sources_tarball variable
+    let len=${#sources_tarball[*]}
+    for ((i=0; i<len; i++)); do
+	if [ "$(basename ${sources_tarball[i]})" == "$tarball" ]; then
+	    sources_tarball[i]=$BUILD_SOURCES/$directory.tar.xz
+	    break
+	fi
+    done
+
+    bandit_popd
+}
+export -f bandit_source_repackage_top

@@ -1,10 +1,10 @@
 #!/bin/bash
 #
-# localhost repository manifest
+# repository manifest template
 #
 
 CATALOGS=(
-    localhost
+    template
 )
 
 CATALOGS_MD5=(

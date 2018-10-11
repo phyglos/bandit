@@ -1,7 +1,7 @@
 #
-# README - Local BANDIT catalog
+# README - BANDIT localhost catalog
 #
-# Copyright (C) 2017 Angel Linares Zapater
+# Copyright (C) 2017-2018 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -11,13 +11,16 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
-The local catalog
+The localhost catalog
 ===================
 
-The local catalog is an empty set of bundles and origins provided with the BANDIT toolkit.
+The localhost catalog is an empty catalog with provided with the BANDIT toolkit.
 
 Use this catalog for building and installing customized bundles in your local system.
+Copy bundles from other catalogs into this catalog and customize for the local system.
 
-Visit http://phy.wiki for more information.
+# bandit emacs-desktop copy -c localhost  my-local-emacs
+
+Visit https://phy.wiki for more information.
 
 

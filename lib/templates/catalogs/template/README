@@ -1,0 +1,28 @@
+#
+# README - BANDIT Catalog template
+#
+# Copyright (C) 2018 Angel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+The template catalog
+====================
+
+The "template" catalog is a template for an empty catalog with an empty bundle 
+provided with the BANDIT toolkit.
+
+This template is used to create a new empty catalog or bundle in your local system 
+when using the create verb in BANDIT commands like:
+
+# bandit -c some-catalog create
+# bandit -b some-bundle create
+
+Visit https://phy.wiki for more information.
+
+

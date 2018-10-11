@@ -36,11 +36,31 @@ bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_LOGS/bundles
 
 bandit_msg "Copying HOST repositories in the TARGET filesystem..."
 bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_REPOSITORIES
-cp -R $BANDIT_REPOSITORIES/* $BANDIT_HOST_TGT_MNT$BANDIT_REPOSITORIES
+for repo in $BANDIT_REPOSITORIES/*; do
+    if [ "$(basename $repo)" == "localhost" ]; then
+	if [ $BANDIT_TARGET_COPY_LOCALHOST == "no" ]; then
+	    # Copy a new local repository from lib/templates
+	    cp -R $BANDIT_HOME/lib/templates/repositories/localhost $BANDIT_HOST_TGT_MNT$BANDIT_REPOSITORIES
+	    continue
+	fi
+    fi
+    # Copy the repository from HOST to TARGET
+    cp -R ${repo} $BANDIT_HOST_TGT_MNT$BANDIT_REPOSITORIES
+done
 
 bandit_msg "Copying HOST catalogs in the TARGET filesystem..."
 bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_CATALOGS
-cp -R $BANDIT_CATALOGS/* $BANDIT_HOST_TGT_MNT$BANDIT_CATALOGS
+for cat in $BANDIT_CATALOGS/*; do
+    if [ "$(basename $cat)" == "localhost" ]; then
+	if [ $BANDIT_TARGET_COPY_LOCALHOST == "no" ]; then
+	    # Copy a new local catalog from lib/templates
+	    cp -R $BANDIT_HOME/lib/templates/catalogs/localhost $BANDIT_HOST_TGT_MNT$BANDIT_CATALOGS
+	    continue
+	fi
+    fi
+    # Copy the catalog from HOST to TARGET
+    cp -R ${cat} $BANDIT_HOST_TGT_MNT$BANDIT_CATALOGS
+done
 
 bandit_msg "Copying HOST caches in the TARGET filesystem..."
 bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XREPOSITORIES

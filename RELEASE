@@ -14,14 +14,16 @@
 RELEASE NOTES for BANDIT
 ========================
 
-This is the release "latest" of the BANDIT toolkit.
-This is a "DEVELOPMENT" release.
+This is the release "1.4.5" of the BANDIT toolkit.
+This is a "STABLE" release.
 
 Visit https://phy.wiki for more information.
 
 
-MAJOR CHANGES in "latest"
+MAJOR CHANGES in "1.4.5"
 =========================
 
-*
+* Allow not to copy the localhost HOST catalog into the TARGET system
+* Refactored localhost and template repositories and catalogs
+* Added new support function bandit_source_repackage_top
 

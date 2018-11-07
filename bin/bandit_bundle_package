@@ -228,6 +228,13 @@ bandit_package_install()
 {
     ## Install 
     if [ -r $BUILD_DESTDIR/$pack ]; then 
+	## Rig the localhost 
+	if bandit_script_has $BUILD_SCRIPTS/$script.sh host_rig; then  
+	    bandit_msg "...rigging host..."
+	    bandit_timestamp stamp
+	    host_rig 2>&1 > $BUILD_LOGS/$script.host_rig-${stamp}.log 
+	fi
+
 	bandit_msg "...unpacking..."
 
 	# Prefix porg to command, if available (except for the bandit user)
@@ -291,7 +298,14 @@ bandit_package_remove()
     (
 	porg -fx ${script}
 	yes | porg -rx ${script}
-    ) 2>&1 > $BUILD_LOGS/$script.remove-${stamp}.log 
+    ) 2>&1 > $BUILD_LOGS/$script.remove-${stamp}.log
+
+    ## Unrig the localhost 
+    if bandit_script_has $BUILD_SCRIPTS/$script.sh host_unrig; then  
+	bandit_msg "...unrigging host..."
+	bandit_timestamp stamp
+	host_unrig 2>&1 > $BUILD_LOGS/$script.host_unrig-${stamp}.log 
+    fi
 }
 
 ###------------------------------
@@ -308,6 +322,8 @@ bandit_package_do()
     bandit_log "$package${variant:+-}$variant [$(date)]"
 
     # Default functions to be overloaded by the package script
+    function host_rig()        { :; } ; export -f host_rig
+    function host_unrig()      { :; } ; export -f host_unrig
     function sources_prepare() { :; } ; export -f sources_prepare
     function build_config()    { :; } ; export -f build_config
     function build_compile()   { :; } ; export -f build_compile

@@ -112,7 +112,7 @@ bandit_exit()
     exit 0
 }
 
-# Finds a function $2 in a script shell S1
+# Finds a function $2 in a script shell $1
 bandit_script_has()
 {  
     if [ -z $(grep "$2()" "$1") ]; then 
@@ -120,6 +120,95 @@ bandit_script_has()
     else
 	return 0
     fi
+}
+
+###------------------------------
+# Users and group helpers
+###------------------------------
+
+bandit_groups_get_max()
+{
+    local top=99999
+    if [ "$1" == "system" ]; then top=998; fi
+    
+    echo $(awk -v max=0 -v top=$top '\
+      BEGIN { FS=":" } 
+      { 
+        if ($3>top) { next }
+        if ($3>max) { max=$3 } 
+      }
+      END { print max }  
+      ' /etc/group )
+}
+
+bandit_group_add()
+{
+    local name=$1
+    local type=$2
+    
+    # Get next user id
+    local id=$(( $(bandit_groups_get_max $type)+1 ))
+
+    # Add the group
+    groupadd -g $id $name
+    
+    # Reorder /etc/group
+    grpck -s
+}
+
+bandit_group_delete()
+{
+    local name=$1
+    
+    # Delete the group
+    groupdel $name
+}
+
+bandit_users_get_max()
+{
+    local top=99999
+    if [ "$1" == "system" ]; then top=998; fi
+    
+    echo $(awk -v max=0 -v top=$top '\
+      BEGIN { FS=":" } 
+      { 
+        if ($3>top) { next }
+        if ($3>max) { max=$3 } 
+      }
+      END { print max }  
+      ' /etc/passwd )
+}
+
+bandit_user_add()
+{
+    local name=$1
+    local type=$2
+    local group=$3
+    local desc=$4
+    local home=$5
+    local shell=$6
+    
+    # Get next user id
+    local id=$(( $(bandit_users_get_max $type)+1 ))
+
+    # Add the user
+    useradd -u $id \
+            -g $group \
+            -c "$desc" \
+            -d "$home" \
+            -s "$shell" \
+	    $name
+    
+    # Reorder /etc/passwd
+    pwck -s
+}
+
+bandit_user_delete()
+{
+    local name=$1
+    
+    # Delete the user
+    userdel $name
 }
 
 ###------------------------------

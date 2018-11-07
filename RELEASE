@@ -14,14 +14,15 @@
 RELEASE NOTES for BANDIT
 ========================
 
-This is the release "latest" of the BANDIT toolkit.
-This is a "DEVELOPMENT" release.
+This is the release "1.5.0" of the BANDIT toolkit.
+This is a "STABLE" release.
 
 Visit https://phy.wiki for more information.
 
 
-MAJOR CHANGES in "latest"
+MAJOR CHANGES in "1.5.0"
 =========================
 
-*
+* Added script functions to rig and unrig the host at installation time
+* Added helper functions to manage users and groups
 

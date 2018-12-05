@@ -11,15 +11,45 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
-Meet the BANDIT
+Getting started
 ===============
 
-The "Build AND Install Toolkit", BANDIT, is the tool for installing a phyglos distribution. 
+The Build AND Install Toolkit, or the BANDIT, is a software toolkit used
+to build and install new software functionality into a GNU/Linux system.
+
+The BANDIT is the equivalent of a package manager in other Linux distributions
+for the phy GNU/Linux operating system. It is the component responsible for
+building and installing new software in the system. In addition to that,
+the BANDIT can also create a new TARGET system aside the HOST system and
+install the phyglos distribution on it.
+
+The toolkit is written as a set of pure GNU Bash scripts. This allows the BANDIT
+to be installed in a variety of hosts systems regardless of their different
+GNU/Linux flavour or processor’s architecture.
+
+When installed in a Linux distribution other than phyglos, like Debian or Fedora,
+it is normally used to raise a new phyglos machine. However, on these distros
+the BANDIT can also be used independently to install software in parallel to
+the main package manager.
+
+
+How to use
+==========
+
+The INSTALL file describes how to install BANDIT in the HOST system. 
+
+Status
+======
+
+The BANDIT is in STABLE status. The toolkit is capable of building and installing
+a new phy system from a HOST system running Debian, Fedora or phyglos. The BANDIT
+is able to manage software bundles on a phy system.
+
+
+More information
+================
 
 The COPYING file contains the GNU License for this software.
-The INSTALL file describes how to install BANDIT in the HOST system. 
-The RELEASE file contains the release notes.
+The RELEASE file describes the main changes in this release.
 
-Visit https://phy.wiki for more information and other installation methods.
-
-
+See https://docs.phyglos.org/bandit for more information.

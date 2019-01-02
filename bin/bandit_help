@@ -16,11 +16,11 @@ bandit_show_version()
 {
     echo "bandit $RELEASE - The Build AND Install Toolkit"
     echo
-    echo " Copyright (C) 2015-2018 Angel Linares Zapater"
+    echo " Copyright (C) 2015-2019 Angel Linares Zapater"
     echo " BANDIT comes with ABSOLUTELY NO WARRANTY." 
     echo
     echo "This is free software, and you are welcome to redistribute it under"
-    echo "certain conditions. See https://docs.phyglos.org/bandit/LEGAL.html"
+    echo "certain conditions. See https://docs.phyglos.org/bandit/legal.html"
     echo
 }
 

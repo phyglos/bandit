@@ -1,7 +1,7 @@
 #
 # README - General description of the contents of the tarball
 #
-# Copyright (C) 2015-2018 Angel Linares Zapater
+# Copyright (C) 2015-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -13,34 +13,36 @@
 
 Getting started
 ===============
+The Build AND Install Toolkit, or the BANDIT, is a software toolkit used to
+build and install new software functionality into a GNU/Linux system.
 
-The Build AND Install Toolkit, or the BANDIT, is a software toolkit used
-to build and install new software functionality into a GNU/Linux system.
+This functionality can be either a new software package, a set of related
+packages, some script acting on the system, or any combination of them. A
+group of these items is called a BANDIT bundle. A set of bundles form a
+BANDIT catalog.
 
-The BANDIT is the equivalent of a package manager in other Linux distributions
-for the phy GNU/Linux operating system. It is the component responsible for
-building and installing new software in the system. In addition to that,
-the BANDIT can also create a new TARGET system aside the HOST system and
-install the phyglos distribution on it.
+The BANDIT is somehow the equivalent to the package manager on some Linux
+distributions. But, in addition to that, the BANDIT can also create a complete,
+new TARGET system -a new, different system than the initial HOST system where
+BANDIT was installed-, and then raise the phyglos distribution on that new phy
+system. In this scenario BANDIT acts as a distribution installer.
 
-The toolkit is written as a set of pure GNU Bash scripts. This allows the BANDIT
-to be installed in a variety of hosts systems regardless of their different
-GNU/Linux flavour or processor’s architecture.
+In the phy GNU/Linux operating system, BANDIT is the component responsible for
+building build packs from source code, and/or installing the binaries either
+from these build packs or from alien binary packages.
 
-When installed in a Linux distribution other than phyglos, like Debian or Fedora,
-it is normally used to raise a new phyglos machine. However, on these distros
-the BANDIT can also be used independently to install software in parallel to
-the main package manager.
+When BANDIT is installed in a supported Linux distribution other than phyglos,
+like Debian or Fedora, it is normally used to raise a new phy system in a free
+partition on any internal or external disk (or even as a container image).
 
 
 How to use
 ==========
-
 The INSTALL file describes how to install BANDIT in the HOST system. 
+
 
 Status
 ======
-
 The BANDIT is in STABLE status. The toolkit is capable of building and installing
 a new phy system from a HOST system running Debian, Fedora or phyglos. The BANDIT
 is able to manage software bundles on a phy system.
@@ -48,7 +50,6 @@ is able to manage software bundles on a phy system.
 
 More information
 ================
-
 The COPYING file contains the GNU License for this software.
 The RELEASE file describes the main changes in this release.
 

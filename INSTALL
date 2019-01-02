@@ -1,7 +1,7 @@
 #
 # INSTALL - Instructions to install the BANDIT on the HOST system
 #
-# Copyright (C) 2015-2018 Angel Linares Zapater
+# Copyright (C) 2015-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -15,7 +15,6 @@ Installing BANDIT on the HOST system
 ====================================
 
 In the following commands replace <latest> with the latest version available.
-See also https://phy.wiki/doc/Install_BANDIT_on_a_Linux_HOST_system
 
 Download the latest released version of BANDIT from ftp://phyglos.org/bandit
 $ wget ftp://phyglos.org/bandit/bandit-<latest>.tar.gz 
@@ -43,7 +42,5 @@ To get help about all bandit options, issue:
 # bandit --help
 
 
-For more information on using the git master branch, see https://phy.wiki/doc/Using_the_latest_git_version_of_BANDIT
-
-For using multiple versions of BANDIT, see https://phy.wiki/doc/Install_BANDIT_on_a_Linux_HOST_system
+See https://docs.phyglos.org/bandit for more information.
 

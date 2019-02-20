@@ -2,7 +2,7 @@
 #
 # bandit_search - functions for BANDIT searches
 #
-# Copyright (C) 2016-2018 Angel Linares Zapater
+# Copyright (C) 2016-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -32,7 +32,7 @@ bandit_search()
     # Search repositories
     #---
     if [[ $options =~ "r" ]]; then
-
+	
 if false; then
 	bandit_db_get_repositories_configured repositories ${expr}
 	echo "Repositories (configured):"
@@ -46,7 +46,7 @@ if false; then
 	fi
 fi
 
-	bandit_db_get_repositories_enabled repositories
+	bandit_db_get_repositories_enabled repositories ${expr}
 	echo "Repositories (enabled):"
 	if [ -n "$repositories" ]; then 
 	    for repository in ${repositories[*]}

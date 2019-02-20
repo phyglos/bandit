@@ -2,7 +2,7 @@
 #
 # bandit_database - BANDIT database functions
 #
-# Copyright (C) 2016-2018 Angel Linares Zapater
+# Copyright (C) 2016-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -35,8 +35,17 @@ bandit_db_get_repositories_configured()
 bandit_db_get_repositories_enabled()
 {
   local retvar=$1
+  local expr=$2
+  local enabled=""
+  local list=""
 
-  eval $retvar="'${BANDIT_REPOSITORY_LIST[*]}'"
+  for repo in ${BANDIT_REPOSITORY_LIST[*]}; do
+      if [[ $repo =~ $expr ]]; then 
+	  enabled+=(${repo})
+      fi
+  done
+
+  eval $retvar="'${enabled[*]}'"
 }
 
 # Get available repositories
@@ -48,7 +57,7 @@ bandit_db_get_repositories_available()
   
   if [ -d $BANDIT_REPOSITORIES ] && \
      [ ! -z "$(ls -A $BANDIT_REPOSITORIES)" ]; then
-      list=$(find $BANDIT_REPOSITORIES/* -maxdepth 0 -type d -name "${expr}*" )
+      list=$(find $BANDIT_REPOSITORIES/* -maxdepth 0 -type d -name "*${expr}*" )
   fi
   
   eval $retvar="'$list'"

@@ -2,7 +2,7 @@
 #
 # bandit_bundle - BANDIT functions for bundles
 #
-# Copyright (C) 2015-2018 Angel Linares Zapater
+# Copyright (C) 2015-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -14,6 +14,7 @@
 
 source $BANDIT_HOME/bin/bandit_bundle_source
 source $BANDIT_HOME/bin/bandit_bundle_package
+source $BANDIT_HOME/bin/bandit_bundle_alien
 source $BANDIT_HOME/bin/bandit_bundle_script
 source $BANDIT_HOME/bin/bandit_bundle_module
 source $BANDIT_HOME/bin/bandit_common
@@ -102,6 +103,7 @@ bandit_bundle_do()
     # Sources
     BUILD_ORIGIN=$BUILD_ORIGINS/$BUNDLE_ORIGIN
     BUILD_SOURCES=$BANDIT_XSOURCES/$BUNDLE_ORIGIN
+    BUILD_BUILDS=$BANDIT_XBUILDS/$BUNDLE_ORIGIN
 
     # Build packs
     BUILD_DESTDIR=$BANDIT_XBUILDS/$BUNDLE
@@ -112,7 +114,7 @@ bandit_bundle_do()
     
     # Update system databases?
     BUILD_UPDATE_SYSTEM_DB=${BUNDLE_UPDATE_SYSTEM_DB:-$BANDIT_UPDATE_SYSTEM_DB}
-   
+
     ## Create working directories
     bandit_mkdir $BUILD_SOURCES
     bandit_mkdir $BUILD_DESTDIR 
@@ -155,6 +157,13 @@ bandit_bundle_do()
 				;;
 			esac
 			;;
+		    alien)
+			case ${words[1]} in
+			    do)
+				bandit_alien_do ${words[*]:2}
+				;;
+			esac
+			;;
 		    script)
 			if [ $COMMAND == "download" ]; then continue; fi
 			if [ $COMMAND == "fetch" ]; then continue; fi
@@ -177,6 +186,13 @@ bandit_bundle_do()
 			case ${words[1]} in
 			    do)
 				bandit_package_do ${words[*]:2}
+				;;
+			esac
+			;;
+		    alien)
+			case ${words[1]} in
+			    do)
+				bandit_alien_do ${words[*]:2}
 				;;
 			esac
 			;;

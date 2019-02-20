@@ -72,8 +72,17 @@ bandit_db_get_repositories_available()
 bandit_db_get_catalogs_enabled()
 {
   local retvar=$1
+  local expr=$2
+  local enabled=""
+  local list=""
 
-  eval $retvar="'${BANDIT_CATALOG_LIST[*]}'"
+  for cat in ${BANDIT_CATALOG_LIST[*]}; do
+      if [[ $cat =~ $expr ]]; then 
+	  enabled+=(${cat})
+      fi
+  done
+
+  eval $retvar="'${enabled[*]}'"
 }
 
 # Get available catalogs
@@ -85,7 +94,7 @@ bandit_db_get_catalogs_available()
 
   if [ -d $BANDIT_CATALOGS ] && \
      [ ! -z "$(ls -A $BANDIT_CATALOGS)" ]; then
-      list=$(find $BANDIT_CATALOGS/* -maxdepth 0 -type d -name "${expr}*" )
+      list=$(find $BANDIT_CATALOGS/* -maxdepth 0 -type d -name "*${expr}*" )
   fi
   
   eval $retvar="'$list'"

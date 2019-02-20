@@ -74,7 +74,7 @@ fi
     #---
     if [[ $options =~ "c" ]] && [[ ! $expr =~ "/" ]]; then
 
-	bandit_db_get_catalogs_enabled catalogs
+	bandit_db_get_catalogs_enabled catalogs ${expr}
 	echo "Catalogs (enabled):"
 	if [ -n "$catalogs" ]; then 
 	    for catalog in ${catalogs[*]}

@@ -14,14 +14,18 @@
 RELEASE NOTES for BANDIT
 ========================
 
-This is the release "latest" of the BANDIT toolkit.
-This is a "DEVELOPMENT" release.
+This is the release "1.6.0" of the BANDIT toolkit.
+This is a "STABLE" release.
 
 See https://docs.phyglos.org/bandit for more information.
 
 
-MAJOR CHANGES in "latest"
+MAJOR CHANGES in "1.6.0"
 =========================
 
-*
+* Added new command to deal with alien items in a bundle
+* Added aliens-latest catalog in bandit.conf
+* Allow to search repositories with an expression
+* Allow to search catalogs with an expression
+
 

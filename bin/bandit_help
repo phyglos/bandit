@@ -75,6 +75,7 @@ bandit_show_help_packages()
 {
     echo
     echo "  bandit -p|--package <package> <action>" 
+    echo
     echo "    <package>:    Name of the package(s)."
     echo "                  Use expressions like <package>* for multiple packages."
     echo "    <action>:"

@@ -42,6 +42,7 @@ bandit_bundle_do()
     fi
 
     # Make default directories available to the bundle scripts and origins
+    BUILD_CATALOG=$BANDIT_CATALOGS/$CATALOG
     BUILD_BUNDLES=$BANDIT_CATALOGS/$CATALOG/bundles
     BUILD_SCRIPTS=$BANDIT_CATALOGS/$CATALOG/bundles/$BUNDLE.dir
     BUILD_ORIGINS=$BANDIT_CATALOGS/$CATALOG/origins

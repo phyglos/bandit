@@ -14,14 +14,22 @@
 RELEASE NOTES for BANDIT
 ========================
 
-This is the release "latest" of the BANDIT toolkit.
-This is a "DEVELOPMENT" release.
+This is the release "1.7.0" of the BANDIT toolkit.
+This is a "STABLE" release.
 
 See https://docs.phyglos.org/bandit for more information.
 
 
-MAJOR CHANGES in "latest"
-=========================
+MAJOR CHANGES
+=============
 
-*
+* Reordered timestamp position in names of log files
+* Added actions to move, rename, delete, etc. bundles
+* Refactored code to work with systems
+  * Removed bespoke command "bandit-builder-enter" and "bandit-target-enter"
+  * Added bandit actions: "bandit -s builder enter" and "bandit -s target enter"
+* Cleaned up old code and sanitized hard tabs
+* Removed unnecessary exports for variables and functions
+* Added variable BUILD_CATALOG
+
 

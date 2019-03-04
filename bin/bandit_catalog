@@ -2,7 +2,7 @@
 #
 # bandit_catalog - functions for BANDIT catalogs
 #
-# Copyright (C) 2018 Angel Linares Zapater
+# Copyright (C) 2018-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -23,48 +23,48 @@ bandit_catalog_fetch()
     # $1 = download -> do not use cache, force download
     [ $? == 1 ] && [ "$1" == "download" ] && download=true 
     if [ download == true ]; then
-	# Force downloading by removing catalogs in local cache 
-	rm -f $BANDIT_XCATALOGS/$tarball{,.md5}
+        # Force downloading by removing catalogs in local cache 
+        rm -f $BANDIT_XCATALOGS/$tarball{,.md5}
     fi
 
     tarball="$CATALOG.tar.gz"
     if [ -r $BANDIT_XCATALOGS/$tarball ]; then
-	# Fetch from local cache if already exists
-	bandit_msg "...fetching catalog $CATALOG from catalogs cache ..."
-	# Just check for MD5
-	bandit_md5sum "$BANDIT_XCATALOGS/$tarball" || bandit_exit
+        # Fetch from local cache if already exists
+        bandit_msg "...fetching catalog $CATALOG from catalogs cache ..."
+        # Just check for MD5
+        bandit_md5sum "$BANDIT_XCATALOGS/$tarball" || bandit_exit
     else
-	# Check if MIRROR is set
-	[ "$MIRROR" != "none" ]     || bandit_exit "BANDIT: Repository mirror not set"
-	[ "$REPOSITORY" != "none" ] || bandit_exit "BANDIT: Repository not set"
-	
-	URL=$MIRROR/$REPOSITORY/catalogs/$tarball
-	
-	# Download from URL into 
-	bandit_msg "...fetching catalog $CATALOG from mirror $MIRROR..."
+        # Check if MIRROR is set
+        [ "$MIRROR" != "none" ]     || bandit_exit "BANDIT: Repository mirror not set"
+        [ "$REPOSITORY" != "none" ] || bandit_exit "BANDIT: Repository not set"
+        
+        URL=$MIRROR/$REPOSITORY/catalogs/$tarball
+        
+        # Download from URL into 
+        bandit_msg "...fetching catalog $CATALOG from mirror $MIRROR..."
 
-	case ${MIRROR} in
-	    file*)
-		# Copy from filesystem
-		bandit_mkdir $BANDIT_XCATALOGS
-		cp -v ${mirror#file:}/$REPOSITORY/catalogs/$tarball \
-		      $BANDIT_XCATALOGS
-		;;
-	    ftp*|http*)
-		# Download catalog tarball
-		wget ${URL} \
-		     --directory-prefix=$BANDIT_XCATALOGS \
-		     --no-verbose \
-		     --no-clobber
-		if [[ $? != 0 ]]; then
-		    bandit_msg "Connection error to ${URL}" red;
-		else
-		    # Check if MD5 is correct
-		    echo ${CATALOG_MD5} > $BANDIT_XCATALOGS/$tarball.md5
-		    bandit_md5sum "$BANDIT_XCATALOGS/$tarball" || bandit_exit
-		fi
-		;;
-	esac
+        case ${MIRROR} in
+            file*)
+                # Copy from filesystem
+                bandit_mkdir $BANDIT_XCATALOGS
+                cp -v ${mirror#file:}/$REPOSITORY/catalogs/$tarball \
+                      $BANDIT_XCATALOGS
+                ;;
+            ftp*|http*)
+                # Download catalog tarball
+                wget ${URL} \
+                     --directory-prefix=$BANDIT_XCATALOGS \
+                     --no-verbose \
+                     --no-clobber
+                if [[ $? != 0 ]]; then
+                    bandit_msg "Connection error to ${URL}" red;
+                else
+                    # Check if MD5 is correct
+                    echo ${CATALOG_MD5} > $BANDIT_XCATALOGS/$tarball.md5
+                    bandit_md5sum "$BANDIT_XCATALOGS/$tarball" || bandit_exit
+                fi
+                ;;
+        esac
     fi
 }
 
@@ -74,49 +74,49 @@ bandit_catalog_find()
    
     bandit_db_get_repositories_enabled repositories ${CATALOG}
     for repo in ${repositories}; do
-	if [ -r $BANDIT_REPOSITORIES/${repo}/manifest ]; then
-	    source $BANDIT_REPOSITORIES/${repo}/manifest
-	    for cat in ${CATALOGS[*]}; do
-		if [ "${CATALOG}" == "${cat}" ]; then
-		    echo "${repo}"
-		    REPOSITORY="${repo}"
-		    break
-		fi	
-	    done
-	fi
+        if [ -r $BANDIT_REPOSITORIES/${repo}/manifest ]; then
+            source $BANDIT_REPOSITORIES/${repo}/manifest
+            for cat in ${CATALOGS[*]}; do
+                if [ "${CATALOG}" == "${cat}" ]; then
+                    echo "${repo}"
+                    REPOSITORY="${repo}"
+                    break
+                fi      
+            done
+        fi
     done
 }
 
 bandit_catalog_install()
 {
     if [ -d $BANDIT_XCATALOGS ]; then 
-	bandit_msg "...installing..."
+        bandit_msg "...installing..."
 
-		bandit_timestamp stamp
-		bandit_mkdir $BANDIT_CATALOGS
-		tar -C $BANDIT_CATALOGS -xvf $BANDIT_XCATALOGS/$tarball \
-		    2>&1 > $BUILD_LOGS/$CATALOG.installing-${stamp}.log 
+                bandit_timestamp stamp
+                bandit_mkdir $BANDIT_CATALOGS
+                tar -C $BANDIT_CATALOGS -xvf $BANDIT_XCATALOGS/$tarball \
+                    2>&1 > $BUILD_LOGS/${stamp}-$CATALOG.installing.log 
     else
-	bandit_msg "BANDIT: Catalog $CATALOG not available." red
+        bandit_msg "BANDIT: Catalog $CATALOG not available." red
     fi
 }
 
 bandit_catalog_remove()
 {
     if [ -d $BANDIT_CATALOGS/$CATALOG ]; then 
-	bandit_msg "...removing catalog $CATALOG..."
+        bandit_msg "...removing catalog $CATALOG..."
 
-	bandit_timestamp stamp
-	(
-	    rm -vrf $BANDIT_CATALOGS/$CATALOG
-	) 2>&1 > $BUILD_LOGS/$CATALOG.remove-${stamp}.log 
+        bandit_timestamp stamp
+        (
+            rm -vrf $BANDIT_CATALOGS/$CATALOG
+        ) 2>&1 > $BUILD_LOGS/${stamp}-$CATALOG.remove.log 
     else
-	bandit_msg "BANDIT: Catalog $CATALOG not available." red
+        bandit_msg "BANDIT: Catalog $CATALOG not available." red
     fi
 }
 
 ###------------------------------
-# Catalog DO
+# Catalog_do command
 ###------------------------------
 
 bandit_catalog_do()
@@ -126,43 +126,42 @@ bandit_catalog_do()
     
     # Find first repository for the catalog
     if [ "$COMMAND" == "find" -o "$COMMAND" == "download" -o "$COMMAND" == "fetch" ]; then   
-	REPOSITORY="$(bandit_find_first_repository_for_catalog)"
-	if [ -z $REPOSITORY ]; then 
-	    bandit_exit "BANDIT: Catalog $CATALOG not found in repositories list"
-	fi
-	echo "Working with repository: $REPOSITORY"
+        REPOSITORY="$(bandit_find_first_repository_for_catalog)"
+        if [ -z $REPOSITORY ]; then 
+            bandit_exit "BANDIT: Catalog $CATALOG not found in repositories list"
+        fi
+        echo "Working with repository: $REPOSITORY"
     fi
     
     # Set directories 
-    BUILD_LOGS=$BANDIT_LOGS/catalogs/$CATALOG.$COMMAND-${stamp}
+    BUILD_LOGS=$BANDIT_LOGS/catalogs/${stamp}-$CATALOG.$COMMAND
 
     # Create working directories
     if [ "$COMMAND" != "download" ]; then 
-	bandit_mkdir $BUILD_LOGS
+        bandit_mkdir $BUILD_LOGS
     fi
 
     case $COMMAND in 
-	find)
-	    bandit_catalog_find
-	    ;;
-	download)
-	    bandit_catalog_fetch download
-	    ;;
-	fetch)
-	    bandit_catalog_fetch
-	    ;;
-	install)
-	    bandit_catalog_fetch
-	    bandit_catalog_install
-	    ;;
-	update)
-	    bandit_catalog_fetch download
-	    bandit_catalog_install
-	    ;;
-	remove)
-	    bandit_catalog_remove
-	    ;;
+        find)
+            bandit_catalog_find
+            ;;
+        download)
+            bandit_catalog_fetch download
+            ;;
+        fetch)
+            bandit_catalog_fetch
+            ;;
+        install)
+            bandit_catalog_fetch
+            bandit_catalog_install
+            ;;
+        update)
+            bandit_catalog_fetch download
+            bandit_catalog_install
+            ;;
+        remove)
+            bandit_catalog_remove
+            ;;
     esac
 }
-export -f bandit_catalog_do
 

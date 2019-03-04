@@ -2,7 +2,7 @@
 #
 # bandit_find - functions for finding BANDIT objects
 #
-# Copyright (C) 2018 Angel Linares Zapater
+# Copyright (C) 2018-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -17,20 +17,20 @@ bandit_find_first_repository_for_catalog()
     local repo
     
     for repo in ${BANDIT_REPOSITORY_LIST[*]}; do
-	grep -sq $CATALOG $BANDIT_REPOSITORIES/$repo/manifest
-	if [ $? == 0 ]; then
-	    echo $repo
-	    break
-	fi		
+        grep -sq $CATALOG $BANDIT_REPOSITORIES/$repo/manifest
+        if [ $? == 0 ]; then
+            echo $repo
+            break
+        fi              
     done
 }
 
 bandit_find_first_catalog_for_bundle()
 {
-	for cat in ${BANDIT_CATALOG_LIST[*]}; do
-	    if [ -r $BANDIT_CATALOGS/$cat/bundles/$BUNDLE.desc ]; then
-		echo $cat
-		break
-	    fi		
-	done
+    for cat in ${BANDIT_CATALOG_LIST[*]}; do
+        if [ -r $BANDIT_CATALOGS/$cat/bundles/$BUNDLE.desc ]; then
+            echo $cat
+            break
+        fi          
+    done
 }

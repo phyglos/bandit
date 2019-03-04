@@ -1,0 +1,51 @@
+#!/bin/bash
+#
+# bandit_system_builder - functions for BANDIT builder systems
+#
+# Copyright (C) 2019 Angel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+###------------------------------
+# system_builder_command functions
+###------------------------------
+
+bandit_system_builder_enter()
+{
+    local mounted
+    
+    mounted="$(grep $BANDIT_HOST_TGT_MNT /etc/mtab)"
+    if [ -z "$mounted" ]; then
+        mount -v $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
+    fi
+
+    mount --bind /dev      $BANDIT_HOST_TGT_MNT/dev
+    mount -t devpts devpts $BANDIT_HOST_TGT_MNT/dev/pts -o gid=5,mode=620
+    mount -t proc  proc    $BANDIT_HOST_TGT_MNT/proc
+    mount -t sysfs sysfs   $BANDIT_HOST_TGT_MNT/sys
+    mount -t tmpfs tmpfs   $BANDIT_HOST_TGT_MNT/run
+
+    chroot $BANDIT_HOST_TGT_MNT $BANDIT_BUILDER_DIR/bin/env -i \
+           HOME=/root \
+           TERM=$TERM \
+           PS1='\u@\h:[BUILDER]:\w\$ ' \
+           BANDIT_HOME=$BANDIT_HOME \
+           PATH=/bin:/usr/bin:/sbin:/usr/sbin:$BANDIT_BUILDER_DIR/bin:$BANDIT_HOME/bin \
+           $BANDIT_BUILDER_DIR/bin/bash --login +h
+
+    umount $BANDIT_HOST_TGT_MNT/dev/pts 
+    umount $BANDIT_HOST_TGT_MNT/dev
+    umount $BANDIT_HOST_TGT_MNT/run
+    umount $BANDIT_HOST_TGT_MNT/sys
+    umount $BANDIT_HOST_TGT_MNT/proc
+
+    if [ -z "$mounted" ]; then
+        umount -v $BANDIT_HOST_TGT_MNT
+    fi
+}

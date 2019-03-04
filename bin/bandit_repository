@@ -2,7 +2,7 @@
 #
 # bandit_repository - functions for BANDIT repositories
 #
-# Copyright (C) 2018 Angel Linares Zapater
+# Copyright (C) 2018-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -24,158 +24,158 @@ bandit_repository_fetch()
     [ $# == 1 ] && [ "$1" == "download" ] && download=true 
 
     if [ $download == true ]; then
-	# Force downloading by removing files in local cache 
-	rm -rf $BANDIT_XREPOSITORIES/$REPOSITORY
+        # Force downloading by removing files in local cache 
+        rm -rf $BANDIT_XREPOSITORIES/$REPOSITORY
     fi
 
     if [ -r $BANDIT_XREPOSITORIES/$REPOSITORY/manifest ]; then
-	# Fetch from local cache if already exists
-	bandit_msg "...fetching manifest from repositories cache..."
-	# Nothing to do
-   	MIRROR="none"
-	if [ "$COMMAND_PARAMS" == "--all" ]; then
-	    # Create a tarball from filesystem for each catalog in the cache 
-	    source $BANDIT_XREPOSITORIES/$REPOSITORY/manifest
-	    bandit_mkdir $BANDIT_XCATALOGS
-	    let len=${#CATALOGS[*]}
-	    for ((i=0; i<len; i++)); do
-		bandit_msg "...fetching catalog ${CATALOGS[i]} from cache..."
-		md5sum $BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz \
-		       > $BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz.md5
-	    done
-	fi
+        # Fetch from local cache if already exists
+        bandit_msg "...fetching manifest from repositories cache..."
+        # Nothing to do
+        MIRROR="none"
+        if [ "$COMMAND_PARAMS" == "--all" ]; then
+            # Create a tarball from filesystem for each catalog in the cache 
+            source $BANDIT_XREPOSITORIES/$REPOSITORY/manifest
+            bandit_mkdir $BANDIT_XCATALOGS
+            let len=${#CATALOGS[*]}
+            for ((i=0; i<len; i++)); do
+                bandit_msg "...fetching catalog ${CATALOGS[i]} from cache..."
+                md5sum $BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz \
+                       > $BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz.md5
+            done
+        fi
     else
-	# Search for first available mirror
-	for mirror in ${REPOSITORY_MIRRORS[*]}; do
-	    bandit_msg "...fetching repository manifest from mirror $mirror..."
+        # Search for first available mirror
+        for mirror in ${REPOSITORY_MIRRORS[*]}; do
+            bandit_msg "...fetching repository manifest from mirror $mirror..."
 
-	    case ${mirror} in
-		file*)
-		    # Copy manifest from filesystem
-		    bandit_mkdir $BANDIT_XREPOSITORIES/$REPOSITORY
-		    cp ${mirror#file:}/$REPOSITORY/manifest $BANDIT_XREPOSITORIES/$REPOSITORY
-		    if [ "$COMMAND_PARAMS" == "--all" ]; then
-			# Create a tarball from filesystem for each catalog in the cache 
-			source $BANDIT_XREPOSITORIES/$REPOSITORY/manifest
-			bandit_mkdir $BANDIT_XCATALOGS
-			let len=${#CATALOGS[*]}
-			for ((i=0; i<len; i++)); do
-			    bandit_msg "...fetching catalog ${CATALOGS[i]} from mirror $mirror..."
-			    tar -C ${mirror#file:}/$REPOSITORY/catalogs/ \
-				-czf $BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz ${CATALOGS[i]}
-			    md5sum $BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz \
-				   > $BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz.md5
-			done
-		    fi
-		    
-   		    MIRROR=$mirror
-		    break
-		    ;;
-		ftp*|http*)
-		    # Download repository manifest
-		    wget ${mirror}/$REPOSITORY/manifest \
-			 --directory-prefix=$BANDIT_XREPOSITORIES/$REPOSITORY \
-			 --timestamping \
-			 --quiet 
-		    if [[ $? != 0 ]]; then
-			bandit_msg "Connection error to ${mirror}" red;
-		    else
-			MIRROR=$mirror
-			if [ "$COMMAND_PARAMS" == "--all" ]; then
-			    source $BANDIT_XREPOSITORIES/$REPOSITORY/manifest
-			    let len=${#CATALOGS[*]}
-			    for ((i=0; i<len; i++)); do
-				bandit_msg "...fetching catalog ${CATALOGS[i]} from mirror $mirror..."
-				wget ${mirror}/$REPOSITORY/catalogs/${CATALOGS[i]}.tar.gz \
-				     --directory-prefix=$BANDIT_XCATALOGS \
-				     --timestamping \
-				     --quiet 
-				if [[ $? != 0 ]]; then
-				    bandit_msg "Connection error to ${mirror}" red;
-				else
-				    # Check if MD5 is correct
-				    echo ${CATALOGS_MD5[i]} > $BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz.md5
-				    bandit_md5sum "$BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz" || bandit_exit
-				fi
-			    done
-			fi
-			MIRROR=$mirror
-			break
-		    fi
-		    ;;
-	    esac
-	done
+            case ${mirror} in
+                file*)
+                    # Copy manifest from filesystem
+                    bandit_mkdir $BANDIT_XREPOSITORIES/$REPOSITORY
+                    cp ${mirror#file:}/$REPOSITORY/manifest $BANDIT_XREPOSITORIES/$REPOSITORY
+                    if [ "$COMMAND_PARAMS" == "--all" ]; then
+                        # Create a tarball from filesystem for each catalog in the cache 
+                        source $BANDIT_XREPOSITORIES/$REPOSITORY/manifest
+                        bandit_mkdir $BANDIT_XCATALOGS
+                        let len=${#CATALOGS[*]}
+                        for ((i=0; i<len; i++)); do
+                            bandit_msg "...fetching catalog ${CATALOGS[i]} from mirror $mirror..."
+                            tar -C ${mirror#file:}/$REPOSITORY/catalogs/ \
+                                -czf $BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz ${CATALOGS[i]}
+                            md5sum $BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz \
+                                   > $BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz.md5
+                        done
+                    fi
+                    
+                    MIRROR=$mirror
+                    break
+                    ;;
+                ftp*|http*)
+                    # Download repository manifest
+                    wget ${mirror}/$REPOSITORY/manifest \
+                         --directory-prefix=$BANDIT_XREPOSITORIES/$REPOSITORY \
+                         --timestamping \
+                         --quiet 
+                    if [[ $? != 0 ]]; then
+                        bandit_msg "Connection error to ${mirror}" red;
+                    else
+                        MIRROR=$mirror
+                        if [ "$COMMAND_PARAMS" == "--all" ]; then
+                            source $BANDIT_XREPOSITORIES/$REPOSITORY/manifest
+                            let len=${#CATALOGS[*]}
+                            for ((i=0; i<len; i++)); do
+                                bandit_msg "...fetching catalog ${CATALOGS[i]} from mirror $mirror..."
+                                wget ${mirror}/$REPOSITORY/catalogs/${CATALOGS[i]}.tar.gz \
+                                     --directory-prefix=$BANDIT_XCATALOGS \
+                                     --timestamping \
+                                     --quiet 
+                                if [[ $? != 0 ]]; then
+                                    bandit_msg "Connection error to ${mirror}" red;
+                                else
+                                    # Check if MD5 is correct
+                                    echo ${CATALOGS_MD5[i]} > $BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz.md5
+                                    bandit_md5sum "$BANDIT_XCATALOGS/${CATALOGS[i]}.tar.gz" || bandit_exit
+                                fi
+                            done
+                        fi
+                        MIRROR=$mirror
+                        break
+                    fi
+                    ;;
+            esac
+        done
     fi
 }
 
 bandit_repository_install()
 {
     if [ -d $BANDIT_XREPOSITORIES/$REPOSITORY ]; then 
-	# Install repository manifest
-	bandit_msg "...installing repository manifest..."
-	bandit_timestamp stamp
-	(
-	    bandit_mkdir $BANDIT_REPOSITORIES/$REPOSITORY
-	    cp -v $BANDIT_XREPOSITORIES/$REPOSITORY/manifest $BANDIT_REPOSITORIES/$REPOSITORY
-	) 2>&1 > "$BUILD_LOGS/$REPOSITORY.install-${stamp}.log"
+        # Install repository manifest
+        bandit_msg "...installing repository manifest..."
+        bandit_timestamp stamp
+        (
+            bandit_mkdir $BANDIT_REPOSITORIES/$REPOSITORY
+            cp -v $BANDIT_XREPOSITORIES/$REPOSITORY/manifest $BANDIT_REPOSITORIES/$REPOSITORY
+        ) 2>&1 > "$BUILD_LOGS/${stamp}-$REPOSITORY.install.log"
 
-	if [ "$COMMAND_PARAMS" == "--all" ]; then
-	    # Install repository catalogs
-	    source $BANDIT_REPOSITORIES/$REPOSITORY/manifest
-	    let len=${#CATALOGS[*]}
-	    for ((i=0; i<len; i++)); do
-		CATALOG=${CATALOGS[i]}
-		CATALOG_MD5=${CATALOGS_MD5[i]}
-		COMMAND="install"
-		COMMAND_PARAMS=""
-		bandit_catalog_do
-	    done
-	fi
+        if [ "$COMMAND_PARAMS" == "--all" ]; then
+            # Install repository catalogs
+            source $BANDIT_REPOSITORIES/$REPOSITORY/manifest
+            let len=${#CATALOGS[*]}
+            for ((i=0; i<len; i++)); do
+                CATALOG=${CATALOGS[i]}
+                CATALOG_MD5=${CATALOGS_MD5[i]}
+                COMMAND="install"
+                COMMAND_PARAMS=""
+                bandit_catalog_do
+            done
+        fi
     else
-	bandit_msg "BANDIT: Repository manifest not cached." red
+        bandit_msg "BANDIT: Repository manifest not cached." red
     fi
 }
 
 bandit_repository_remove()
 {
     if [ -d $BANDIT_REPOSITORIES/$REPOSITORY ]; then 
-	if [ "$COMMAND_PARAMS" == "--all" ]; then
-	    # Remove repository catalogs
-	    source $BANDIT_REPOSITORIES/$REPOSITORY/manifest
-	    let len=${#CATALOGS[*]}
-	    for ((i=0; i<len; i++)); do
-		CATALOG=${CATALOGS[i]}
-		CATALOG_MD5=${CATALOGS_MD5[i]}
-		COMMAND="remove"
-		COMMAND_PARAMS=""
-		bandit_catalog_do
-	    done
-	fi
-	# Remove epository manifest
-	bandit_timestamp stamp
-	(
-	    rm -vrf $BANDIT_REPOSITORIES/$REPOSITORY 
-	) 2>&1 > $BUILD_LOGS/$REPOSITORY.remove-${stamp}.log
+        if [ "$COMMAND_PARAMS" == "--all" ]; then
+            # Remove repository catalogs
+            source $BANDIT_REPOSITORIES/$REPOSITORY/manifest
+            let len=${#CATALOGS[*]}
+            for ((i=0; i<len; i++)); do
+                CATALOG=${CATALOGS[i]}
+                CATALOG_MD5=${CATALOGS_MD5[i]}
+                COMMAND="remove"
+                COMMAND_PARAMS=""
+                bandit_catalog_do
+            done
+        fi
+        # Remove epository manifest
+        bandit_timestamp stamp
+        (
+            rm -vrf $BANDIT_REPOSITORIES/$REPOSITORY 
+        ) 2>&1 > $BUILD_LOGS/${stamp}-$REPOSITORY.remove.log
     else
-	bandit_msg "BANDIT: Repository $REPOSITORY not available." red
+        bandit_msg "BANDIT: Repository $REPOSITORY not available." red
     fi   
 }
 
 bandit_repository_show()
 {
     if [ -r $BANDIT_REPOSITORIES/$REPOSITORY/manifest ]; then 
-	source $BANDIT_REPOSITORIES/$REPOSITORY/manifest
+        source $BANDIT_REPOSITORIES/$REPOSITORY/manifest
 
-	local md5=""
-	let len=${#CATALOGS[*]}
-	for ((i=0; i<len; i++)); do
-	    if [ "$COMMAND_PARAMS" == "--md5" ]; then
-		md5=${CATALOGS_MD5[i]}
-	    fi
-	    echo ${CATALOGS[i]} $md5
-	done
+        local md5=""
+        let len=${#CATALOGS[*]}
+        for ((i=0; i<len; i++)); do
+            if [ "$COMMAND_PARAMS" == "--md5" ]; then
+                md5=${CATALOGS_MD5[i]}
+            fi
+            echo ${CATALOGS[i]} $md5
+        done
     else
-	bandit_msg "BANDIT: Repository not available." red
+        bandit_msg "BANDIT: Repository not available." red
     fi
 }
 
@@ -190,38 +190,37 @@ bandit_repository_do()
 
     # Source repository configuration
     if [ -r $BANDIT_HOME/etc/repositories/$REPOSITORY ]; then 
-	source $BANDIT_HOME/etc/repositories/$REPOSITORY
+        source $BANDIT_HOME/etc/repositories/$REPOSITORY
     else
-	bandit_exit "BANDIT: Cannot find '$REPOSITORY' repository file"
+        bandit_exit "BANDIT: Cannot find '$REPOSITORY' repository file"
     fi
 
     # Set directories 
-    BUILD_LOGS=$BANDIT_LOGS/repositories/$REPOSITORY.$COMMAND-${stamp}
+    BUILD_LOGS=$BANDIT_LOGS/repositories/${stamp}-$REPOSITORY.$COMMAND
 
     # Create working directories
     if [ $COMMAND != "download" -a $COMMAND != "fetch" ]; then 
-	bandit_mkdir $BUILD_LOGS
+        bandit_mkdir $BUILD_LOGS
     fi
 
     case $COMMAND in
-	download)
-	    bandit_repository_fetch download
-	    ;;
-	install)
-	    bandit_repository_fetch 
-	    bandit_repository_install
-	    ;;
-	update)
-	    bandit_repository_fetch download
-	    bandit_repository_install
-	    ;;
-	remove)
-	    bandit_repository_remove
-	    ;;
-	show)
-	    bandit_repository_show
-	    ;;
+        download)
+            bandit_repository_fetch download
+            ;;
+        install)
+            bandit_repository_fetch 
+            bandit_repository_install
+            ;;
+        update)
+            bandit_repository_fetch download
+            bandit_repository_install
+            ;;
+        remove)
+            bandit_repository_remove
+            ;;
+        show)
+            bandit_repository_show
+            ;;
     esac
 }
-export -f bandit_repository_do
 

@@ -2,7 +2,7 @@
 #
 # bandit_bundle_source - BANDIT functions for bundle sources
 #
-# Copyright (C) 2015-2018 Angel Linares Zapater
+# Copyright (C) 2015-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -25,22 +25,21 @@ bandit_source_rename()
     # Copy the file and .md5 in the cache
     # Keep a copy of the original tarball to avoid unintended downloads
     if [ -r $orig ]; then
-	cp $orig     $dest
-	cp $orig.md5 $dest.md5
+        cp $orig     $dest
+        cp $orig.md5 $dest.md5
     fi
 
     # Change file name in sources_tarball variable
     let len=${#sources_tarball[*]}
     for ((i=0; i<len; i++)); do
-	if [ "$(basename ${sources_tarball[i]})" == "${orig}" ]; then
-	    sources_tarball[i]=$BUILD_SOURCES/${dest}
-	    break
-	fi
+        if [ "$(basename ${sources_tarball[i]})" == "${orig}" ]; then
+            sources_tarball[i]=$BUILD_SOURCES/${dest}
+            break
+        fi
     done
     
     bandit_popd
 }
-export -f bandit_source_rename
 
 bandit_source_repackage_into()
 {
@@ -71,7 +70,7 @@ bandit_source_repackage_into()
     cd ..
 
     # Build the new temporary tarball 
-    tar -c $directory | xz > ../$tmp.tar.xz
+    tar -c $directory | xz -1 > ../$tmp.tar.xz
 
     cd ..
 
@@ -88,15 +87,14 @@ bandit_source_repackage_into()
     # Change file name in sources_tarball variable
     let len=${#sources_tarball[*]}
     for ((i=0; i<len; i++)); do
-	if [ "$(basename ${sources_tarball[i]})" == "$tarball" ]; then
-	    sources_tarball[i]=$BUILD_SOURCES/$directory.tar.xz
-	    break
-	fi
+        if [ "$(basename ${sources_tarball[i]})" == "$tarball" ]; then
+            sources_tarball[i]=$BUILD_SOURCES/$directory.tar.xz
+            break
+        fi
     done
 
     bandit_popd
 }
-export -f bandit_source_repackage_into
 
 bandit_source_repackage_top()
 {
@@ -129,12 +127,11 @@ bandit_source_repackage_top()
     # Change file name in sources_tarball variable
     let len=${#sources_tarball[*]}
     for ((i=0; i<len; i++)); do
-	if [ "$(basename ${sources_tarball[i]})" == "$tarball" ]; then
-	    sources_tarball[i]=$BUILD_SOURCES/$directory.tar.xz
-	    break
-	fi
+        if [ "$(basename ${sources_tarball[i]})" == "$tarball" ]; then
+            sources_tarball[i]=$BUILD_SOURCES/$directory.tar.xz
+            break
+        fi
     done
 
     bandit_popd
 }
-export -f bandit_source_repackage_top

@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+# bandit_system - functions for BANDIT systems
+#
+# Copyright (C) 2019 Angel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+source $BANDIT_HOME/bin/bandit_common
+source $BANDIT_HOME/bin/bandit_system_host
+source $BANDIT_HOME/bin/bandit_system_builder
+source $BANDIT_HOME/bin/bandit_system_target
+
+###------------------------------
+# System DO
+###------------------------------
+
+bandit_system_do()
+{
+    case $SYSTEM in
+        host)
+            case $COMMAND in 
+                clean)
+                    bandit_system_host_clean
+                    ;;
+                check)
+                    bandit_system_host_check
+                    ;;
+                init)
+                    bandit_system_host_init
+                    ;;
+                *)
+                    bandit_msg "BANDIT: Command $COMMAND not allowed for $SYSTEM systems" red
+            esac
+            ;;
+        builder)
+            case $COMMAND in 
+                enter)
+                    bandit_system_builder_enter
+                    ;;
+                *)
+                    bandit_msg "BANDIT: Command $COMMAND not allowed for $SYSTEM systems" red
+            esac
+            ;;
+        target)
+            case $COMMAND in 
+                init)
+                    bandit_system_target_init
+                    ;;
+                enter)
+                    bandit_system_target_enter
+                    ;;
+                *)
+                    bandit_msg "BANDIT: Command $COMMAND not allowed for $SYSTEM systems" red
+            esac
+            ;;
+        *)
+            bandit_msg "BANDIT: Unknown type of $SYSTEM systems" red
+            ;;
+    esac   
+}

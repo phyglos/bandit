@@ -2,7 +2,7 @@
 #
 # bandit_help - functions to show help in BANDIT
 #
-# Copyright (C) 2018 Angel Linares Zapater
+# Copyright (C) 2018-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -32,16 +32,24 @@ bandit_show_help_bundles()
     echo "    <bundle>:     Name of the bundle"
     echo "    -i <item>:    Apply the action only to this item in the bundle"
     echo "    <action>:"
-    echo "      copy        Copy an existing bundle into new one"
-    echo "                  <dest>  name for the new bundle"
     echo "      edit        Edit the configuration files for the bundle"
     echo "                  --conf for editing the configuration file (default)"
     echo "                  --desc for editing the description file"
+    echo "      copy        Copy an existing bundle into new one, optionally in other catalog"
+    echo "                  <dest> [<dest_cat>] name for the destination bundle and catalog"
+    echo "      move        Move an existing bundle into another catalog"
+    echo "                  <dest_cat> name for the destination catalog"
+    echo "      rename      Rename an existing bundle"
+    echo "                  <dest> new name for the bundle"
+    echo "      delete      Delete a bundle from an existing catalog"
+    echo "                  (Use 'remove' to uninstall the bundle items)"
+    echo
     echo "      download    Download (inconditionally) from origins into the corresponding caches"
     echo "      fetch       Download (when not in cache) from origins"
+    echo "                  --all for fetching sources and build packs (default)"
     echo "                  --sources for fetching sources"
     echo "                  --builds for fetching build packs"
-    echo "                  --all for fetching sources and build packs (default)"
+    echo
     echo "      config      Interactively configure the bundle"
     echo "      build       Build the bundle and save a build pack in the builds cache"
     echo "      install     Install the build pack from the builds cache"
@@ -128,10 +136,12 @@ bandit_show_help_systems()
     echo
     echo "  bandit -s|--system <system> <action>" 
     echo
-    echo "     host check   Checks the building requiremts of the HOST"
-    echo "     host init    Creates users and partitions on the HOST"
-    echo "     host clean   Cleans the HOST from previous installations"
-    echo "     target init  Initialize the TARGET filesystem"
+    echo "     host check    Checks the building requiremts of the HOST"
+    echo "     host clean    Cleans the HOST from previous installations"
+    echo "     host init     Creates users and partitions on the HOST"
+    echo "     builder enter Enter into the BUILDER chroot jail"
+    echo "     target init   Initialize the TARGET filesystem"
+    echo "     target enter  Enter into the TARGET chroot jail"
     echo
 }
 

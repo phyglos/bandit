@@ -2,7 +2,7 @@
 #
 # bandit_bundle_module - BANDIT functions for bundle modules
 #
-# Copyright (C) 2015-2018 Angel Linares Zapater
+# Copyright (C) 2015-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -15,12 +15,13 @@
 #---
 # Modules_command functions
 #---
+
 bandit_module_install()
 {
     ## Install the module
     bandit_msg "...installing..."
     bandit_timestamp stamp
-    module_install ${*} 2>&1 > $BUILD_LOGS/${module_log}.install-${stamp}.log 
+    module_install ${*} 2>&1 > $BUILD_LOGS/${stamp}-${module_log}.install.log 
 }
 
 bandit_module_remove()
@@ -28,7 +29,7 @@ bandit_module_remove()
     ## Remove the module
     bandit_msg "...removing..."
     bandit_timestamp stamp
-    module_remove ${*} 2>&1 > $BUILD_LOGS/${module_log}.remove-${stamp}.log 
+    module_remove ${*} 2>&1 > $BUILD_LOGS/${stamp}-${module_log}.remove.log 
 }
 
 ###---
@@ -57,16 +58,15 @@ bandit_module()
     
     # Perform module command
     case $COMMAND in
-	build)
-	    echo "...no build command defined for modules..."
-	    ;;
-	install | raise )
-	    bandit_module_install ${module_name}
-	    ;;
-	remove )
-	    bandit_module_remove ${module_name}
-	    ;;
+        build)
+            echo "...no build command defined for modules..."
+            ;;
+        install | raise )
+            bandit_module_install ${module_name}
+            ;;
+        remove )
+            bandit_module_remove ${module_name}
+            ;;
     esac
 }
-export -f bandit_module
 

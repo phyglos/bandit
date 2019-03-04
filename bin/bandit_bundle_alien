@@ -5,11 +5,11 @@
 # Copyright (C) 2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License, version 2, as 
+# it under the terms of the GNU General Public License, version 2, as
 # published by the Free Software Foundation. See the COPYING file.
 #
-# This program is distributed WITHOUT ANY WARRANTY; without even the 
-# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+# This program is distributed WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
 ###------------------------------
@@ -26,14 +26,14 @@ bandit_alien_get_origins()
     # Get the builds URLs to fetch from
     aliens_fetch_url=(${URL[*]})
     aliens_fetch_md5=(${MD5[*]})
-    # Add other included sources 
+    # Add other included sources
     if [ -n $ADD ]; then
-	for payload in ${ADD[*]}; do
-	    unset URL MD5
-	    source $BUILD_ORIGINS/$BUNDLE_BUILDS/builds/$payload
-	    aliens_fetch_url=(${aliens_fetch_url[*]} ${URL[*]})
-	    aliens_fetch_md5=(${aliens_fetch_md5[*]} ${MD5[*]})
-	done
+        for payload in ${ADD[*]}; do
+            unset URL MD5
+            source $BUILD_ORIGINS/$BUNDLE_BUILDS/builds/$payload
+            aliens_fetch_url=(${aliens_fetch_url[*]} ${URL[*]})
+            aliens_fetch_md5=(${aliens_fetch_md5[*]} ${MD5[*]})
+        done
     fi
 
     # Clean sourced origins variables
@@ -47,51 +47,51 @@ bandit_alien_get_origins()
 bandit_alien_fetch_builds()
 {
     local download=false
-    
+
     # $1 = download -> do not use cache, force download
-    [ "$1" == "download" ] && download=true 
+    [ "$1" == "download" ] && download=true
 
     let len=${#aliens_fetch_url[*]}
     for ((i=0; i<len; i++)); do
-	file=$(basename "${aliens_fetch_url[i]}")
+        file=$(basename "${aliens_fetch_url[i]}")
 
-	if [ $download == true ]; then
-	    # Force downloading by removing files in local cache 
-	    rm $BUILD_DESTDIR/$file{,.md5} 2>/dev/null
-	fi
+        if [ $download == true ]; then
+            # Force downloading by removing files in local cache
+            rm $BUILD_DESTDIR/$file{,.md5} 2>/dev/null
+        fi
 
-	if [ -r $BUILD_DESTDIR/$file ]; then
-	    # Fetch from local cache if already exists
-	    bandit_msg "...fetching $file from builds cache..."
-	    # Just check for MD5 
-	    bandit_md5sum "$BUILD_DESTDIR/$file" || bandit_exit
-	else
-	    case ${aliens_fetch_url[i]} in
-		file*)
-		    # Copy from filesystem
-		    bandit_msg "...fetching $file from local filesystem..."
-		    cp ${aliens_fetch_url[i]#file:}     $BUILD_DESTDIR/$file
-		    cp ${aliens_fetch_url[i]#file:}.md5 $BUILD_DESTDIR/$file.md5
-		    # Check if MD5 is correct
-		    bandit_md5sum "$BUILD_DESTDIR/$file" || bandit_exit
-		    ;;
-		ftp*|http*)
-		    # Download from URL into BUILD_DESTDIR
-		    bandit_msg "...fetching $file from aliens origin..."
-		    wget ${aliens_fetch_url[i]} \
-			 --directory-prefix=$BUILD_DESTDIR \
-			 --quiet \
-			 --no-clobber
-		    if [[ $? != 0 ]]; then
-			bandit_msg "Connection error to ${builds_fetch_url[i]}" red;
-		    else
-			# Check if MD5 is correct
-			echo ${aliens_fetch_md5[i]} > $BUILD_DESTDIR/$file.md5
-			bandit_md5sum "$BUILD_DESTDIR/$file" || bandit_exit
-		    fi
-		    ;;
-	    esac
-	fi
+        if [ -r $BUILD_DESTDIR/$file ]; then
+            # Fetch from local cache if already exists
+            bandit_msg "...fetching $file from builds cache..."
+            # Just check for MD5
+            bandit_md5sum "$BUILD_DESTDIR/$file" || bandit_exit
+        else
+            case ${aliens_fetch_url[i]} in
+                file*)
+                    # Copy from filesystem
+                    bandit_msg "...fetching $file from local filesystem..."
+                    cp ${aliens_fetch_url[i]#file:}     $BUILD_DESTDIR/$file
+                    cp ${aliens_fetch_url[i]#file:}.md5 $BUILD_DESTDIR/$file.md5
+                    # Check if MD5 is correct
+                    bandit_md5sum "$BUILD_DESTDIR/$file" || bandit_exit
+                    ;;
+                ftp*|http*)
+                    # Download from URL into BUILD_DESTDIR
+                    bandit_msg "...fetching $file from aliens origin..."
+                    wget ${aliens_fetch_url[i]} \
+                         --directory-prefix=$BUILD_DESTDIR \
+                         --quiet \
+                         --no-clobber
+                    if [[ $? != 0 ]]; then
+                        bandit_msg "Connection error to ${builds_fetch_url[i]}" red;
+                    else
+                        # Check if MD5 is correct
+                        echo ${aliens_fetch_md5[i]} > $BUILD_DESTDIR/$file.md5
+                        bandit_md5sum "$BUILD_DESTDIR/$file" || bandit_exit
+                    fi
+                    ;;
+            esac
+        fi
 
     done
 }
@@ -111,20 +111,20 @@ bandit_alien_prepare_install()
 #---
 bandit_alien_install()
 {
-    ## Install the alien 
+    ## Install the alien
     bandit_msg "...installing..."
 
     # Prefix porg to command, if available (except for the bandit user)
     local CMD=""
     local PRE="eval"
     if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
-	if [ -e /usr/bin/porg ]; then 
-	    PRE="porg -lp+ $script"
-	    # Prefix sudo if available
-	    if [ -e /usr/bin/sudo ]; then 
-: #		PRE="sudo "$PRE
-	    fi
-	fi
+        if [ -e /usr/bin/porg ]; then
+            PRE="porg -lp+ $script"
+            # Prefix sudo if available
+            if [ -e /usr/bin/sudo ]; then
+: #             PRE="sudo "$PRE
+            fi
+        fi
     fi
 
     # Create a new, temporary bash script, and ...
@@ -139,42 +139,42 @@ EOF
     # Execute the install function
     bandit_timestamp stamp
     (
-	# Execute the function, prefixed with porg
-	CMD="sh ${tmpCMD} alien_install ${*}"    
+        # Execute the function, prefixed with porg
+        CMD="sh ${tmpCMD} alien_install ${*}"
         ${PRE} "${CMD}"
-    ) 2>&1 > $BUILD_LOGS/${alien}.alien_install-${stamp}.log 
+    ) 2>&1 > $BUILD_LOGS/${stamp}-${alien}.alien_install.log
 
     ## Verify the installed alien
-    if bandit_script_has $BUILD_SCRIPTS/${alien}.sh install_verify; then  
-	bandit_msg "...verifying..."
-	bandit_timestamp stamp
-	install_verify 2>&1 > $BUILD_LOGS/${alien}.install_verify-${stamp}.log 
+    if bandit_script_has $BUILD_SCRIPTS/${alien}.sh install_verify; then
+        bandit_msg "...verifying..."
+        bandit_timestamp stamp
+        install_verify 2>&1 > $BUILD_LOGS/${stamp}-${alien}.install_verify.log
     fi
 
     ## Set up the installed alien
-    if bandit_script_has $BUILD_SCRIPTS/${alien}.sh install_setup; then  
-	bandit_msg "...setting up..."
-	bandit_timestamp stamp
-	install_setup 2>&1 > $BUILD_LOGS/${alien}.install_setup-${stamp}.log 
+    if bandit_script_has $BUILD_SCRIPTS/${alien}.sh install_setup; then
+        bandit_msg "...setting up..."
+        bandit_timestamp stamp
+        install_setup 2>&1 > $BUILD_LOGS/${stamp}-${alien}.install_setup.log
     fi
 }
 
 bandit_alien_remove()
 {
     # Set up for removal
-    if bandit_script_has $BUILD_SCRIPTS/$alien.sh remove_setup; then  
-	bandit_msg "...setting up..."
-	bandit_timestamp stamp
-	remove_setup 2>&1 > $BUILD_LOGS/$alien.remove_setup-${stamp}.log 
+    if bandit_script_has $BUILD_SCRIPTS/$alien.sh remove_setup; then
+        bandit_msg "...setting up..."
+        bandit_timestamp stamp
+        remove_setup 2>&1 > $BUILD_LOGS/${stamp}-$alien.remove_setup.log
     fi
 
     # Log files from porg database and then remove the alien
     bandit_msg "...removing alien files..."
     bandit_timestamp stamp
     (
-	porg -fx ${alien}
-	yes | porg -rx ${alien}
-    ) 2>&1 > $BUILD_LOGS/$alien.remove-${stamp}.log 
+        porg -fx ${alien}
+        yes | porg -rx ${alien}
+    ) 2>&1 > $BUILD_LOGS/${stamp}-$alien.remove.log
 }
 
 
@@ -186,7 +186,7 @@ bandit_alien_do()
 {
     # Parse the line from the bundle description file
     local alien=$1  `# Alien name`
-    local variant=$2     `# Script variant` 
+    local variant=$2     `# Script variant`
 
     bandit_log "${alien} (alien) [$(date)]"
 
@@ -194,10 +194,10 @@ bandit_alien_do()
     function alien_install() { :; } ; export -f alien_install
     function alien_remove()  { :; } ; export -f alien_remove
 
-    # Source script file name with a possible variant 
+    # Source script file name with a possible variant
     script=$alien
     if [ -n "$variant" ]; then
-	script=$alien-$variant
+        script=$alien-$variant
     fi
     [ -r $BUILD_SCRIPTS/$script.sh ] || bandit_exit "BANDIT: Cannot find $script.sh file"
     source $BUILD_SCRIPTS/$script.sh
@@ -209,36 +209,33 @@ bandit_alien_do()
     # Declare list of alien origins
     declare -a aliens_fetch_url
     declare -a aliens_fetch_md5
-    
+
     # Perform alien command
     case $COMMAND in
-	download)
-	    bandit_alien_get_origins
-	    bandit_alien_fetch_builds download
-		    ;;
-	fetch)
-	    bandit_alien_get_origins
-	    bandit_alien_fetch_builds 
-		    ;;
-	build)
-	    echo "...no build command defined for aliens..."
-	    ;;
-	install | raise )
-	    bandit_alien_get_origins
-	    bandit_alien_fetch_builds 
-	    bandit_alien_prepare_install
-	    bandit_alien_install
-	    ;;
-	remove )
-	    bandit_alien_remove 
-	    ;;
+        download)
+            bandit_alien_get_origins
+            bandit_alien_fetch_builds download
+                    ;;
+        fetch)
+            bandit_alien_get_origins
+            bandit_alien_fetch_builds
+                    ;;
+        build)
+            echo "...no build command defined for aliens..."
+            ;;
+        install | raise )
+            bandit_alien_get_origins
+            bandit_alien_fetch_builds
+            bandit_alien_prepare_install
+            bandit_alien_install
+            ;;
+        remove )
+            bandit_alien_remove
+            ;;
     esac
 
     # Remove temporary DESTDIR
     rm -rf $BUILD_DESTDIR/$alien
     # Remove WORK package directory
     rm -rf $alien
-
 }
-export -f bandit_alien_do
-

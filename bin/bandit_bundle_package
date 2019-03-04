@@ -2,7 +2,7 @@
 #
 # bandit_bundle_package - BANDIT functions for bundle packages
 #
-# Copyright (C) 2015-2018 Angel Linares Zapater
+# Copyright (C) 2015-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -28,12 +28,12 @@ bandit_package_get_origins()
     sources_fetch_md5=(${MD5[*]})
     # Add other included sources 
     if [ -n $ADD ]; then
-	for payload in ${ADD[*]}; do
-	    unset URL MD5
-	    source $BUILD_ORIGINS/$BUNDLE_SOURCES/sources/$payload
-	    sources_fetch_url=(${sources_fetch_url[*]} ${URL[*]})
-	    sources_fetch_md5=(${sources_fetch_md5[*]} ${MD5[*]})
-	done
+        for payload in ${ADD[*]}; do
+            unset URL MD5
+            source $BUILD_ORIGINS/$BUNDLE_SOURCES/sources/$payload
+            sources_fetch_url=(${sources_fetch_url[*]} ${URL[*]})
+            sources_fetch_md5=(${sources_fetch_md5[*]} ${MD5[*]})
+        done
     fi
 
     # Clean sourced origins variables
@@ -53,48 +53,48 @@ bandit_package_fetch_sources()
 
     let len=${#sources_fetch_url[*]}
     for ((i=0; i<len; i++)); do
-	file=$(basename "${sources_fetch_url[i]}")
-	
-	if [ $download == true ]; then
-	    # Force downloading by removing files in local cache 
-	    rm $BUILD_SOURCES/$file{,.md5} 2>/dev/null
-	fi
+        file=$(basename "${sources_fetch_url[i]}")
+        
+        if [ $download == true ]; then
+            # Force downloading by removing files in local cache 
+            rm $BUILD_SOURCES/$file{,.md5} 2>/dev/null
+        fi
 
-	if [ -r $BUILD_SOURCES/$file ]; then
-	    # Fetch from local cache if already exists
-	    bandit_msg "...fetching $file from sources cache..."
-	    # Just check for MD5 
-	    bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
-	else
-	    case ${sources_fetch_url[i]} in
-		file*)
-		    # Copy from filesystem
-		    bandit_msg "...fetching $file from local filesystem..."
-		    cp ${sources_fetch_url[i]#file:}     $BUILD_SOURCES/$file
-		    cp ${sources_fetch_url[i]#file:}.md5 $BUILD_SOURCES/$file.md5
-		    # Check if MD5 is correct
-		    bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
-		    ;;
-		ftp*|http*)
-		    # Download from URL into BUILD_SOURCES
-		    bandit_msg "...fetching $file from source origin..."
-		    wget ${sources_fetch_url[i]} \
-			 --directory-prefix=$BUILD_SOURCES \
-			 --quiet \
-			 --no-clobber
-		    if [[ $? != 0 ]]; then
-			bandit_msg "Connection error to ${sources_fetch_url[i]}" red;
-		    else
-			# Check if MD5 is correct
-			echo ${sources_fetch_md5[i]} > $BUILD_SOURCES/$file.md5
-			bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
-		    fi
-		    ;;
-	    esac
-	fi
+        if [ -r $BUILD_SOURCES/$file ]; then
+            # Fetch from local cache if already exists
+            bandit_msg "...fetching $file from sources cache..."
+            # Just check for MD5 
+            bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
+        else
+            case ${sources_fetch_url[i]} in
+                file*)
+                    # Copy from filesystem
+                    bandit_msg "...fetching $file from local filesystem..."
+                    cp ${sources_fetch_url[i]#file:}     $BUILD_SOURCES/$file
+                    cp ${sources_fetch_url[i]#file:}.md5 $BUILD_SOURCES/$file.md5
+                    # Check if MD5 is correct
+                    bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
+                    ;;
+                ftp*|http*)
+                    # Download from URL into BUILD_SOURCES
+                    bandit_msg "...fetching $file from source origin..."
+                    wget ${sources_fetch_url[i]} \
+                         --directory-prefix=$BUILD_SOURCES \
+                         --quiet \
+                         --no-clobber
+                    if [[ $? != 0 ]]; then
+                        bandit_msg "Connection error to ${sources_fetch_url[i]}" red;
+                    else
+                        # Check if MD5 is correct
+                        echo ${sources_fetch_md5[i]} > $BUILD_SOURCES/$file.md5
+                        bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
+                    fi
+                    ;;
+            esac
+        fi
 
-	# Set the tarball
-	sources_tarball[i]=$BUILD_SOURCES/$file
+        # Set the tarball
+        sources_tarball[i]=$BUILD_SOURCES/$file
     done
 }
 
@@ -102,9 +102,9 @@ bandit_package_prepare_sources()
 {
     # Custom sources preparation
     if bandit_script_has $BUILD_ORIGINS/$BUNDLE_SOURCES/sources/$package sources_prepare; then
-	bandit_msg "...preparing sources..."
-	# Refactor or rename tarball and payload
-	sources_prepare $sources_tarball
+        bandit_msg "...preparing sources..."
+        # Refactor or rename tarball and payload
+        sources_prepare $sources_tarball
     fi
 
     # Untar main source tarball
@@ -120,36 +120,36 @@ bandit_package_fetch_builds()
     # $1 = download -> do not use cache, force download
 
     if [ "$1" == "download" ]; then
-	# Force downloading by removing files in local cache 
-	rm $BUILD_DESTDIR/$pack{,.md5} 2>/dev/null
+        # Force downloading by removing files in local cache 
+        rm $BUILD_DESTDIR/$pack{,.md5} 2>/dev/null
     fi
 
     if [ -r $BUILD_DESTDIR/$pack ]; then
-	# Fetch from local cache if already exists
-	bandit_msg "...fetching $pack from builds cache ..."
-	# just check for MD5 
-	bandit_md5sum $BUILD_DESTDIR/$pack || bandit_exit
+        # Fetch from local cache if already exists
+        bandit_msg "...fetching $pack from builds cache ..."
+        # just check for MD5 
+        bandit_md5sum $BUILD_DESTDIR/$pack || bandit_exit
     else
-	# Download from URL into BUILD_DEST
-	bandit_msg "...fetching $pack from build origin..."
+        # Download from URL into BUILD_DEST
+        bandit_msg "...fetching $pack from build origin..."
 
-	local mirror
-	local file
-	source $BANDIT_HOME/etc/repositories/$REPOSITORY
-	for mirror in ${REPOSITORY_MIRRORS[*]}; do
-	    file=$mirror"/phyglos.org/builds/$CATALOG/$BUNDLE/$pack"
-	    wget ${file}{,.md5} \
-		 --directory-prefix=$BUILD_DESTDIR \
-		 --quiet \
-		 --no-clobber
-	    if [[ $? != 0 ]]; then
-		bandit_msg "Connection error to ${file}" red
-	    else
-		# Check if MD5 is correct
-		bandit_md5sum $BUILD_DESTDIR/${pack} || bandit_exit
-		break
-	    fi
-	done
+        local mirror
+        local file
+        source $BANDIT_HOME/etc/repositories/$REPOSITORY
+        for mirror in ${REPOSITORY_MIRRORS[*]}; do
+            file=$mirror"/phyglos.org/builds/$CATALOG/$BUNDLE/$pack"
+            wget ${file}{,.md5} \
+                 --directory-prefix=$BUILD_DESTDIR \
+                 --quiet \
+                 --no-clobber
+            if [[ $? != 0 ]]; then
+                bandit_msg "Connection error to ${file}" red
+            else
+                # Check if MD5 is correct
+                bandit_md5sum $BUILD_DESTDIR/${pack} || bandit_exit
+                break
+            fi
+        done
     fi
 }
 
@@ -161,14 +161,14 @@ bandit_package_prepare_build()
 
     # Patch libtool to avoid warnings due to staged build
     if [ -w /usr/bin/libtool ]; then 
-	find .. -name 'ltmain*' | \
-	    xargs \
-		sed \
-		-e "/remember to run/c\ : "        \
- 		-e "/has not been installed/c\ : " \
- 		-e "/seems to be moved/c\ : " \
- 		-e "/relinking /c\ : "              \
-		-i /usr/bin/libtool
+        find .. -name 'ltmain*' | \
+            xargs \
+                sed \
+                -e "/remember to run/c\ : "        \
+                -e "/has not been installed/c\ : " \
+                -e "/seems to be moved/c\ : " \
+                -e "/relinking /c\ : "              \
+                -i /usr/bin/libtool
     fi
 }
 
@@ -180,7 +180,7 @@ bandit_package_config()
 {
     ## Configure
     if bandit_script_has $BUILD_SCRIPTS/$script.sh build_config; then  
-	bandit_msg "...configuring..."
+        bandit_msg "...configuring..."
         build_config
     fi
 }
@@ -189,38 +189,38 @@ bandit_package_build()
 {
     ## Compile 
     if bandit_script_has $BUILD_SCRIPTS/$script.sh build_compile; then  
-	bandit_msg "...compiling..."
-	bandit_timestamp stamp
-        build_compile 2>&1 > $BUILD_LOGS/$script.compile-${stamp}.log
+        bandit_msg "...compiling..."
+        bandit_timestamp stamp
+        build_compile 2>&1 > $BUILD_LOGS/${stamp}-$script.compile.log
     fi
 
     ## Test 
     if (( $BANDIT_BUILD_TEST_LEVEL >= $build_test_level )); then
-	if bandit_script_has $BUILD_SCRIPTS/$script.sh build_test; then  
-	    bandit_msg "...testing..."
-	    bandit_timestamp stamp
-	    build_test 2>&1 > $BUILD_LOGS/$script.test-${stamp}.log
-	fi
+        if bandit_script_has $BUILD_SCRIPTS/$script.sh build_test; then  
+            bandit_msg "...testing..."
+            bandit_timestamp stamp
+            build_test 2>&1 > $BUILD_LOGS/${stamp}-$script.test.log
+        fi
     fi
 
     # Remove unneeded files
     if [ "$BUILD_KEEP_LA" != "yes" ]; then
-	find $BUILD_WORK -name \*.la -delete
+        find $BUILD_WORK -name \*.la -delete
     fi
 
     ## Pack 
-    export BUILD_PACK=$BUILD_DESTDIR/$script
+    BUILD_PACK=$BUILD_DESTDIR/$script
     if bandit_script_has $BUILD_SCRIPTS/$script.sh build_pack; then  
-	bandit_msg "...packing..."
-	bandit_timestamp stamp
-	build_pack 2>&1 > $BUILD_LOGS/$script.pack-${stamp}.log
-	bandit_pushd $BUILD_PACK
-	(
-	    tar -c * | xz -1 > ../$pack
-	    cd ..
-	    md5sum -b $pack > $pack.md5
-	)
-	bandit_popd
+        bandit_msg "...packing..."
+        bandit_timestamp stamp
+        build_pack 2>&1 > $BUILD_LOGS/${stamp}-$script.pack.log
+        bandit_pushd $BUILD_PACK
+        (
+            tar -c * | xz -1 > ../$pack
+            cd ..
+            md5sum -b $pack > $pack.md5
+        )
+        bandit_popd
     fi
 }
 
@@ -228,58 +228,58 @@ bandit_package_install()
 {
     ## Install 
     if [ -r $BUILD_DESTDIR/$pack ]; then 
-	## Rig the localhost 
-	if bandit_script_has $BUILD_SCRIPTS/$script.sh host_rig; then  
-	    bandit_msg "...rigging host..."
-	    bandit_timestamp stamp
-	    host_rig 2>&1 > $BUILD_LOGS/$script.host_rig-${stamp}.log 
-	fi
+        ## Rig the localhost 
+        if bandit_script_has $BUILD_SCRIPTS/$script.sh host_rig; then  
+            bandit_msg "...rigging host..."
+            bandit_timestamp stamp
+            host_rig 2>&1 > $BUILD_LOGS/${stamp}-$script.host_rig.log 
+        fi
 
-	bandit_msg "...unpacking..."
+        bandit_msg "...unpacking..."
 
-	# Prefix porg to command, if available (except for the bandit user)
-	local CMD=""
-	local PRE="eval"
-	if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
-	    if [ -e /usr/bin/porg ]; then 
-		PRE="porg -lp+ $script"
-		# Prefix sudo if available
-		if [ -e /usr/bin/sudo ]; then 
-		    PRE="sudo "$PRE
-		fi
-	    fi
-	fi
-	
-	# Unpack
-	bandit_timestamp stamp
-	( 
-	    CMD="tar -C / --no-overwrite-dir --keep-directory-symlink -xvf $BUILD_DESTDIR/$pack"    
-            ${PRE} "${CMD}"
-	    if bandit_script_has $BUILD_SCRIPTS/$script.sh install_unpack; then  
-		echo "-----"
-		CMD="install_unpack"
-		${PRE} "${CMD}"
+        # Prefix porg to command, if available (except for the bandit user)
+        local CMD=""
+        local PRE="eval"
+        if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
+            if [ -e /usr/bin/porg ]; then 
+                PRE="porg -lp+ $script"
+                # Prefix sudo if available
+                if [ -e /usr/bin/sudo ]; then 
+                    PRE="sudo "$PRE
+                fi
             fi
-        ) 2>&1 > $BUILD_LOGS/$script.unpack-${stamp}.log 
+        fi
+        
+        # Unpack
+        bandit_timestamp stamp
+        ( 
+            CMD="tar -C / --no-overwrite-dir --keep-directory-symlink -xvf $BUILD_DESTDIR/$pack"    
+            ${PRE} "${CMD}"
+            if bandit_script_has $BUILD_SCRIPTS/$script.sh install_unpack; then  
+                echo "-----"
+                CMD="install_unpack"
+                ${PRE} "${CMD}"
+            fi
+        ) 2>&1 > $BUILD_LOGS/${stamp}-$script.unpack.log 
 
-	# Make new libraries immediately available (except for the bandit user)
-	if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
-	    [ -x /sbin/ldconfig ] && ldconfig
-	fi
+        # Make new libraries immediately available (except for the bandit user)
+        if [ "$(id -un $UID)" != "$BANDIT_USR" ]; then
+            [ -x /sbin/ldconfig ] && ldconfig
+        fi
 
-	## Verify the installed pack
-	if bandit_script_has $BUILD_SCRIPTS/$script.sh install_verify; then  
-	    bandit_msg "...verifying..."
-	    bandit_timestamp stamp
-	    install_verify 2>&1 > $BUILD_LOGS/$script.install_verify-${stamp}.log 
-	fi
+        ## Verify the installed pack
+        if bandit_script_has $BUILD_SCRIPTS/$script.sh install_verify; then  
+            bandit_msg "...verifying..."
+            bandit_timestamp stamp
+            install_verify 2>&1 > $BUILD_LOGS/${stamp}-$script.install_verify.log 
+        fi
 
         ## Set up the installed pack
-	if bandit_script_has $BUILD_SCRIPTS/$script.sh install_setup; then  
-	    bandit_msg "...setting up..."
-	    bandit_timestamp stamp
-	    install_setup 2>&1 > $BUILD_LOGS/$script.install_setup-${stamp}.log 
-	fi
+        if bandit_script_has $BUILD_SCRIPTS/$script.sh install_setup; then  
+            bandit_msg "...setting up..."
+            bandit_timestamp stamp
+            install_setup 2>&1 > $BUILD_LOGS/${stamp}-$script.install_setup.log 
+        fi
     fi
 }
 
@@ -287,24 +287,24 @@ bandit_package_remove()
 {
     # Set up for removal
     if bandit_script_has $BUILD_SCRIPTS/$script.sh remove_setup; then  
-	bandit_msg "...setting up..."
-	bandit_timestamp stamp
-	remove_setup 2>&1 > $BUILD_LOGS/$script.remove_setup-${stamp}.log 
+        bandit_msg "...setting up..."
+        bandit_timestamp stamp
+        remove_setup 2>&1 > $BUILD_LOGS/${stamp}-$script.remove_setup.log 
     fi
 
     # Log files from porg database and then remove the package
     bandit_msg "...removing package files..."
     bandit_timestamp stamp
     (
-	porg -fx ${script}
-	yes | porg -rx ${script}
-    ) 2>&1 > $BUILD_LOGS/$script.remove-${stamp}.log
+        porg -fx ${script}
+        yes | porg -rx ${script}
+    ) 2>&1 > $BUILD_LOGS/${stamp}-$script.remove.log
 
     ## Unrig the localhost 
     if bandit_script_has $BUILD_SCRIPTS/$script.sh host_unrig; then  
-	bandit_msg "...unrigging host..."
-	bandit_timestamp stamp
-	host_unrig 2>&1 > $BUILD_LOGS/$script.host_unrig-${stamp}.log 
+        bandit_msg "...unrigging host..."
+        bandit_timestamp stamp
+        host_unrig 2>&1 > $BUILD_LOGS/${stamp}-$script.host_unrig.log 
     fi
 }
 
@@ -340,7 +340,7 @@ bandit_package_do()
     # Source script file name with a possible variant 
     script=$package
     if [ -n "$variant" ]; then
-	script=$package-$variant
+        script=$package-$variant
     fi
     [ -r $BUILD_SCRIPTS/$script.sh ] || bandit_exit "BANDIT: Cannot find $script.sh file"
     source $BUILD_SCRIPTS/$script.sh
@@ -360,73 +360,73 @@ bandit_package_do()
     declare -a sources_tarball
 
     case $COMMAND in
-	download)
-	    case $COMMAND_PARAMS in
-		"--sources")
-		    bandit_package_get_origins
-		    bandit_package_fetch_sources download
-		    ;;
-		"--builds") 
-		    bandit_package_fetch_builds download
-		    ;;
-		"--all" )
-		    bandit_package_get_origins
-		    bandit_package_fetch_sources download
-		    bandit_package_fetch_builds download
-		    ;;
-	    esac
-	    ;;
-	fetch)
-	    case $COMMAND_PARAMS in
-		"--sources")
-		    bandit_package_get_origins
-		    bandit_package_fetch_sources
-		    ;;
-		"--builds") 
-		    bandit_package_fetch_builds 
-		    ;;
-		"--all")
-		    bandit_package_get_origins
-		    bandit_package_fetch_sources
-		    bandit_package_fetch_builds
-		    ;;
-	    esac
-	    ;;
-	config)
-	    bandit_package_get_origins
-	    bandit_package_fetch_sources
+        download)
+            case $COMMAND_PARAMS in
+                "--sources")
+                    bandit_package_get_origins
+                    bandit_package_fetch_sources download
+                    ;;
+                "--builds") 
+                    bandit_package_fetch_builds download
+                    ;;
+                "--all" )
+                    bandit_package_get_origins
+                    bandit_package_fetch_sources download
+                    bandit_package_fetch_builds download
+                    ;;
+            esac
+            ;;
+        fetch)
+            case $COMMAND_PARAMS in
+                "--sources")
+                    bandit_package_get_origins
+                    bandit_package_fetch_sources
+                    ;;
+                "--builds") 
+                    bandit_package_fetch_builds 
+                    ;;
+                "--all")
+                    bandit_package_get_origins
+                    bandit_package_fetch_sources
+                    bandit_package_fetch_builds
+                    ;;
+            esac
+            ;;
+        config)
+            bandit_package_get_origins
+            bandit_package_fetch_sources
             bandit_package_prepare_sources
-	    bandit_package_prepare_build
-	    bandit_package_config
-	    bandit_popd 
-	    ;;
-	build)
-	    bandit_package_get_origins
-	    bandit_package_fetch_sources
-	    bandit_package_prepare_sources
-	    bandit_package_prepare_build
-	    bandit_package_build
-	    bandit_popd 
-	    ;;
-	install)
-	    bandit_package_fetch_builds
-	    bandit_package_prepare_build
-	    bandit_package_install
-	    bandit_popd 
-	    ;;
-	raise)
-	    # Copy and mix build and raise options code for bash3 compatibility
-	    bandit_package_get_origins
-	    bandit_package_fetch_sources
-	    bandit_package_prepare_sources
-	    bandit_package_prepare_build
-	    bandit_package_build
-	    bandit_package_install
-	    bandit_popd 
-	    ;;
-	remove)
-	    bandit_package_remove
-	    ;;
+            bandit_package_prepare_build
+            bandit_package_config
+            bandit_popd 
+            ;;
+        build)
+            bandit_package_get_origins
+            bandit_package_fetch_sources
+            bandit_package_prepare_sources
+            bandit_package_prepare_build
+            bandit_package_build
+            bandit_popd 
+            ;;
+        install)
+            bandit_package_fetch_builds
+            bandit_package_prepare_build
+            bandit_package_install
+            bandit_popd 
+            ;;
+        raise)
+            # Copy and mix build and raise options code for bash3 compatibility
+            bandit_package_get_origins
+            bandit_package_fetch_sources
+            bandit_package_prepare_sources
+            bandit_package_prepare_build
+            bandit_package_build
+            bandit_package_install
+            bandit_popd 
+            ;;
+        remove)
+            bandit_package_remove
+            ;;
     esac
 
     # Remove temporary DESTDIR
@@ -434,4 +434,3 @@ bandit_package_do()
     # Remove WORK package directory
     rm -rf $package
 }
-export -f bandit_package_do

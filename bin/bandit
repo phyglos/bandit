@@ -2,7 +2,7 @@
 #
 # bandit - the Build AND Install Toolkit
 #
-# Copyright (C) 2015-2018 Angel Linares Zapater
+# Copyright (C) 2015-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -17,7 +17,7 @@ source $BANDIT_HOME/bin/bandit_common
 source $BANDIT_HOME/bin/bandit_database
 
 ###----------------------------------------
-# Display information commands. 
+# Display-only information commands. 
 # Do not source all scripts yet. Just show info and quit.
 ###----------------------------------------
 
@@ -30,41 +30,41 @@ source $BANDIT_HOME/bin/bandit_search
 
 case $1 in 
     -h|--help | help | "")
-	shift;
-	
-	case $1 in
-	    edit)
-		bandit_show_help_edit
-		;;
-	    search)
-		bandit_show_help_search
-		;;
-	    systems)
-		bandit_show_help_systems
-		;;
-	    repositories)
-		bandit_show_help_repositories
-		;;
-	    catalogs)
-		bandit_show_help_catalogs
-		;;
-	    bundles)
-		bandit_show_help_bundles
-		;;
-	    packages)
-		bandit_show_help_packages
-		;;
-	    *)
-		bandit_show_version
-		bandit_show_help
-		;;
-	esac
-	exit 0
-	;;
+        shift
+        
+        case $1 in
+            edit)
+                bandit_show_help_edit
+                ;;
+            search)
+                bandit_show_help_search
+                ;;
+            systems)
+                bandit_show_help_systems
+                ;;
+            repositories)
+                bandit_show_help_repositories
+                ;;
+            catalogs)
+                bandit_show_help_catalogs
+                ;;
+            bundles)
+                bandit_show_help_bundles
+                ;;
+            packages)
+                bandit_show_help_packages
+                ;;
+            *)
+                bandit_show_version
+                bandit_show_help
+                ;;
+        esac
+        exit 0
+        ;;
     -v|--version)
-	bandit_show_version
-	exit 0
-	;;
+        bandit_show_version
+        exit 0
+        ;;
 esac
 
 #---
@@ -92,59 +92,63 @@ fi
 # Change default pager
 case $1 in 
     "--pager")
-	pager="yes"
-	shift;
-	;;
+        pager="yes"
+        shift
+        ;;
     "--no-pager")
-	pager="no"
-	shift;
-	;;
+        pager="no"
+        shift
+        ;;
 esac
+
+#---
+# Work with read-only commands
+#---
 
 case $1 in 
     search)
-	shift;
-	
-	# Get search options
-	options=""
-	while getopts "rcbixfl" opt; do
-	    case $opt in
-		r|c|b|i|f|l|x)
-		    options+=$opt
-		    ;;
-		\?)
-		    echo "Invalid option: -$OPTARG"
-		    exit 1
-		    ;;
-	    esac
-	done
-	# Skip options so expression is left in $1
-	shift $((OPTIND-1))
+        shift
+        
+        # Get search options
+        options=""
+        while getopts "rcbixfl" opt; do
+            case $opt in
+                r|c|b|i|f|l|x)
+                    options+=$opt
+                    ;;
+                \?)
+                    echo "Invalid option: -$OPTARG"
+                    exit 1
+                    ;;
+            esac
+        done
+        # Skip options so expression is left in $1
+        shift $((OPTIND-1))
 
-	# Set default search options when none are provided
-	if [ "$options" == "" ]; then
-	    if [ "$@" ]; then
-		# Search the expression in bundles and items
-		options="bi"    
-	    else
-		# No expression. Show repositories and catalogs 
-		options="rc"
-	    fi
-	fi
+        # Set default search options when none are provided
+        if [ "$options" == "" ]; then
+            if [ "$@" ]; then
+                # Search the expression in bundles and items
+                options="bi"    
+            else
+                # No expression. Show repositories and catalogs 
+                options="rc"
+            fi
+        fi
 
-	# Get search expression
-	expr="all"
-	[ $# -ge 1 ] && expr=$1
-	
-	# Do the search
-	if [ "$pager" == "yes" ]; then
-	    bandit_search ${expr} ${options} | $BANDIT_PAGER
-	else
-	    bandit_search ${expr} ${options}
-	fi
-	
-	exit 0
-	;;
+        # Get search expression
+        expr="all"
+        [ $# -ge 1 ] && expr=$1
+        
+        # Do the search
+        if [ "$pager" == "yes" ]; then
+            bandit_search ${expr} ${options} | $BANDIT_PAGER
+        else
+            bandit_search ${expr} ${options}
+        fi
+        
+        exit 0
+        ;;
 esac
 
 #---
@@ -153,16 +157,16 @@ esac
 
 case $1 in
     edit)
-	shift;
+        shift
 
-	# Check permissions to write bandit.conf file
-	[ -w $BANDIT_HOME/etc/bandit.conf ] || bandit_exit "BANDIT: Permission denied to write bandit.conf file."
+        # Check permissions to write bandit.conf file
+        [ -w $BANDIT_HOME/etc/bandit.conf ] || bandit_exit "BANDIT: Permission denied to write bandit.conf file."
 
-	
-	${EDITOR:-vi} $BANDIT_HOME/etc/bandit.conf
-	source $BANDIT_HOME/etc/bandit.conf
-	exit 0
-	;;
+        
+        ${EDITOR:-vi} $BANDIT_HOME/etc/bandit.conf
+        source $BANDIT_HOME/etc/bandit.conf
+        exit 0
+        ;;
 esac
 
 ###----------------------------------------
@@ -170,6 +174,7 @@ esac
 ###----------------------------------------
 
 source $BANDIT_HOME/bin/bandit_find
+source $BANDIT_HOME/bin/bandit_system
 source $BANDIT_HOME/bin/bandit_repository
 source $BANDIT_HOME/bin/bandit_catalog
 source $BANDIT_HOME/bin/bandit_bundle
@@ -190,162 +195,176 @@ if [[ $1 == -* ]]; then object=$1; fi
 
 case $object in
     -r|--repository)
-	shift
+        shift
 
-	# Get repository 
-	REPOSITORY=$1
-	shift
-	
-	# Execute command
-	COMMAND=$1
-	shift
-	COMMAND_PARAMS=$*
-	case $COMMAND in
-	    download | fetch | install | update | remove | show)
-		bandit_repository_do
-		;;
-	    *) 
-		bandit_exit "BANDIT: Command ${COMMAND} not defined for repositories."
-		;;
-	esac
-	;;
+        # Get repository 
+        REPOSITORY=$1; shift
+        
+        # Execute command
+        COMMAND=$1; shift
+        COMMAND_PARAMS=$*
+        
+        case $COMMAND in
+            download | fetch | install | update | remove | show)
+                bandit_repository_do
+                ;;
+            *) 
+                bandit_exit "BANDIT: Command ${COMMAND} not defined for repositories."
+                ;;
+        esac
+        ;;
     -c|--catalog)
-	shift
+        shift
 
-	# Get catalog 
-	CATALOG=$1
-	shift
-	
-	# Execute command
-	COMMAND=$1; shift
-	COMMAND_PARAMS=$*
-	case $COMMAND in
-	    find | download | fetch | install | remove)
-		bandit_catalog_do
-		;;
-	    *) 
-		bandit_exit "BANDIT: Command ${COMMAND} not defined for catalogs."
-		;;
-	esac
-	;;
+        # Get catalog 
+        CATALOG=$1; shift
+        
+        # Execute command
+        COMMAND=$1; shift
+        COMMAND_PARAMS=$*
+        case $COMMAND in
+            find | download | fetch | install | remove)
+                bandit_catalog_do
+                ;;
+            *) 
+                bandit_exit "BANDIT: Command ${COMMAND} not defined for catalogs."
+                ;;
+        esac
+        ;;
     -b|--bundle | --default)
-	# Get the bundle name
-	if [ "$object" != "--default" ]; then shift; fi
+        # Get the bundle name
+        if [ "$object" != "--default" ]; then shift; fi
 
-	BUNDLE=$1
-	shift
+        BUNDLE=$1; shift
 
-	# Get optional item in the bundle
-	ITEM="all"
-	case $1 in 
-	    -i|--item) 
-		shift
-		ITEM="$1"; shift
-		;;
-	esac
+        # Get optional item in the bundle
+        ITEM="all"
+        case $1 in 
+            -i|--item) 
+                shift
+                ITEM="$1"; shift
+                ;;
+        esac
 
-	# Get the command
-	COMMAND=$1; shift
+        # Get the command
+        COMMAND=$1; shift
 
-	# Get optional command parameters
-	COMMAND_PARAMS=$*;
-	
-	# Set default parameter, if nothing provided
-	if [ -z "$COMMAND_PARAMS" ]; then
-	    case $COMMAND in
-		edit)
-		    COMMAND_PARAMS="--conf"
-		    ;;
-		*)
-		    COMMAND_PARAMS="--all"
-		    ;;
-	    esac
-	fi
-	case $COMMAND_PARAMS in
-	    --all | --sources | --builds | --desc | --conf)
-		:
-		;;
-	    --*)
-		bandit_exit "BANDIT: Parameter ${COMMAND_PARAMS} not defined for bundle commands."
-		;;
-	esac
+        # Get optional command parameters
+        COMMAND_PARAMS=$*
+        
+        # Set default parameter, if nothing provided
+        if [ -z "$COMMAND_PARAMS" ]; then
+            case $COMMAND in
+                edit)
+                    COMMAND_PARAMS="--conf"
+                    ;;
+                *)
+                    COMMAND_PARAMS="--all"
+                    ;;
+            esac
+        fi
+        case $COMMAND_PARAMS in
+            --all | --sources | --builds | --desc | --conf)
+                :
+                ;;
+            --*)
+                bandit_exit "BANDIT: Parameter ${COMMAND_PARAMS} not defined for bundle commands."
+                ;;
+        esac
 
         # Start the work on the bundle
-	bandit_mkdir $BANDIT_LOGS/bundles
-	case $COMMAND in
-	    config | copy | edit)
-		# Run interactively without logging
-		bandit_bundle_do 
-		;;
-	    download | fetch | build | install | raise | remove)
-		# All other commands run non-interactively and log
-		bandit_timestamp stamp
-		(time bandit_bundle_do) 2>&1 \
-		    | tee $BANDIT_LOGS/bundles/${BUNDLE}.$COMMAND-${stamp}.log
-		;;
-	    *) 
-		bandit_exit "BANDIT: Command ${COMMAND} not defined for bundles."
-		;;
-	esac
+        bandit_mkdir $BANDIT_LOGS/bundles
+        case $COMMAND in
+            config | copy | rename | delete | move | edit)
+                # Run interactively without logging
+                bandit_bundle_do 
+                ;;
+            download | fetch | build | install | raise | remove)
+                # All other commands run non-interactively and log
+                bandit_timestamp stamp
+                (time bandit_bundle_do) 2>&1 \
+                    | tee $BANDIT_LOGS/bundles/${stamp}-${BUNDLE}.${COMMAND}.log
+                ;;
+            *) 
+                bandit_exit "BANDIT: Command ${COMMAND} not defined for bundles."
+                ;;
+        esac
 	;;
     -p|--package)
-	shift
+        shift
 
-	# Get package expression
-	package_expr=$1; shift
-	
-	# Execute command
-	COMMAND=$1; shift
-	COMMAND_PARAMS="$@"
-	
-	case $COMMAND in
-	    bundles)
-		bandit_db_get_packages_available packages ${package_expr}
-		for p in $packages
-		do
-		    bandit_path_get_catalog CATALOG $p
-		    bandit_path_get_bundle  BUNDLE  $p
-		    bandit_path_get_package PACKAGE $p
-   		    echo "[$CATALOG/${BUNDLE}] ${PACKAGE}" 
-		done
-		;;
-	    files)
-		bandit_db_get_packages_installed packages ${package_expr}
-		for p in $packages
-		do
-		    bandit_path_get_package PACKAGE $p
-		    bandit_db_get_package_files $PACKAGE
-		done
-		;;
-	    info)
-		bandit_db_get_packages_available packages ${package_expr}
-		for p in $packages
-		do
-		    bandit_path_get_catalog CATALOG $p
-		    bandit_path_get_bundle  BUNDLE  $p
-		    bandit_path_get_package PACKAGE $p
-		    echo "Information for [$CATALOG/${BUNDLE}] ${PACKAGE}" 
-		    bandit_db_get_package_info $PACKAGE
-		done
-		;;
-	    *) 
-		bandit_exit "BANDIT: Command ${COMMAND} not defined for packages."
-		;;
-	esac
-	;;
+        # Get package expression
+        package_expr=$1; shift
+        
+        # Execute command
+        COMMAND=$1; shift
+        COMMAND_PARAMS="$@"
+        
+        case $COMMAND in
+            bundles)
+                bandit_db_get_packages_available packages ${package_expr}
+                for p in $packages
+                do
+                    bandit_path_get_catalog CATALOG $p
+                    bandit_path_get_bundle  BUNDLE  $p
+                    bandit_path_get_package PACKAGE $p
+                    echo "[$CATALOG/${BUNDLE}] ${PACKAGE}" 
+                done
+                ;;
+            files)
+                bandit_db_get_packages_installed packages ${package_expr}
+                for p in $packages
+                do
+                    bandit_path_get_package PACKAGE $p
+                    bandit_db_get_package_files $PACKAGE
+                done
+                ;;
+            info)
+                bandit_db_get_packages_available packages ${package_expr}
+                for p in $packages
+                do
+                    bandit_path_get_catalog CATALOG $p
+                    bandit_path_get_bundle  BUNDLE  $p
+                    bandit_path_get_package PACKAGE $p
+                    echo "Information for [$CATALOG/${BUNDLE}] ${PACKAGE}" 
+                    bandit_db_get_package_info $PACKAGE
+                done
+                ;;
+            *) 
+                bandit_exit "BANDIT: Command ${COMMAND} not defined for packages."
+                ;;
+        esac
+        ;;
     -s|--system)
-	shift
+        shift
 
-	bandit_mkdir $BANDIT_LOGS/systems
-	bandit_timestamp stamp
-	# Ensure that systems related command shells are run using /bin/bash
-	(time /bin/bash $BANDIT_HOME/bin/systems/bandit-"$1"-"$2".sh) 2>&1 \
-            | tee $BANDIT_LOGS/systems/bandit-"$1"."$2"-${stamp}.log
-	;;
+        # Get catalog 
+        SYSTEM=$1; shift
+        
+        # Get command
+        COMMAND=$1; shift
+        COMMAND_PARAMS=$*
+
+        # Start the work on the system
+        bandit_mkdir $BANDIT_LOGS/systems
+        
+        case $COMMAND in
+            enter)
+                # Run interactively without logging
+                bandit_system_do 
+                ;;
+            init | check | clean)
+                # All other commands run non-interactively and log
+                bandit_timestamp stamp
+                (time bandit_system_do) 2>&1 \
+                    | tee $BANDIT_LOGS/systems/${stamp}-${SYSTEM}.${COMMAND}.log
+                ;;
+            *) 
+                bandit_exit "BANDIT: Command ${COMMAND} not defined for systems."
+                ;;
+        esac
+        ;;
     *)
-	bandit_exit "BANDIT: Unknow option $1."
-	;;
+        bandit_exit "BANDIT: Unknow option $1."
+        ;;
 esac
-
-# Done
-exit 0

@@ -2,7 +2,7 @@
 #
 # bandit_bundle_script - BANDIT functions for bundle scripts
 #
-# Copyright (C) 2015-2018 Angel Linares Zapater
+# Copyright (C) 2015-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -26,9 +26,9 @@ bandit_script_run()
 
     # Set LOG file name
     if [ -z "$1" ]; then 
-	script_log=$script
+        script_log=$script
     else
-	script_log=$script-$1
+        script_log=$script-$1
     fi 
 
     bandit_log "$script $@ (script) [$(date)]"
@@ -43,25 +43,24 @@ bandit_script_run()
     ## Run the script 
     bandit_msg "...running..."
     bandit_timestamp stamp
-    script_run 2>&1 >> $BUILD_LOGS/$script_log.run-${stamp}.log
+    script_run 2>&1 >> $BUILD_LOGS/${stamp}-$script_log.run.log
 
     ## Test  
     if (( $BANDIT_BUILD_TEST_LEVEL >= $script_test_level )); then
-	if bandit_script_has $BUILD_SCRIPTS/$script.sh script_test; then  
-	    bandit_msg "...testing..."
-	    bandit_timestamp stamp
-	    script_test 2>&1 > $BUILD_LOGS/$script_log.test-${stamp}.log
-	fi
+        if bandit_script_has $BUILD_SCRIPTS/$script.sh script_test; then  
+            bandit_msg "...testing..."
+            bandit_timestamp stamp
+            script_test 2>&1 > $BUILD_LOGS/${stamp}-$script_log.test.log
+        fi
     fi
 
     ## Verify the script just run
     if bandit_script_has $BUILD_SCRIPTS/$script.sh script_verify; then  
-	bandit_msg "...verifying..."
-	bandit_timestamp stamp
-	script_verify 2>&1 > $BUILD_LOGS/$script.verify-${stamp}.log 
+        bandit_msg "...verifying..."
+        bandit_timestamp stamp
+        script_verify 2>&1 > $BUILD_LOGS/${stamp}-$script.verify.log 
     fi
 }
-export -f bandit_script_run
 
 bandit_script_reverse()
 {
@@ -70,9 +69,9 @@ bandit_script_reverse()
 
     # Set LOG file name
     if [ -z "$1" ]; then 
-	script_log=$script
+        script_log=$script
     else
-	script_log=$script-$1
+        script_log=$script-$1
     fi 
 
     bandit_log "$script $@ (script) [$(date)]"
@@ -84,10 +83,9 @@ bandit_script_reverse()
     
     ## Reversing script
     if bandit_script_has $BUILD_SCRIPTS/$script.sh script_reverse; then  
-	bandit_msg "...reversing..."
-	bandit_timestamp stamp
-	script_reverse 2>&1 > $BUILD_LOGS/$script.reverse-${stamp}.log 
+        bandit_msg "...reversing..."
+        bandit_timestamp stamp
+        script_reverse 2>&1 > $BUILD_LOGS/${stamp}-$script.reverse.log 
     fi
 }
-export -f bandit_script_reverse
 

@@ -2,7 +2,7 @@
 #
 # bandit_common - BANDIT common functions
 #
-# Copyright (C) 2015-2018 Angel Linares Zapater
+# Copyright (C) 2015-2019 Angel Linares Zapater
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License, version 2, as 
@@ -73,7 +73,7 @@ bandit_backup()
     local file=$1
     
     if [ -r $file ]; then
-	cp $file $file-${BANDIT_STAMP}
+        cp $file $file-${BANDIT_STAMP}
     fi
 }
 
@@ -86,12 +86,11 @@ bandit_md5sum()
     [ -r "$1.md5" ] && expected=$(cat $1.md5 | awk '{print $1}')
 
     if [ "$value" != "$expected" ]; then 
-	bandit_msg "Checksum error for package $1" red
-	return 1
+        bandit_msg "Checksum error for package $1" red
+        return 1
     fi
     return 0
 }
-export -f bandit_md5sum
 
 # Finds whether a command $1 in installed the local system
 bandit_system_has()
@@ -99,7 +98,6 @@ bandit_system_has()
     which ${1} 2>&1 >/dev/null
     return $?
 }
-export -f bandit_system_has
 
 ###------------------------------
 # Script helpers
@@ -116,9 +114,9 @@ bandit_exit()
 bandit_script_has()
 {  
     if [ -z $(grep "$2()" "$1") ]; then 
-	return 1
+        return 1
     else
-	return 0
+        return 0
     fi
 }
 
@@ -197,7 +195,7 @@ bandit_user_add()
             -c "$desc" \
             -d "$home" \
             -s "$shell" \
-	    $name
+            $name
     
     # Reorder /etc/passwd
     pwck -s
@@ -223,7 +221,6 @@ bandit_random_string()
     
     eval "$_retval"=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${length:-30} | head -n 1)
 }
-export -f bandit_random_string
 
 # Get new unique timestamp 
 bandit_timestamp()
@@ -234,7 +231,6 @@ bandit_timestamp()
 
     eval "$_retval"=${d:2:16}
 }
-export -f bandit_timestamp
 
 ###------------------------------
 # Log and messages helpers
@@ -255,7 +251,6 @@ bandit_log()
     echo "$1"
     echo "---"
 }
-export -f bandit_log
 
 bandit_msg()
 {
@@ -265,12 +260,12 @@ bandit_msg()
     [ $# == 2 ] && color=$2
     
     case $color in
-	blue)   seq=$BLUE ;;
-	cyan)   seq=$CYAN ;;
-	green)  seq=$GREEN ;;
-	grey)   seq=$GREY ;;
-	red)    seq=$RED ;;
-	yellow) seq=$YELLOW ;;
+        blue)   seq=$BLUE ;;
+        cyan)   seq=$CYAN ;;
+        green)  seq=$GREEN ;;
+        grey)   seq=$GREY ;;
+        red)    seq=$RED ;;
+        yellow) seq=$YELLOW ;;
     esac     
 
     local line=$seq"$1"
@@ -278,4 +273,3 @@ bandit_msg()
 
     echo -e $line
 }
-export -f bandit_msg

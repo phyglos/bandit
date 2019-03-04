@@ -1,0 +1,250 @@
+#!/bin/bash
+#
+# bandit_system_host - functions for BANDIT host systems
+#
+# Copyright (C) 2019 Angel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+###------------------------------
+# system_host_command functions
+###------------------------------
+
+bandit_system_host_check()
+{
+    bandit_log "Checking HOST building requirements..." 
+
+    export LC_ALL=C
+
+    echo
+    echo "CHECK: bash >= 3.2"
+    bash --version | head -n1 | cut -d" " -f2-4
+    echo
+    echo "CHECK: sh is a link to bash"
+    MYSH=$(readlink -f /bin/sh)
+    echo "/bin/sh -> $MYSH"
+    echo $MYSH | grep -q bash || echo "ERROR: /bin/sh does not point to bash"
+    unset MYSH
+
+    echo
+    echo "CHECK: binutils >= 2.17"
+    echo -n "Binutils: "; ld --version | head -n1 | cut -d" " -f3-
+
+    echo
+    echo "CHECK: bison >= 2.3"
+    bison --version | head -n1
+    echo
+    echo "CHECK: yacc is a link to bison or an executable file"
+    if [ -h /usr/bin/yacc ]; then
+        echo "/usr/bin/yacc -> `readlink -f /usr/bin/yacc`";
+    elif [ -x /usr/bin/yacc ]; then
+        echo yacc is `/usr/bin/yacc --version | head -n1`
+    else
+        echo "yacc not found" 
+    fi
+
+    echo
+    echo "CHECK: bzip2 >= 1.0.4"
+    bzip2 --version 2>&1 < /dev/null | head -n1 | cut -d" " -f1,6-
+
+    echo
+    echo "CHECK: coreutils >= 6.9"
+    echo -n "Coreutils: "; chown --version | head -n1 | cut -d")" -f2
+
+    echo
+    echo "CHECK: diff >= 2.8.1"
+    diff --version | head -n1
+
+    echo
+    echo "CHECK: findutils >= 4.2.31"
+    find --version | head -n1
+
+    echo
+    echo "CHECK: gawk >= 4.0.1"
+    gawk --version | head -n1
+    echo
+    echo "CHECK: awk is a link to gawk"
+    if [ -h /usr/bin/awk ]; then
+        echo "/usr/bin/awk -> `readlink -f /usr/bin/awk`";
+    elif [ -x /usr/bin/awk ]; then
+        echo awk is `/usr/bin/awk --version | head -n1`
+    else 
+        echo "awk not found" 
+    fi
+
+    echo
+    echo "CHECK: gcc >= 4.7"
+    gcc --version | head -n1
+    g++ --version | head -n1
+
+    echo
+    echo "CHECK: glibc >= 2.11"
+    ldd --version | head -n1 | cut -d" " -f2-  # glibc version
+
+    echo
+    echo "CHECK: grep >= 2.5.1a"
+    grep --version | head -n1
+
+    echo
+    echo "CHECK: gzip >= 1.3.12"
+    gzip --version | head -n1
+
+    echo
+    echo "CHECK: linux >= 2.6.32"
+    cat /proc/version
+
+    echo
+    echo "CHECK: m4 >= 1.4.10"
+    m4 --version | head -n1
+
+    echo
+    echo "CHECK: make >= 3.81"
+    make --version | head -n1
+
+    echo
+    echo "CHECK: patch >= 2.5.4"
+    patch --version | head -n1
+
+    echo
+    echo "CHECK: perl >= 5.8.8"
+    echo Perl `perl -V:version`
+
+    echo
+    echo "CHECK: sed >= 4.1.5"
+    sed --version | head -n1
+
+    echo
+    echo "CHECK: tar >= 1.22"
+    tar --version | head -n1
+
+    echo
+    echo "CHECK: texinfo >= 4.7"
+    makeinfo --version | head -n1
+
+    echo
+    echo "CHECK: xz >= 5.0.0"
+    xz --version | head -n1
+
+    echo
+    echo "CHECK: gmp, mpfr and mpc are all found or all not found"
+    for lib in lib{gmp,mpfr,mpc}.la; do
+        echo $lib: $(if find /usr/lib* -name $lib |
+                             grep -q $lib;then :;else echo not;fi) found
+    done
+    unset lib
+
+    bandit_log "Checking HOST compilation capabilities..." 
+
+    echo 'int main(){}' > dummy.c && g++ -o dummy dummy.c
+    if [ -x dummy ]; then 
+        echo "g++ compilation OK"
+    else
+        echo "g++ compilation failed"
+    fi
+    rm -f dummy.c dummy
+}
+
+bandit_system_host_clean()
+{
+    # Remove previous users ans partitions from HOST
+    bandit_log "Removing BANDIT user from HOST..."
+
+    userdel $BANDIT_USR
+    rm -vrf /home/$BANDIT_USR
+    rm -vrf /var/mail/$BANDIT_USR
+
+    bandit_log "Removing TARGET partitions from HOST system..."
+
+    # Switch off swap partition
+    swapoff -v $BANDIT_TARGET_SWAP
+
+    # Umount the target directory
+    umount -vfl $BANDIT_HOST_TGT_MNT            
+    rm -rf $BANDIT_HOST_TGT_MNT            
+
+    # Remove crosstools host link
+    rm -rf $BANDIT_BUILDER_DIR
+}
+
+bandit_system_host_init()
+{
+    # Set up a new user 'bandit'
+    bandit_log "Setting up BANDIT user in HOST ..." 
+
+    # Create group for the user
+    groupadd $BANDIT_GRP
+    # Create user with no password nor use any skeleton
+    useradd -g $BANDIT_GRP -p "*" -s /bin/bash -m -k /dev/null $BANDIT_USR
+
+    # Prepare user environment
+    cat > /home/$BANDIT_USR/.bash_profile <<EOF
+exec env -i HOME=/home/$BANDIT_USR TERM=$TERM PS1='\u@\h:\w\$ ' /bin/bash
+EOF
+
+    cat > /home/$BANDIT_USR/.bashrc <<EOF
+set +h
+umask 022
+LC_ALL=POSIX
+
+BANDIT_HOME=$BANDIT_HOME
+PATH=$BANDIT_BUILDER_DIR/bin:/bin:/usr/bin:$BANDIT_HOME/bin
+
+export LC_ALL PATH BANDIT_HOME
+EOF
+
+    # Take ownership of user and BANDIT directory
+    chown -R $BANDIT_USR:$BANDIT_GRP $BANDIT_HOME
+    chown -vR $BANDIT_USR:$BANDIT_GRP /home/$BANDIT_USR
+
+
+    # Prepare partitions and directories in HOST
+    bandit_log "Preparing TARGET partition..." 
+
+    ## Format target root partition
+    lsblk -ip
+    bandit_msg "Enter 'init' to erase $BANDIT_TARGET_PART :" red 
+    read CMD
+    [ "$CMD" == "init" ] || bandit_exit "Cancelled"
+
+    mkdir -pv $BANDIT_HOST_TGT_MNT
+    mkfs -v -t $BANDIT_TARGET_PART_TYPE -L ${BANDIT_TARGET_PART_LABEL} $BANDIT_TARGET_PART
+    if [ $? != 0 ]; then
+        bandit_exit "BANDIT: Unable to initialize TARGET partition"
+    fi
+    mount -v -t $BANDIT_TARGET_PART_TYPE $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
+
+    bandit_log "Preparing TARGET swap area..." 
+
+    ## Format target swap partition
+    lsblk -ip
+    bandit_msg "Enter 'init' to erase $BANDIT_TARGET_SWAP :" red 
+    read CMD
+    [ "$CMD" == "init" ] || bandit_exit "Cancelled "
+
+    mkswap -L ${BANDIT_TARGET_SWAP_LABEL} $BANDIT_TARGET_SWAP
+    if [ $? != 0 ]; then
+        bandit_exit "BANDIT: Unable to initialize swap area"
+    fi
+    /sbin/swapon -v $BANDIT_TARGET_SWAP
+
+
+    bandit_log "Preparing the BUILDER system..." 
+
+    ## Add BUILDER directory into TARGET filesystem and link to the HOST filesystem
+    mkdir -pv $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR
+    chown -R $BANDIT_USR:$BANDIT_GRP $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR
+
+    ln -sv $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR $BANDIT_BUILDER_DIR
+
+    # Done
+    bandit_log "The HOST system is ready..."
+    echo
+    lsblk -ip
+
+}

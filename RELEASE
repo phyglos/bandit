@@ -14,14 +14,17 @@
 RELEASE NOTES for BANDIT
 ========================
 
-This is the release "latest" of the BANDIT toolkit.
-This is a "DEVELOPMENT" release.
+This is the release "1.7.1" of the BANDIT toolkit.
+This is a "STABLE" release.
 
 See https://docs.phyglos.org/bandit for more information.
 
 
-MAJOR CHANGES in "latest"
-=========================
-
-*
+MAJOR CHANGES
+=============
+ 
+* Fixed typos in messages
+* Fixed download of catalogs and repositories
+* Support old and new filenames format when displaying logs
+* Added BANDIT_DOWNLOADS variable for local alien packages
 

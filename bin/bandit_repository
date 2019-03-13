@@ -151,7 +151,8 @@ bandit_repository_remove()
                 bandit_catalog_do
             done
         fi
-        # Remove epository manifest
+        # Remove repository manifest
+        bandit_msg "...removing repository manifest..."
         bandit_timestamp stamp
         (
             rm -vrf $BANDIT_REPOSITORIES/$REPOSITORY 

@@ -12,6 +12,8 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
+source $BANDIT_HOME/bin/bandit_find
+
 ###------------------------------
 # Catalog_command functions
 ###------------------------------
@@ -19,15 +21,14 @@
 bandit_catalog_fetch()
 {
     local download=false
-    
+
     # $1 = download -> do not use cache, force download
-    [ $? == 1 ] && [ "$1" == "download" ] && download=true 
-    if [ download == true ]; then
-        # Force downloading by removing catalogs in local cache 
+    [ $# == 1 ] && [ "$1" == "download" ] && download=true 
+    if [ $download == true ]; then
+        # Force download by removing the catalog from local cache 
         rm -f $BANDIT_XCATALOGS/$tarball{,.md5}
     fi
 
-    tarball="$CATALOG.tar.gz"
     if [ -r $BANDIT_XCATALOGS/$tarball ]; then
         # Fetch from local cache if already exists
         bandit_msg "...fetching catalog $CATALOG from catalogs cache ..."
@@ -54,13 +55,13 @@ bandit_catalog_fetch()
                 # Download catalog tarball
                 wget ${URL} \
                      --directory-prefix=$BANDIT_XCATALOGS \
-                     --no-verbose \
-                     --no-clobber
+                     --no-clobber \
+                     --quiet
                 if [[ $? != 0 ]]; then
                     bandit_msg "Connection error to ${URL}" red;
                 else
                     # Check if MD5 is correct
-                    echo ${CATALOG_MD5} > $BANDIT_XCATALOGS/$tarball.md5
+                    echo $(bandit_find_catalog_md5 $REPOSITORY $CATALOG) > $BANDIT_XCATALOGS/$tarball.md5
                     bandit_md5sum "$BANDIT_XCATALOGS/$tarball" || bandit_exit
                 fi
                 ;;
@@ -144,6 +145,9 @@ bandit_catalog_do()
         
     # Set directories 
     BUILD_LOGS=$BANDIT_LOGS/catalogs/${stamp}-$CATALOG.$COMMAND
+
+    # Set tarball name
+    tarball="$CATALOG.tar.gz"
 
     # Create working directories
     if [ "$COMMAND" != "download" ]; then 

@@ -34,3 +34,23 @@ bandit_find_first_catalog_for_bundle()
         fi          
     done
 }
+
+bandit_find_catalog_md5()
+{
+    local repository=$1
+    local catalog=$2
+    local pos=0
+    local md5=""
+    
+    source $BANDIT_REPOSITORIES/${repository}/manifest
+
+    for cat in ${CATALOGS[*]}; do
+        if [ "${cat}" == "${catalog}" ]; then
+            md5=${CATALOGS_MD5[pos]}
+            break
+        fi
+        pos=pos+1
+    done
+
+    echo $md5
+}

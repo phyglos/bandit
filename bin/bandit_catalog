@@ -48,7 +48,7 @@ bandit_catalog_fetch()
                 # Copy from filesystem
                 bandit_mkdir $BANDIT_XCATALOGS
                 cp -v ${mirror#file:}/$REPOSITORY/catalogs/$tarball \
-                      $BANDIT_XCATALOGS
+                   $BANDIT_XCATALOGS
                 ;;
             ftp*|http*)
                 # Download catalog tarball
@@ -71,7 +71,7 @@ bandit_catalog_fetch()
 bandit_catalog_find()
 {
     local repositories=""
-   
+    
     bandit_db_get_repositories_enabled repositories ${CATALOG}
     for repo in ${repositories}; do
         if [ -r $BANDIT_REPOSITORIES/${repo}/manifest ]; then
@@ -92,10 +92,10 @@ bandit_catalog_install()
     if [ -d $BANDIT_XCATALOGS ]; then 
         bandit_msg "...installing..."
 
-                bandit_timestamp stamp
-                bandit_mkdir $BANDIT_CATALOGS
-                tar -C $BANDIT_CATALOGS -xvf $BANDIT_XCATALOGS/$tarball \
-                    2>&1 > $BUILD_LOGS/${stamp}-$CATALOG.installing.log 
+        bandit_timestamp stamp
+        bandit_mkdir $BANDIT_CATALOGS
+        tar -C $BANDIT_CATALOGS -xvf $BANDIT_XCATALOGS/$tarball \
+            2>&1 > $BUILD_LOGS/${stamp}-$CATALOG.installing.log 
     else
         bandit_msg "BANDIT: Catalog $CATALOG not available." red
     fi
@@ -132,7 +132,16 @@ bandit_catalog_do()
         fi
         echo "Working with repository: $REPOSITORY"
     fi
-    
+
+    # Set repository mirror
+    if [ -f $BANDIT_HOME/etc/repositories/$REPOSITORY ]; then
+        # Get the mirror list 
+        source $BANDIT_HOME/etc/repositories/$REPOSITORY
+        MIRROR=${REPOSITORY_MIRRORS[0]}
+    else
+        MIRROR="none"
+    fi
+        
     # Set directories 
     BUILD_LOGS=$BANDIT_LOGS/catalogs/${stamp}-$CATALOG.$COMMAND
 

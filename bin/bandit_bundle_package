@@ -68,12 +68,16 @@ bandit_package_fetch_sources()
         else
             case ${sources_fetch_url[i]} in
                 file*)
-                    # Copy from filesystem
+                    # Copy from filesystem 
                     bandit_msg "...fetching $file from local filesystem..."
-                    cp ${sources_fetch_url[i]#file:}     $BUILD_SOURCES/$file
-                    cp ${sources_fetch_url[i]#file:}.md5 $BUILD_SOURCES/$file.md5
-                    # Check if MD5 is correct
-                    bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
+                    if [ ! -r ${sources_fetch_url[i]#file:} ]; then
+                        bandit_msg "${sources_fetch_url[i]} not found in filesystem " red;
+                    else
+                        cp ${sources_fetch_url[i]#file:} $BUILD_SOURCES/$file
+                        # Check if MD5 is correct
+                        echo ${sources_fetch_md5[i]} > $BUILD_SOURCES/$file.md5
+                        bandit_md5sum "$BUILD_SOURCES/$file" || bandit_exit
+                    fi
                     ;;
                 ftp*|http*)
                     # Download from URL into BUILD_SOURCES

@@ -24,6 +24,18 @@ bandit_show_version()
     echo
 }
 
+bandit_show_bandit()
+{
+    echo "bandit $RELEASE - The Build AND Install Toolkit"
+    echo
+    echo " BANDIT_HOME =" $BANDIT_HOME
+    echo " BANDIT_BUILD_TAG =" $BANDIT_BUILD_TAG
+    echo " BANDIT_DOWNLOADS =" $BANDIT_DOWNLOADS
+    echo
+    echo " EDITOR =" $EDITOR
+    echo " PATH =" $PATH
+}
+
 bandit_show_help_bundles()
 {
     echo

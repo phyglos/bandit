@@ -29,7 +29,7 @@ source $BANDIT_HOME/bin/bandit_search
 #---
 
 case $1 in 
-    -h|--help | help | "")
+    -h|--help | help )
         shift
         
         case $1 in
@@ -63,6 +63,10 @@ case $1 in
         ;;
     -v|--version)
         bandit_show_version
+        exit 0
+        ;;
+    "" )
+        bandit_show_bandit
         exit 0
         ;;
 esac
@@ -181,7 +185,7 @@ source $BANDIT_HOME/bin/bandit_bundle
 
 # Check permissions to write files...
 [ -w $BANDIT_TMP ]           || bandit_exit "BANDIT: Permission denied to write in the work directory ."
-[ -w $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to write in the logs directorys."
+[ -w $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to write in the logs directories."
 [ -w $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to write in the builds cache."
 [ -w $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to write in the sources cache."
 [ -w $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to write in the catalogs cache."

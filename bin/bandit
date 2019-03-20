@@ -268,7 +268,7 @@ case $object in
             esac
         fi
         case $COMMAND_PARAMS in
-            --all | --sources | --builds | --desc | --conf)
+            --all | --sources | --builds | --desc | --conf | --tag=*)
                 :
                 ;;
             --*)

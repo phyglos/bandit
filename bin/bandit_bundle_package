@@ -354,6 +354,11 @@ bandit_package_do()
     source $BUILD_ORIGINS/$BUNDLE_SOURCES/sources/$package
 
     # Set the build pack name
+    case $COMMAND_PARAMS in
+        --tag=*)            
+            BUILD_RELEASE_TAG="${COMMAND_PARAMS#--tag=}"
+            ;;
+    esac
     pack=${script}-${BANDIT_TARGET_ARCH}-${BUILD_RELEASE_TAG}.tar.xz
 
     # Declare list of package origins

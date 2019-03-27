@@ -221,6 +221,9 @@ bandit_bundle_do()
     ## Build inside work directory
     bandit_pushd $BUILD_WORK
 
+    # Determine whether some item is used
+    local item_used=false
+    
     ## Parse bundle command list by lines
     OLD=$IFS; IFS=$'\n';
     for line in ${BUILD_CMD[*]}; do
@@ -237,7 +240,9 @@ bandit_bundle_do()
         fi
         # Ignore all other items, when one specific item was selected
         if [ "${ITEM}" != "all" ] && [ "${ITEM}" != "${bundle_item}" ]; then continue; fi
-
+        # At least one item will be used
+        item_used=true
+        
         case $COMMAND in
             config)
                 bandit_package_do ${words[*]:2}
@@ -306,6 +311,13 @@ bandit_bundle_do()
     done
     IFS=$OLD
 
+    if [ $ITEM == "all" ] && [ $item_used == false ]; then
+        bandit_msg "BANDIT: No items found in the bundle" red
+    fi
+    if [ $ITEM != "all" ] && [ $item_used == false ]; then
+        bandit_msg "BANDIT: Item ${ITEM} not found in the bundle" red
+    fi
+    
     # Return from work directory
     bandit_popd
 

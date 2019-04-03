@@ -19,10 +19,12 @@
 bandit_system_builder_enter()
 {
     local mounted
-    
-    mounted="$(grep $BANDIT_HOST_TGT_MNT /etc/mtab)"
-    if [ -z "$mounted" ]; then
-        mount -v $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
+
+    if [ $BANDIT_TARGET_TYPE == "partition" ]; then
+        mounted="$(grep $BANDIT_HOST_TGT_MNT /etc/mtab)"
+        if [ -z "$mounted" ]; then
+            mount -v $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
+        fi
     fi
 
     mount --bind /dev      $BANDIT_HOST_TGT_MNT/dev
@@ -45,7 +47,9 @@ bandit_system_builder_enter()
     umount $BANDIT_HOST_TGT_MNT/sys
     umount $BANDIT_HOST_TGT_MNT/proc
 
-    if [ -z "$mounted" ]; then
-        umount -v $BANDIT_HOST_TGT_MNT
+    if [ $BANDIT_TARGET_TYPE == "partition" ]; then
+        if [ -z "$mounted" ]; then
+            umount -v $BANDIT_HOST_TGT_MNT
+        fi
     fi
 }

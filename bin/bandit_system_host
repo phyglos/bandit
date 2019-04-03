@@ -159,15 +159,22 @@ bandit_system_host_clean()
     rm -vrf /home/$BANDIT_USR
     rm -vrf /var/mail/$BANDIT_USR
 
-    bandit_log "Removing TARGET partitions from HOST system..."
+    case $BANDIT_TARGET_TYPE in
+        directory)
+            bandit_log "Removing TARGET directory from HOST system..."
+            rm -rfv $BANDIT_HOST_TGT_MNT            
+            ;;
+        partition)
+            bandit_log "Removing TARGET partitions from HOST system..."
+            # Umount the target directory
+            umount -vfl $BANDIT_HOST_TGT_MNT            
+            rm -rfv $BANDIT_HOST_TGT_MNT            
 
-    # Switch off swap partition
-    swapoff -v $BANDIT_TARGET_SWAP
-
-    # Umount the target directory
-    umount -vfl $BANDIT_HOST_TGT_MNT            
-    rm -rf $BANDIT_HOST_TGT_MNT            
-
+            # Switch off swap partition
+            swapoff -v $BANDIT_TARGET_SWAP
+            ;;
+    esac
+    
     # Remove crosstools host link
     rm -rf $BANDIT_BUILDER_DIR
 }
@@ -202,36 +209,48 @@ EOF
     chown -R $BANDIT_USR:$BANDIT_GRP $BANDIT_HOME
     chown -vR $BANDIT_USR:$BANDIT_GRP /home/$BANDIT_USR
 
+    case $BANDIT_TARGET_TYPE in
+        directory)
+            # Prepare TARGET directory in HOST
+            bandit_log "Preparing TARGET directory..."
 
-    # Prepare partitions and directories in HOST
-    bandit_log "Preparing TARGET partition..." 
+            # Create the TARGET directory
+            mkdir -pv $BANDIT_HOST_TGT_MNT
+            ;;
+        partition) 
+            # Prepare TARGET partitions in HOST
+            bandit_log "Preparing TARGET partition..." 
 
-    ## Format target root partition
-    lsblk -ip
-    bandit_msg "Enter 'init' to erase $BANDIT_TARGET_PART :" red 
-    read CMD
-    [ "$CMD" == "init" ] || bandit_exit "Cancelled"
+            ## Format target root partition
+            lsblk -ip
+            bandit_msg "Enter 'init' to erase $BANDIT_TARGET_PART :" red 
+            read CMD
+            [ "$CMD" == "init" ] || bandit_exit "Cancelled"
+            mkfs -v -t $BANDIT_TARGET_PART_TYPE -L ${BANDIT_TARGET_PART_LABEL} $BANDIT_TARGET_PART
+            if [ $? != 0 ]; then
+                bandit_exit "BANDIT: Unable to initialize TARGET partition"
+            fi
 
-    mkdir -pv $BANDIT_HOST_TGT_MNT
-    mkfs -v -t $BANDIT_TARGET_PART_TYPE -L ${BANDIT_TARGET_PART_LABEL} $BANDIT_TARGET_PART
-    if [ $? != 0 ]; then
-        bandit_exit "BANDIT: Unable to initialize TARGET partition"
-    fi
-    mount -v -t $BANDIT_TARGET_PART_TYPE $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
+            # Create the TARGET directory
+            mkdir -pv $BANDIT_HOST_TGT_MNT
+            # Mount the TARGET partition
+            mount -v -t $BANDIT_TARGET_PART_TYPE $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
 
-    bandit_log "Preparing TARGET swap area..." 
+            bandit_log "Preparing TARGET swap area..." 
 
-    ## Format target swap partition
-    lsblk -ip
-    bandit_msg "Enter 'init' to erase $BANDIT_TARGET_SWAP :" red 
-    read CMD
-    [ "$CMD" == "init" ] || bandit_exit "Cancelled "
-
-    mkswap -L ${BANDIT_TARGET_SWAP_LABEL} $BANDIT_TARGET_SWAP
-    if [ $? != 0 ]; then
-        bandit_exit "BANDIT: Unable to initialize swap area"
-    fi
-    /sbin/swapon -v $BANDIT_TARGET_SWAP
+            ## Format target swap partition
+            lsblk -ip
+            bandit_msg "Enter 'init' to erase $BANDIT_TARGET_SWAP :" red 
+            read CMD
+            [ "$CMD" == "init" ] || bandit_exit "Cancelled "
+            mkswap -L ${BANDIT_TARGET_SWAP_LABEL} $BANDIT_TARGET_SWAP
+            if [ $? != 0 ]; then
+                bandit_exit "BANDIT: Unable to initialize swap area"
+            fi
+            
+            /sbin/swapon -v $BANDIT_TARGET_SWAP
+            ;;
+    esac
 
 
     bandit_log "Preparing the BUILDER system..." 
@@ -243,8 +262,6 @@ EOF
     ln -sv $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR $BANDIT_BUILDER_DIR
 
     # Done
-    bandit_log "The HOST system is ready..."
     echo
-    lsblk -ip
-
+    bandit_msg "The HOST system is ready..." green
 }

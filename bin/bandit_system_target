@@ -16,6 +16,44 @@
 # system_target_command functions
 ###------------------------------
 
+bandit_system_target_enter()
+{
+    local mounted
+    
+    if [ $BANDIT_TARGET_TYPE == "partition" ]; then
+        mounted="$(grep $BANDIT_HOST_TGT_MNT /etc/mtab)"
+        if [ -z "$mounted" ]; then
+            mount -v $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
+        fi
+    fi
+    
+    mount --bind /dev      $BANDIT_HOST_TGT_MNT/dev
+    mount -t devpts devpts $BANDIT_HOST_TGT_MNT/dev/pts -o gid=5,mode=620
+    mount -t proc  proc    $BANDIT_HOST_TGT_MNT/proc
+    mount -t sysfs sysfs   $BANDIT_HOST_TGT_MNT/sys
+    mount -t tmpfs tmpfs   $BANDIT_HOST_TGT_MNT/run
+
+    chroot $BANDIT_HOST_TGT_MNT /usr/bin/env -i \
+           HOME=/root \
+           TERM=$TERM \
+           PS1='\u@\h:[TARGET]:\w\\$ ' \
+           BANDIT_HOME=$BANDIT_HOME \
+           PATH=/bin:/usr/bin:/sbin:/usr/sbin:$BANDIT_HOME/bin \
+           /bin/bash --login +h
+
+    umount $BANDIT_HOST_TGT_MNT/dev/pts 
+    umount $BANDIT_HOST_TGT_MNT/dev
+    umount $BANDIT_HOST_TGT_MNT/run
+    umount $BANDIT_HOST_TGT_MNT/sys
+    umount $BANDIT_HOST_TGT_MNT/proc
+
+    if [ $BANDIT_TARGET_TYPE == "partition" ]; then
+        if [ -z "$mounted" ]; then
+            umount -v $BANDIT_HOST_TGT_MNT
+        fi
+    fi
+}
+
 bandit_system_target_init()
 {
     # Install BANDIT, from HOST to TARGET
@@ -166,16 +204,17 @@ EOF
     chmod -v 600  $BANDIT_HOST_TGT_MNT/var/log/btmp
 
 }
-
 bandit_system_target_enter()
 {
     local mounted
     
-    mounted="$(grep $BANDIT_HOST_TGT_MNT /etc/mtab)"
-    if [ -z "$mounted" ]; then
-        mount -v $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
+    if [ $BANDIT_TARGET_TYPE == "partition" ]; then
+        mounted="$(grep $BANDIT_HOST_TGT_MNT /etc/mtab)"
+        if [ -z "$mounted" ]; then
+            mount -v $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
+        fi
     fi
-
+    
     mount --bind /dev      $BANDIT_HOST_TGT_MNT/dev
     mount -t devpts devpts $BANDIT_HOST_TGT_MNT/dev/pts -o gid=5,mode=620
     mount -t proc  proc    $BANDIT_HOST_TGT_MNT/proc
@@ -196,7 +235,83 @@ bandit_system_target_enter()
     umount $BANDIT_HOST_TGT_MNT/sys
     umount $BANDIT_HOST_TGT_MNT/proc
 
-    if [ -z "$mounted" ]; then
-        umount -v $BANDIT_HOST_TGT_MNT
+    if [ $BANDIT_TARGET_TYPE == "partition" ]; then
+        if [ -z "$mounted" ]; then
+            umount -v $BANDIT_HOST_TGT_MNT
+        fi
+    fi
+}
+bandit_system_target_enter()
+{
+    local mounted
+    
+    if [ $BANDIT_TARGET_TYPE == "partition" ]; then
+        mounted="$(grep $BANDIT_HOST_TGT_MNT /etc/mtab)"
+        if [ -z "$mounted" ]; then
+            mount -v $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
+        fi
+    fi
+    
+    mount --bind /dev      $BANDIT_HOST_TGT_MNT/dev
+    mount -t devpts devpts $BANDIT_HOST_TGT_MNT/dev/pts -o gid=5,mode=620
+    mount -t proc  proc    $BANDIT_HOST_TGT_MNT/proc
+    mount -t sysfs sysfs   $BANDIT_HOST_TGT_MNT/sys
+    mount -t tmpfs tmpfs   $BANDIT_HOST_TGT_MNT/run
+
+    chroot $BANDIT_HOST_TGT_MNT /usr/bin/env -i \
+           HOME=/root \
+           TERM=$TERM \
+           PS1='\u@\h:[TARGET]:\w\\$ ' \
+           BANDIT_HOME=$BANDIT_HOME \
+           PATH=/bin:/usr/bin:/sbin:/usr/sbin:$BANDIT_HOME/bin \
+           /bin/bash --login +h
+
+    umount $BANDIT_HOST_TGT_MNT/dev/pts 
+    umount $BANDIT_HOST_TGT_MNT/dev
+    umount $BANDIT_HOST_TGT_MNT/run
+    umount $BANDIT_HOST_TGT_MNT/sys
+    umount $BANDIT_HOST_TGT_MNT/proc
+
+    if [ $BANDIT_TARGET_TYPE == "partition" ]; then
+        if [ -z "$mounted" ]; then
+            umount -v $BANDIT_HOST_TGT_MNT
+        fi
+    fi
+}
+bandit_system_target_enter()
+{
+    local mounted
+    
+    if [ $BANDIT_TARGET_TYPE == "partition" ]; then
+        mounted="$(grep $BANDIT_HOST_TGT_MNT /etc/mtab)"
+        if [ -z "$mounted" ]; then
+            mount -v $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
+        fi
+    fi
+    
+    mount --bind /dev      $BANDIT_HOST_TGT_MNT/dev
+    mount -t devpts devpts $BANDIT_HOST_TGT_MNT/dev/pts -o gid=5,mode=620
+    mount -t proc  proc    $BANDIT_HOST_TGT_MNT/proc
+    mount -t sysfs sysfs   $BANDIT_HOST_TGT_MNT/sys
+    mount -t tmpfs tmpfs   $BANDIT_HOST_TGT_MNT/run
+
+    chroot $BANDIT_HOST_TGT_MNT /usr/bin/env -i \
+           HOME=/root \
+           TERM=$TERM \
+           PS1='\u@\h:[TARGET]:\w\\$ ' \
+           BANDIT_HOME=$BANDIT_HOME \
+           PATH=/bin:/usr/bin:/sbin:/usr/sbin:$BANDIT_HOME/bin \
+           /bin/bash --login +h
+
+    umount $BANDIT_HOST_TGT_MNT/dev/pts 
+    umount $BANDIT_HOST_TGT_MNT/dev
+    umount $BANDIT_HOST_TGT_MNT/run
+    umount $BANDIT_HOST_TGT_MNT/sys
+    umount $BANDIT_HOST_TGT_MNT/proc
+
+    if [ $BANDIT_TARGET_TYPE == "partition" ]; then
+        if [ -z "$mounted" ]; then
+            umount -v $BANDIT_HOST_TGT_MNT
+        fi
     fi
 }

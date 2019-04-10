@@ -41,11 +41,13 @@ bandit_system_builder_enter()
            PATH=/bin:/usr/bin:/sbin:/usr/sbin:$BANDIT_BUILDER_DIR/bin:$BANDIT_HOME/bin \
            $BANDIT_BUILDER_DIR/bin/bash --login +h
 
+    # Lazy unmount /dev and /proc because they could be locked
+    # by any service started while inside BUILDER
     umount $BANDIT_HOST_TGT_MNT/dev/pts 
-    umount $BANDIT_HOST_TGT_MNT/dev
+    umount -l $BANDIT_HOST_TGT_MNT/dev
     umount $BANDIT_HOST_TGT_MNT/run
     umount $BANDIT_HOST_TGT_MNT/sys
-    umount $BANDIT_HOST_TGT_MNT/proc
+    umount -l $BANDIT_HOST_TGT_MNT/proc
 
     if [ $BANDIT_TARGET_TYPE == "partition" ]; then
         if [ -z "$mounted" ]; then

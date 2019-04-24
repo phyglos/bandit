@@ -27,11 +27,11 @@ bandit_system_target_enter()
         fi
     fi
     
-    mount --bind /dev      $BANDIT_HOST_TGT_MNT/dev
-    mount -t devpts devpts $BANDIT_HOST_TGT_MNT/dev/pts -o gid=5,mode=620
-    mount -t proc  proc    $BANDIT_HOST_TGT_MNT/proc
-    mount -t sysfs sysfs   $BANDIT_HOST_TGT_MNT/sys
-    mount -t tmpfs tmpfs   $BANDIT_HOST_TGT_MNT/run
+    grep -q $BANDIT_HOST_TGT_MNT/dev     /proc/mounts || mount --bind /dev      $BANDIT_HOST_TGT_MNT/dev
+    grep -q $BANDIT_HOST_TGT_MNT/dev/pts /proc/mounts || mount -t devpts devpts $BANDIT_HOST_TGT_MNT/dev/pts -o gid=5,mode=620
+    grep -q $BANDIT_HOST_TGT_MNT/proc    /proc/mounts || mount -t proc   proc   $BANDIT_HOST_TGT_MNT/proc
+    grep -q $BANDIT_HOST_TGT_MNT/sys     /proc/mounts || mount -t sysfs  sysfs  $BANDIT_HOST_TGT_MNT/sys
+    grep -q $BANDIT_HOST_TGT_MNT/run     /proc/mounts || mount -t tmpfs  tmpfs  $BANDIT_HOST_TGT_MNT/run
 
     chroot $BANDIT_HOST_TGT_MNT /usr/bin/env -i \
            HOME=/root \

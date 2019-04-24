@@ -11,17 +11,21 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
-RELEASE NOTES for BANDIT
-========================
+RELEASE NOTES
+=============
 
-This is the release "latest" of the BANDIT toolkit.
-This is a "DEVELOPMENT" release.
+This is the release "1.9.0" of the BANDIT toolkit.
+This is a "STABLE" release.
 
 See https://docs.phyglos.org/bandit for more information.
 
 
-MAJOR CHANGES in "latest"
-=========================
+MAJOR CHANGES
+=============
 
-*
+* Set TARGET default partitions to none
+* Check for previous mounts when entering TARGET
+* Lazy unmount /dev and /proc when leaving TARGET or BUILDER
+* Allow raising TARGET on a directory instead of a partition
+
 

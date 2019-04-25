@@ -162,13 +162,13 @@ bandit_system_host_clean()
     case $BANDIT_TARGET_TYPE in
         directory)
             bandit_log "Removing TARGET directory from HOST system..."
-            rm -rfv $BANDIT_HOST_TGT_MNT            
+            rm -rf $BANDIT_HOST_TGT_MNT            
             ;;
         partition)
             bandit_log "Removing TARGET partitions from HOST system..."
             # Umount the target directory
             umount -vfl $BANDIT_HOST_TGT_MNT            
-            rm -rfv $BANDIT_HOST_TGT_MNT            
+            rm -rf $BANDIT_HOST_TGT_MNT            
 
             # Switch off swap partition
             swapoff -v $BANDIT_TARGET_SWAP

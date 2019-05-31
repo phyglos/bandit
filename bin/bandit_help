@@ -39,28 +39,33 @@ bandit_show_bandit()
 bandit_show_help_bundles()
 {
     echo
-    echo "  bandit [-b|--bundle] <bundle> [-i|--item <item>] <action> <params>" 
+    echo "  bandit [-b|--bundle] <bundle> [-i|--item <item>] <action> [<params>]" 
     echo
     echo "    <bundle>:     Name of the bundle"
-    echo "    -i <item>:    Apply the action only to this item in the bundle"
+    echo "    <item>:       Apply the action only to this item in the bundle"
     echo "    <action>:"
     echo "      edit        Edit the configuration files for the bundle"
-    echo "                  --conf for editing the configuration file (default)"
-    echo "                  --desc for editing the description file"
+    echo "                  <params>:"
+    echo "                    --conf  for editing the configuration file (default)"
+    echo "                    --desc  for editing the description file"
     echo "      copy        Copy an existing bundle into new one, optionally in other catalog"
-    echo "                  <dest> [<dest_cat>] name for the destination bundle and catalog"
+    echo "                  <params>:"
+    echo "                    <dest_cat> name of the destination catalog"
     echo "      move        Move an existing bundle into another catalog"
-    echo "                  <dest_cat> name for the destination catalog"
+    echo "                  <params>:"
+    echo "                    <dest_cat>  name of the destination catalog"
     echo "      rename      Rename an existing bundle"
-    echo "                  <dest> new name for the bundle"
+    echo "                  <params>:"
+    echo "                    <name>  new name for the bundle"
     echo "      delete      Delete a bundle from an existing catalog"
     echo "                  (Use 'remove' to uninstall the bundle items)"
     echo
     echo "      download    Download (inconditionally) from origins into the corresponding caches"
     echo "      fetch       Download (when not in cache) from origins"
-    echo "                  --all for fetching sources and build packs (default)"
-    echo "                  --sources for fetching sources"
-    echo "                  --builds for fetching build packs"
+    echo "                  <params>:"
+    echo "                    --all      for fetching sources and build packs (default)"
+    echo "                    --sources  for fetching sources"
+    echo "                    --builds   for fetching build packs"
     echo
     echo "      config      Interactively configure the bundle"
     echo "      build       Build the bundle and save a build pack in the builds cache"
@@ -108,19 +113,23 @@ bandit_show_help_packages()
 bandit_show_help_repositories()
 {
     echo
-    echo "  bandit -r|--repository <repository> <action> <params>" 
+    echo "  bandit -r|--repository <repository> <action> [<params>]" 
     echo
     echo "    <repository>: Name of the repository"
     echo "    <action>:"
     echo "      download    Download the repository manifest into cache"
     echo "      install     Install the repository manifest from cache"
-    echo "                  --all for installing the catalogs in the manifest"
+    echo "                  <params>:"
+    echo "                    --all  for installing the catalogs in the manifest"
     echo "      update      Download and install the repository manifest"
-    echo "                  --all for updating the catalogs in the manifest"
+    echo "                  <params>:"
+    echo "                    --all  for updating the catalogs in the manifest"
     echo "      remove      Remove the repository manifest"
-    echo "                  --all for removing the catalogs in the manifest"
+    echo "                  <params>:"
+    echo "                    --all  for removing the catalogs in the manifest"
     echo "      show        List catalogs in the repository manifest"
-    echo "                  --md5 for MD5 checksums"
+    echo "                  <params>:"
+    echo "                    --md5  to display MD5 checksums"
     echo
 }
 
@@ -148,12 +157,12 @@ bandit_show_help_systems()
     echo
     echo "  bandit -s|--system <system> <action>" 
     echo
-    echo "     host check    Checks the building requiremts of the HOST"
-    echo "     host clean    Cleans the HOST from previous installations"
-    echo "     host init     Creates users and partitions on the HOST"
-    echo "     builder enter Enter into the BUILDER chroot jail"
-    echo "     target init   Initialize the TARGET filesystem"
-    echo "     target enter  Enter into the TARGET chroot jail"
+    echo "     host check     Checks the building requiremts of the HOST"
+    echo "     host clean     Cleans the HOST from previous installations"
+    echo "     host init      Creates users and partitions on the HOST"
+    echo "     builder enter  Enter into the BUILDER chroot jail"
+    echo "     target init    Initialize the TARGET filesystem"
+    echo "     target enter   Enter into the TARGET chroot jail"
     echo
 }
 

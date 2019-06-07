@@ -206,8 +206,10 @@ export LC_ALL PATH BANDIT_HOME
 EOF
 
     # Take ownership of user and BANDIT directory
-    chown -R $BANDIT_USR:$BANDIT_GRP $BANDIT_HOME
     chown -vR $BANDIT_USR:$BANDIT_GRP /home/$BANDIT_USR
+    chown -R $BANDIT_USR:$BANDIT_GRP $BANDIT_HOME
+    chown -R $BANDIT_USR:$BANDIT_GRP $BANDIT_LOGS
+    chown -R $BANDIT_USR:$BANDIT_GRP $BANDIT_XBUILDS
 
     case $BANDIT_TARGET_TYPE in
         directory)

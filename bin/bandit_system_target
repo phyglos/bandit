@@ -120,6 +120,8 @@ bandit_system_target_init()
 
     # Change ownership to root
     chown -R root:root $BANDIT_HOST_TGT_MNT/$BANDIT_HOME
+    chown -R root:root $BANDIT_HOST_TGT_MNT/$BANDIT_LOGS
+    chown -R root:root $BANDIT_HOST_TGT_MNT/$BANDIT_XBUILDS
     chown -R root:root $BANDIT_HOST_TGT_MNT/$BANDIT_BUILDER_DIR
 
     ## Create filesystem layout

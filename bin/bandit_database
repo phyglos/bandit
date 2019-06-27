@@ -298,16 +298,20 @@ bandit_db_get_log_entries()
 
   if [ -d $BANDIT_LOGS ]; then 
       list=$(find $BANDIT_LOGS -type f -name "*${prefix}*" |
-              sed -e "s#${BANDIT_LOGS}/bundles/##g" -e "s/.log$//g" | 
+              sed -e "s#${BANDIT_LOGS}/systems/##g" | 
+              sed -e "s#${BANDIT_LOGS}/repositories/##g" | 
+              sed -e "s#${BANDIT_LOGS}/catalogs/##g" | 
+              sed -e "s#${BANDIT_LOGS}/bundles/##g" | 
+              sed -e "s/.log$//g" | 
               awk -F '/' '{
                            match($1, /[0-9]+-[0-9]+.[0-9]+/)
                            timestamp=substr($1, RSTART, RLENGTH)
                            # Temporary support both old and new log file names
                            if (RSTART==1)
-                              bundle=substr($1, 18)
+                              entity=substr($1, 18)
                            else
-                              bundle=substr($1, 1, RSTART-2)
-                           print timestamp"|"bundle"|"$2
+                              entity=substr($1, 1, RSTART-2)
+                           print timestamp"|"entity"|"$2
                           }' |
               sort -d)
   fi

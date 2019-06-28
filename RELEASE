@@ -14,14 +14,19 @@
 RELEASE NOTES for BANDIT
 ========================
 
-This is the release "latest" of the BANDIT toolkit.
-This is a "DEVELOPMENT" release.
+This is the release "1.9.1" of the BANDIT toolkit.
+This is a "STABLE" release.
 
 See https://docs.phyglos.org/bandit for more information.
 
 
-MAJOR CHANGES in "latest"
-=========================
+MAJOR CHANGES
+=============
 
-*
+* Show all entities in log searches
+* Use 'latest' as default tag for build packs
+* Allow logs and builds cache outside from BANDIT_HOME
+* Rewritten some help messages
+* Clean host with silent removes
+
 

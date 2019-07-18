@@ -49,7 +49,7 @@ bandit_find_catalog_md5()
             md5=${CATALOGS_MD5[pos]}
             break
         fi
-        pos=pos+1
+        pos=$((pos+1))
     done
 
     echo $md5

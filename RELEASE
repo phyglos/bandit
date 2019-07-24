@@ -14,14 +14,19 @@
 RELEASE NOTES for BANDIT
 ========================
 
-This is the release "latest" of the BANDIT toolkit.
-This is a "DEVELOPMENT" release.
+This is the release "1.9.2" of the BANDIT toolkit.
+This is a "STABLE" release.
 
 See https://docs.phyglos.org/bandit for more information.
 
 
-MAJOR CHANGES in "latest"
-=========================
+MAJOR CHANGES
+=============
 
-*
+* Do not copy HOST build packs into the TARGET filesystem
+* Add temporary users/groups 'bin' and 'tty' to the BUILDER system
+* Removed unused BUILD_ variables
+* Fixed error in bandit_find_catalog_MD5
+* Show BUNDLE_SOURCES group when no origin can be found
+
 

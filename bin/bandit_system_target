@@ -103,14 +103,18 @@ bandit_system_target_init()
     done
 
     bandit_msg "Copying HOST caches in the TARGET filesystem..."
+
     bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XREPOSITORIES
     cp -R $BANDIT_XREPOSITORIES/* $BANDIT_HOST_TGT_MNT$BANDIT_XREPOSITORIES
     bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XCATALOGS
     cp -R $BANDIT_XCATALOGS/* $BANDIT_HOST_TGT_MNT$BANDIT_XCATALOGS
+
     bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XSOURCES
     cp -R $BANDIT_XSOURCES/* $BANDIT_HOST_TGT_MNT$BANDIT_XSOURCES
+
+    # Do not copy HOST build packs into the TARGET filesystem
     bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XBUILDS
-    cp -R $BANDIT_XBUILDS/* $BANDIT_HOST_TGT_MNT$BANDIT_XBUILDS
+    # cp -R $BANDIT_XBUILDS/* $BANDIT_HOST_TGT_MNT$BANDIT_XBUILDS
 
     ###----------------------------------------
     # Layout TARGET filesystem

@@ -188,11 +188,14 @@ bandit_system_target_init()
 
     cat > $BANDIT_HOST_TGT_MNT/etc/passwd <<EOF
 root:x:0:0:root:/root:/bin/bash
+bin:x:1:1:bin:/dev/null:/bin/false
 nobody:x:99:99:Unprivileged User:/dev/null:/bin/false
 EOF
 
     cat > $BANDIT_HOST_TGT_MNT/etc/group <<EOF
 root:x:0:
+bin:x:1:daemon
+tty:x:5:
 nogroup:x:99:
 EOF
 

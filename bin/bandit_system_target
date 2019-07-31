@@ -182,10 +182,9 @@ bandit_system_target_init()
     bandit_log "Create essential files and symlinks..."
 
     # bin
-    ln -sv $BANDIT_BUILDER_DIR/bin/{bash,cat,echo,pwd,stty} $BANDIT_HOST_TGT_MNT/bin
-    ln -sv $BANDIT_BUILDER_DIR/bin/file $BANDIT_HOST_TGT_MNT/usr/bin
-    ln -sv $BANDIT_BUILDER_DIR/bin/perl $BANDIT_HOST_TGT_MNT/usr/bin
-    ln -sv bash $BANDIT_HOST_TGT_MNT/bin/sh
+    ln -sv $BANDIT_BUILDER_DIR/bin/{bash,cat,chmod,dd,echo,ln,mkdir,pwd,rm,stty,touch} $BANDIT_HOST_TGT_MNT/bin
+    ln -sv bash                                                                        $BANDIT_HOST_TGT_MNT/bin/sh
+    ln -sv $BANDIT_BUILDER_DIR/bin/{env,file,install,perl,printf}                      $BANDIT_HOST_TGT_MNT/usr/bin
 
     # etc
     ln -sv /proc/self/mounts $BANDIT_HOST_TGT_MNT/etc/mtab
@@ -204,9 +203,8 @@ nogroup:x:99:
 EOF
 
     # libs
-    ln -sv $BANDIT_BUILDER_DIR/lib/libgcc_s.so{,.1} $BANDIT_HOST_TGT_MNT/usr/lib
-    ln -sv $BANDIT_BUILDER_DIR/lib/libstdc++.so{,.6} $BANDIT_HOST_TGT_MNT/usr/lib
-    sed "s#$BANDIT_BUILDER_DIR#usr#" $BANDIT_BUILDER_DIR/lib/libstdc++.la > $BANDIT_HOST_TGT_MNT/usr/lib/libstdc++.la
+    ln -sv $BANDIT_BUILDER_DIR/lib/libgcc_s.so{,.1}                         $BANDIT_HOST_TGT_MNT/usr/lib
+    ln -sv $BANDIT_BUILDER_DIR/lib/libstdc++.{a,so{,.6}}                    $BANDIT_HOST_TGT_MNT/usr/lib
 
     # var/logs
     touch $BANDIT_HOST_TGT_MNT/var/log/{btmp,lastlog,faillog,wtmp}

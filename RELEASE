@@ -11,17 +11,17 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 
-RELEASE NOTES for BANDIT
-========================
+RELEASE NOTES
+=============
 
-This is the release "latest" of the BANDIT toolkit.
-This is a "DEVELOPMENT" release.
+This is the revision "$REVISION" of the BANDIT toolkit.
+This is a "$RELEASE_TYPE" release.
 
 See https://docs.phyglos.org/bandit for more information.
 
 
-MAJOR CHANGES in "latest"
-=========================
+MAJOR CHANGES
+=============
 
 *
 

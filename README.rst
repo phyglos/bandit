@@ -75,18 +75,12 @@ or, to get help about all bandit options, issue:
 
     # bandit --help
 
-Status
-======
-
-The BANDIT is in STABLE status. The toolkit is capable of building and installing
-a new phy system from a HOST system running Debian, Fedora or phyglos. The BANDIT
-is able to manage software bundles on a phy system.
-
 More information
 ================
 
-The COPYING file contains the GNU License for this software.
+See the documentation at https://docs.phyglos.org/bandit for more information about the status, roadmap, handbook and reference.
 
 The RELEASE file describes the main changes in this release.
 
-See https://docs.phyglos.org/bandit for more information.
+The COPYING file contains the GNU License for this software.
+

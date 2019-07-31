@@ -237,7 +237,7 @@ EOF
             mkdir -pv $BANDIT_HOST_TGT_MNT
             # Mount the TARGET partition
             mount -v -t $BANDIT_TARGET_PART_TYPE $BANDIT_TARGET_PART $BANDIT_HOST_TGT_MNT
-
+           
             bandit_log "Preparing TARGET swap area..." 
 
             ## Format target swap partition
@@ -262,6 +262,20 @@ EOF
     chown -R $BANDIT_USR:$BANDIT_GRP $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR
 
     ln -sv $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR $BANDIT_BUILDER_DIR
+
+    # Ensure that lib/32/64 directories are created on the BUILDER filesystem
+    case $BANDIT_TARGET_ARCH in
+        i?86) 
+            mkdir -pv $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR/lib32
+            ln -sv lib32 $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR/lib
+            ;;
+        x86_64) 
+            mkdir -pv $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR/lib32
+            mkdir -pv $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR/lib64
+            ln -sv lib64 $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR/lib
+            ;;
+    esac
+    chown -vR $BANDIT_USR:$BANDIT_GRP $BANDIT_HOST_TGT_MNT$BANDIT_BUILDER_DIR/lib*
 
     # Done
     echo

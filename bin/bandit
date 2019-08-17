@@ -72,6 +72,24 @@ case $1 in
 esac
 
 #---
+# Work with write-only commands
+#---
+
+case $1 in
+    edit)
+        shift
+
+        # Check permissions to write bandit.conf file
+        [ -w $BANDIT_HOME/etc/bandit.conf ] || bandit_exit "BANDIT: Permission denied to write bandit.conf file."
+
+        
+        ${EDITOR:-vi} $BANDIT_HOME/etc/bandit.conf
+        source $BANDIT_HOME/etc/bandit.conf
+        exit 0
+        ;;
+esac
+
+#---
 # Work with read-only commands
 #---
 
@@ -151,24 +169,6 @@ case $1 in
             bandit_search ${expr} ${options}
         fi
         
-        exit 0
-        ;;
-esac
-
-#---
-# Work with write-only commands
-#---
-
-case $1 in
-    edit)
-        shift
-
-        # Check permissions to write bandit.conf file
-        [ -w $BANDIT_HOME/etc/bandit.conf ] || bandit_exit "BANDIT: Permission denied to write bandit.conf file."
-
-        
-        ${EDITOR:-vi} $BANDIT_HOME/etc/bandit.conf
-        source $BANDIT_HOME/etc/bandit.conf
         exit 0
         ;;
 esac

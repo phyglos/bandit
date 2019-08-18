@@ -82,10 +82,12 @@ bandit_package_fetch_sources()
                 ftp*|http*)
                     # Download from URL into BUILD_SOURCES
                     bandit_msg "...fetching $file from source origin..."
-                    wget ${sources_fetch_url[i]} \
-                         --directory-prefix=$BUILD_SOURCES \
-                         --quiet \
-                         --no-clobber
+                    (
+                        echo "...DOWNLOADING: $file" >&2
+                        wget ${sources_fetch_url[i]} \
+                             --directory-prefix=$BUILD_SOURCES \
+                             --no-clobber --no-verbose
+                    ) 2>> $BUILD_LOGS/${stamp}-$script.download.log
                     if [[ $? != 0 ]]; then
                         bandit_msg "Connection error to ${sources_fetch_url[i]}" red;
                     else
@@ -142,10 +144,12 @@ bandit_package_fetch_builds()
         source $BANDIT_HOME/etc/repositories/$REPOSITORY
         for mirror in ${REPOSITORY_MIRRORS[*]}; do
             file=$mirror"/phyglos.org/builds/$CATALOG/$BUNDLE/$pack"
-            wget ${file}{,.md5} \
-                 --directory-prefix=$BUILD_DESTDIR \
-                 --quiet \
-                 --no-clobber
+            (
+                echo "...DOWNLOADING: $file (+MD5)" >&2
+                wget ${file}{,.md5} \
+                     --directory-prefix=$BUILD_DESTDIR \
+                     --no-clobber --no-verbose
+            ) 2>> $BUILD_LOGS/${stamp}-$script.download.log
             if [[ $? != 0 ]]; then
                 bandit_msg "Connection error to ${file}" red
             else

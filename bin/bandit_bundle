@@ -132,6 +132,7 @@ bandit_bundle_do()
     local stamp
     bandit_timestamp stamp
 
+    echo "Starting action $COMMAND on bundle $BUNDLE..." 
     ## Find first catalog and first repository
     if [ $COMMAND != "download" -o $COMMAND != "fetch" ]; then
         # Find first catalog for the bundle
@@ -139,15 +140,16 @@ bandit_bundle_do()
         if [ -z $CATALOG ]; then
             bandit_exit "BANDIT: Bundle $BUNDLE not found in enabled catalogs list"
         fi
-        echo "Working with catalog: $CATALOG"
+        echo "...using catalog: $CATALOG"
 
         # Find first repository for the catalog
         REPOSITORY="$(bandit_find_first_repository_for_catalog)"
         if [ -z $REPOSITORY ]; then
             bandit_exit "BANDIT: Catalog $CATALOG not found in repositories list"
         fi
-        echo "Working with repository: $REPOSITORY"
+        echo "...using repository: $REPOSITORY"
     fi
+
 
     # Make default directories available to the bundle scripts and origins
     BUILD_CATALOG=$BANDIT_CATALOGS/$CATALOG
@@ -211,8 +213,7 @@ bandit_bundle_do()
     bandit_mkdir $BUILD_SOURCES
     bandit_mkdir $BUILD_DESTDIR
     bandit_mkdir $BUILD_WORK
-    if [ $COMMAND != "download"   -a $COMMAND != "fetch" \
-                  -a $COMMAND != "config" -a $COMMAND != "edit" ]; then
+    if [ $COMMAND != "fetch" -a $COMMAND != "config" -a $COMMAND != "edit" ]; then
         bandit_mkdir $BUILD_LOGS
     fi
 

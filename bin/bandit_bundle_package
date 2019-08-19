@@ -80,13 +80,15 @@ bandit_package_fetch_sources()
                     fi
                     ;;
                 ftp*|http*)
-                    # Download from URL into BUILD_SOURCES
+                    # Download from URL into BUILD_SOURCES                   
                     bandit_msg "...fetching $file from source origin..."
                     (
                         echo "...DOWNLOADING: $file" >&2
                         wget ${sources_fetch_url[i]} \
                              --directory-prefix=$BUILD_SOURCES \
-                             --no-clobber --no-verbose
+                             --no-clobber \
+                             --no-verbose \
+                             $BUILD_WGET_IGNORE_CERTS
                     ) 2>> $BUILD_LOGS/${stamp}-$script.download.log
                     if [[ $? != 0 ]]; then
                         bandit_msg "Connection error to ${sources_fetch_url[i]}" red;
@@ -148,7 +150,9 @@ bandit_package_fetch_builds()
                 echo "...DOWNLOADING: $file (+MD5)" >&2
                 wget ${file}{,.md5} \
                      --directory-prefix=$BUILD_DESTDIR \
-                     --no-clobber --no-verbose
+                     --no-clobber \
+                     --no-verbose \
+                     $BUILD_WGET_IGNORE_CERTS
             ) 2>> $BUILD_LOGS/${stamp}-$script.download.log
             if [[ $? != 0 ]]; then
                 bandit_msg "Connection error to ${file}" red
@@ -373,6 +377,17 @@ bandit_package_do()
     # Declare list of package tarball
     declare -a sources_tarball
 
+    ## Set specific action parameters
+    # Allow to download ignoring remote server certificates
+    BUILD_WGET_IGNORE_CERTS=" "
+    if [[ $COMMAND_PARAMS =~ "--ignore-certs" ]]; then
+        BUILD_WGET_IGNORE_CERTS="--no-check-certificate"
+        # Consume the parameter plus blanks
+        COMMAND_PARAMS=${COMMAND_PARAMS/--ignore-certs/}
+        COMMAND_PARAMS=${COMMAND_PARAMS/\ */}
+    fi
+
+    # Perform the command
     case $COMMAND in
         download)
             case $COMMAND_PARAMS in
@@ -383,7 +398,7 @@ bandit_package_do()
                 "--builds") 
                     bandit_package_fetch_builds download
                     ;;
-                "--all" )
+                "--all")
                     bandit_package_get_origins
                     bandit_package_fetch_sources download
                     bandit_package_fetch_builds download

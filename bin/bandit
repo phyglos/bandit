@@ -254,7 +254,7 @@ case $object in
         COMMAND=$1; shift
 
         # Get optional command parameters
-        COMMAND_PARAMS=$*
+        COMMAND_PARAMS="$@"
         
         # Set default parameter, if nothing provided
         if [ -z "$COMMAND_PARAMS" ]; then
@@ -267,15 +267,18 @@ case $object in
                     ;;
             esac
         fi
-        case $COMMAND_PARAMS in
-            --all | --sources | --builds | --desc | --conf | --tag=*)
-                :
-                ;;
-            --*)
-                bandit_exit "BANDIT: Parameter ${COMMAND_PARAMS} not defined for bundle commands."
-                ;;
-        esac
-
+        # Check allowed command parameters
+        for p in ${COMMAND_PARAMS[*]}; do
+            case $p in
+                --all | --sources | --builds | --desc | --conf | --tag=* | --ignore-certs)
+                    : # Accepted
+                    ;;
+                --*)
+                    bandit_exit "BANDIT: Parameter ${COMMAND_PARAMS} not defined for bundle commands."
+                    ;;
+            esac
+        done
+        
         # Start the work on the bundle
         bandit_mkdir $BANDIT_LOGS/bundles
         case $COMMAND in

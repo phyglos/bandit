@@ -213,7 +213,7 @@ bandit_bundle_do()
     bandit_mkdir $BUILD_SOURCES
     bandit_mkdir $BUILD_DESTDIR
     bandit_mkdir $BUILD_WORK
-    if [ $COMMAND != "fetch" -a $COMMAND != "config" -a $COMMAND != "edit" ]; then
+    if [ $COMMAND != "config" -a $COMMAND != "edit" ]; then
         bandit_mkdir $BUILD_LOGS
     fi
 

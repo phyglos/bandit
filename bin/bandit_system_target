@@ -109,13 +109,21 @@ bandit_system_target_init()
     bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XCATALOGS
     cp -R $BANDIT_XCATALOGS/* $BANDIT_HOST_TGT_MNT$BANDIT_XCATALOGS
 
+    # Copy sources cache if not empty
     bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XSOURCES
-    cp -R $BANDIT_XSOURCES/* $BANDIT_HOST_TGT_MNT$BANDIT_XSOURCES
-
-    # Do not copy HOST build packs into the TARGET filesystem
+    if [ "$(ls -A $BANDIT_XSOURCES)" ]; then 
+        cp -R $BANDIT_XSOURCES/* $BANDIT_HOST_TGT_MNT$BANDIT_XSOURCES
+    fi
+    
+    # Copy builds cache if so configured and it is not empty
     bandit_mkdir $BANDIT_HOST_TGT_MNT$BANDIT_XBUILDS
-    # cp -R $BANDIT_XBUILDS/* $BANDIT_HOST_TGT_MNT$BANDIT_XBUILDS
-
+    if [ $BANDIT_TARGET_COPY_XBUILDS == "yes" ];
+    then
+        if [ "$(ls -A $BANDIT_XBUILDS)" ]; then 
+            cp -R $BANDIT_XBUILDS/* $BANDIT_HOST_TGT_MNT$BANDIT_XBUILDS
+        fi
+    fi
+    
     ###----------------------------------------
     # Layout TARGET filesystem
     ###----------------------------------------

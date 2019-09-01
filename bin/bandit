@@ -28,6 +28,27 @@ source $BANDIT_HOME/bin/bandit_search
 # Work with display-only commands
 #---
 
+# Determine the use of a pager
+if [ "$BANDIT_PAGER" = "none" ]; then 
+    pager="no"
+    # Set defaut pager
+    BANDIT_PAGER="more"
+else
+    pager=yes
+fi
+
+# Change default pager
+case $1 in 
+    "--pager")
+        pager="yes"
+        shift
+        ;;
+    "--no-pager")
+        pager="no"
+        shift
+        ;;
+esac
+
 case $1 in 
     -h|--help | help )
         shift
@@ -53,6 +74,9 @@ case $1 in
                 ;;
             packages)
                 bandit_show_help_packages
+                ;;
+            caches)
+                bandit_show_help_caches
                 ;;
             *)
                 bandit_show_version
@@ -93,39 +117,21 @@ esac
 # Work with read-only commands
 #---
 
-# Check permissions to read files...
-[ -r $BANDIT_REPOSITORIES ]  || bandit_exit "BANDIT: Permission denied to read from repositories directory."
-[ -r $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to read from catalogs directory."
-[ -r $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to read from repositories cache."
-[ -r $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to read from catalogs cache."
-[ -r $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to read from sources cache."
-[ -r $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to read from builds cache."
-[ -r $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to read from logs directory."
-
-# Determine the use of a pager
-if [ "$BANDIT_PAGER" = "none" ]; then 
-    pager="no"
-    # Set defaut pager
-    BANDIT_PAGER="more"
-else
-    pager=yes
+# bandit help and bandit edit are already processed.
+if [[ "$1" == "-x" || "$1" == "--cache" ]]; then
+    if [[ "$3" == "init" ]]; then
+        : # bandit -x * init should proceed; maybe the cache does not exist.
+    fi
+else   
+    # Check permissions to read files...
+    [ -r $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to read from logs directory $BANDIT_LOGS".
+    [ -r $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to read from builds cache $BANDIT_XBUILDS."
+    [ -r $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to read from sources cache $BANDIT_XSOURCES."
+    [ -r $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to read from catalogs cache $BANDIT_XCATALOGS."
+    [ -r $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to read from repositories cache $BANDIT_XREPOSITORIES."
+    [ -r $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to read from catalogs directory $BANDIT_CATALOGS."
+    [ -r $BANDIT_REPOSITORIES ]  || bandit_exit "BANDIT: Permission denied to read from repositories directory $BANDIT_REPOSITORIES."
 fi
-
-# Change default pager
-case $1 in 
-    "--pager")
-        pager="yes"
-        shift
-        ;;
-    "--no-pager")
-        pager="no"
-        shift
-        ;;
-esac
-
-#---
-# Work with read-only commands
-#---
 
 case $1 in 
     search)
@@ -178,20 +184,27 @@ esac
 ###----------------------------------------
 
 source $BANDIT_HOME/bin/bandit_find
+source $BANDIT_HOME/bin/bandit_cache
 source $BANDIT_HOME/bin/bandit_system
 source $BANDIT_HOME/bin/bandit_repository
 source $BANDIT_HOME/bin/bandit_catalog
 source $BANDIT_HOME/bin/bandit_bundle
 
-# Check permissions to write files...
-[ -w $BANDIT_TMP ]           || bandit_exit "BANDIT: Permission denied to write in the work directory ."
-[ -w $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to write in the logs directories."
-[ -w $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to write in the builds cache."
-[ -w $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to write in the sources cache."
-[ -w $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to write in the catalogs cache."
-[ -w $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to write in the repositories cache."
-[ -w $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to write in the catalogs directory."
-[ -w $BANDIT_REPOSITORIES ]  || bandit_exit "BANDIT: Permission denied to write in the repositories directory."
+if [[ "$1" == "-x" || "$1" == "--cache" ]]; then
+    if [[ "$3" == "init" ]]; then
+        : # bandit -x * init should proceed; maybe the cache does not exist.
+    fi
+else   
+    # Check permissions to write files...
+    [ -w $BANDIT_TMP ]           || bandit_exit "BANDIT: Permission denied to write in the work directory $BANDIT_TMP."
+    [ -w $BANDIT_LOGS ]          || bandit_exit "BANDIT: Permission denied to write in the logs directories $BANDIT_LOGS."
+    [ -w $BANDIT_XBUILDS ]       || bandit_exit "BANDIT: Permission denied to write in the builds cache $BANDIT_XBUILDS."
+    [ -w $BANDIT_XSOURCES ]      || bandit_exit "BANDIT: Permission denied to write in the sources cache $BANDIT_XSOURCES."
+    [ -w $BANDIT_XCATALOGS ]     || bandit_exit "BANDIT: Permission denied to write in the catalogs cache $BANDIT_XCATALOGS."
+    [ -w $BANDIT_XREPOSITORIES ] || bandit_exit "BANDIT: Permission denied to write in the repositories cache $BANDIT_XREPOSITORIES."
+    [ -w $BANDIT_CATALOGS ]      || bandit_exit "BANDIT: Permission denied to write in the catalogs directory $BANDIT_CATALOGS."
+    [ -w $BANDIT_REPOSITORIES ]  || bandit_exit "BANDIT: Permission denied to write in the repositories directory $BANDIT_REPOSITORIES."
+fi
 
 # Check if any type of object is set or set default 
 object="--default"
@@ -368,6 +381,29 @@ case $object in
                 ;;
             *) 
                 bandit_exit "BANDIT: Command ${COMMAND} not defined for systems."
+                ;;
+        esac
+        ;;
+    -x|--cache)
+        shift
+
+        # Get cache 
+        CACHE=$1; shift
+        
+        # Get command
+        COMMAND=$1; shift
+        COMMAND_PARAMS=$*
+
+        # Start the work on the system
+        bandit_mkdir $BANDIT_LOGS/systems
+        
+        case $COMMAND in
+            init | show | clean )
+                # Run interactively without logging
+                bandit_cache_do 
+                ;;
+            *) 
+                bandit_exit "BANDIT: Command ${COMMAND} not defined for caches."
                 ;;
         esac
         ;;

@@ -75,6 +75,20 @@ bandit_show_help_bundles()
     echo
 }
 
+bandit_show_help_caches()
+{
+    echo
+    echo "  bandit -x|--cache <cache>|all <action>" 
+    echo
+    echo "    <cache>:      Name of the cache ('repositories', 'catalogs', 'sources', 'builds')"
+    echo "                  or 'all' for everything"   
+    echo "    <action>:"
+    echo "      clean       Remove files and directories from the cache"   
+    echo "      init        Set cache directories and files groups and permissions"
+    echo "      show        Show cache location and size"   
+    echo
+}
+
 bandit_show_help_catalogs()
 {
     echo

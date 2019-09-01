@@ -1,0 +1,286 @@
+#!/bin/bash
+#
+# bandit_system - functions for BANDIT systems
+#
+# Copyright (C) 2019 Angel Linares Zapater
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2, as 
+# published by the Free Software Foundation. See the COPYING file.
+#
+# This program is distributed WITHOUT ANY WARRANTY; without even the 
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#
+
+source $BANDIT_HOME/bin/bandit_common
+
+###------------------------------
+# Cache_command functions
+###------------------------------
+
+###--- SOURCES
+
+bandit_cache_sources_clean()
+{
+    bandit_msg "Cleaning sources cache at ${BANDIT_XSOURCES}"
+
+    if [[ ! $(stat -c %a $BANDIT_XSOURCES) =~ ^.*[67].$ ]]; then
+        bandit_exit "BANDIT: Permission denied to write in the sources cache $BANDIT_XSOURCES" red
+    fi
+    
+    if [ -d $BANDIT_XSOURCES ]; then
+        rm -iv $BANDIT_XSOURCES/*
+    fi
+}
+
+bandit_cache_sources_init()
+{
+    bandit_msg "Initializing sources cache at ${BANDIT_XSOURCES}"
+
+    if [ ! -d $BANDIT_XSOURCES ]; then
+        bandit_mkdir $BANDIT_XSOURCES
+        if [ ! $?  ]; then
+            bandit_exit "BANDIT: Unable to create sources cache $BANDIT_XSOURCES" red
+        fi
+    fi
+    # Set common group and permissions
+    chgrp -Rc phyglos $BANDIT_XSOURCES   
+    chmod -c 775 $BANDIT_XSOURCES
+
+    if [[ ! $(stat -c %a $BANDIT_XSOURCES) =~ ^.*[67].$ ]]; then
+        bandit_exit "BANDIT: Permission denied to write in the sources cache $BANDIT_XSOURCES" red
+    fi
+    
+    if [ "$(ls -A $BANDIT_XSOURCES)" ]; then 
+        find $BANDIT_XSOURCES/* -type f -exec chmod -c 664 {} \;
+    fi
+}
+
+bandit_cache_sources_show()
+{  
+    if [ ! -r $BANDIT_XSOURCES ]; then
+        bandit_msg "BANDIT: Unable to read sources cache directory" red
+    else 
+        echo "BANDIT_XSOURCES      :" $(du -sh $BANDIT_XSOURCES)
+    fi
+}
+
+###--- BUILDS
+
+bandit_cache_builds_clean()
+{
+    bandit_msg "Cleaning builds cache at ${BANDIT_XBUILDS}"
+
+    if [[ ! $(stat -c %a $BANDIT_XBUILDS) =~ ^.*[67].$ ]]; then
+        bandit_exit "BANDIT: Permission denied to write in the builds cache $BANDIT_XBUILDS" red
+    fi
+    
+    if [ -d $BANDIT_XBUILDS ]; then
+        rm -rfv $BANDIT_XBUILDS/*
+    fi
+}
+
+bandit_cache_builds_init()
+{
+    bandit_msg "Initializing builds cache at ${BANDIT_XBUILDS}"
+
+    if [ ! -d $BANDIT_XBUILDS ]; then
+        bandit_mkdir $BANDIT_XBUILDS
+        if [ ! $?  ]; then
+            bandit_exit "BANDIT: Unable to create builds cache $BANDIT_XBUILDS" red
+        fi
+    fi
+    # Set common group and permissions
+    chgrp -Rc phyglos $BANDIT_XBUILDS   
+    chmod -c 775 $BANDIT_XBUILDS
+    
+    if [[ ! $(stat -c %a $BANDIT_XBUILDS) =~ ^.*[67].$ ]]; then
+        bandit_exit "BANDIT: Permission denied to write in the builds cache $BANDIT_XBUILDS" red
+    fi
+    
+    if [ "$(ls -A $BANDIT_XBUILDS)" ]; then 
+        find $BANDIT_XBUILDS/* -type d -exec chmod -c 775 {} \; 
+        find $BANDIT_XBUILDS/* -type f -exec chmod -c 664 {} \;
+    fi
+}
+
+bandit_cache_builds_show()
+{  
+    if [ ! -r $BANDIT_XBUILDS ]; then
+        bandit_msg "BANDIT: Unable to read builds cache directory" red
+    else 
+        echo "BANDIT_XBUILDS       :" $(du -sh $BANDIT_XBUILDS)
+    fi
+}
+
+
+###--- REPOSITORIES
+
+bandit_cache_repositories_clean()
+{
+    bandit_msg "Cleaning repositories cache at ${BANDIT_XREPOSITORIES}"
+
+    if [[ ! $(stat -c %a $BANDIT_XREPOSITORIES) =~ ^.*[67].$ ]]; then
+        bandit_exit "BANDIT: Permission denied to write in the repositories cache $BANDIT_XREPOSITORIES" red
+    fi
+    
+    if [ -d $BANDIT_XREPOSITORIES ]; then
+        rm -rfv $BANDIT_XREPOSITORIES/*
+    fi
+}
+
+bandit_cache_repositories_init()
+{
+    bandit_msg "Initializing repositories cache at ${BANDIT_XREPOSITORIES}"
+
+    if [ ! -d $BANDIT_XREPOSITORIES ]; then
+        bandit_mkdir $BANDIT_XREPOSITORIES
+        if [ ! $?  ]; then
+            bandit_exit "BANDIT: Unable to create repositories cache $BANDIT_XREPOSITORIES" red
+        fi
+    fi
+    # Set common group and permissions
+    chgrp -Rc phyglos $BANDIT_XREPOSITORIES   
+    chmod -c  775 $BANDIT_XREPOSITORIES
+
+    if [[ ! $(stat -c %a $BANDIT_XREPOSITORIES) =~ ^.*[67].$ ]]; then
+        bandit_exit "BANDIT: Permission denied to write in the repositories cache $BANDIT_XREPOSITORIES" red
+    fi
+    
+    if [ "$(ls -A $BANDIT_XREPOSITORIES)" ]; then 
+        find $BANDIT_XREPOSITORIES   -type d -exec chmod -c 775 {} \; 
+        find $BANDIT_XREPOSITORIES/* -type f -exec chmod -c 664 {} \;
+    fi
+}
+
+bandit_cache_repositories_show()
+{  
+    if [ ! -r $BANDIT_XREPOSITORIES ]; then
+        bandit_msg "BANDIT: Unable to read repositories cache directory" red
+    else 
+        echo "BANDIT_XREPOSITORIES :" $(du -sh $BANDIT_XREPOSITORIES)
+    fi
+}
+
+###--- CATALOGS
+
+bandit_cache_catalogs_clean()
+{
+    bandit_msg "Cleaning catalogs cache at ${BANDIT_XCATALOGS}"
+
+    if [[ ! $(stat -c %a $BANDIT_XCATALOGS) =~ ^.*[67].$ ]]; then
+        bandit_exit "BANDIT: Permission denied to write in the catalogs cache $BANDIT_XCATALOGS" red
+    fi
+    
+    if [ -d $BANDIT_XCATALOGS ]; then
+        rm -v $BANDIT_XCATALOGS/*
+    fi
+}
+
+bandit_cache_catalogs_init()
+{
+    bandit_msg "Initializing catalogs cache at ${BANDIT_XCATALOGS}"
+
+    if [ ! -d $BANDIT_XCATALOGS ]; then
+        bandit_mkdir $BANDIT_XCATALOGS
+        if [ ! $?  ]; then
+            bandit_exit "BANDIT: Unable to create catalogs cache $BANDIT_XCATALOGS" red
+        fi
+    fi
+    # Set common group and permissions
+    chgrp -Rc phyglos $BANDIT_XCATALOGS   
+    chmod -c  775 $BANDIT_XCATALOGS
+
+    if [[ ! $(stat -c %a $BANDIT_XCATALOGS) =~ ^.*[67].$ ]]; then
+        bandit_exit "BANDIT: Permission denied to write in the catalogs cache $BANDIT_XCATALOGS" red
+    fi
+    
+    if [ "$(ls -A $BANDIT_XCATALOGS)" ]; then 
+        find $BANDIT_XCATALOGS/* -type f -exec chmod -c 664 {} \;
+    fi
+}
+
+bandit_cache_catalogs_show()
+{  
+    if [ ! -r $BANDIT_XCATALOGS ]; then
+        bandit_msg "BANDIT: Unable to read catalogs cache directory" red
+    else 
+        echo "BANDIT_XCATALOGS     :" $(du -sh $BANDIT_XCATALOGS)
+    fi
+}
+
+###------------------------------
+# Cache DO
+###------------------------------
+
+bandit_cache_do()
+{
+    case $CACHE in
+        repositories | all )
+            case $COMMAND in 
+                clean)
+                    bandit_cache_repositories_clean
+                    ;;
+                init)
+                    bandit_cache_repositories_init
+                    ;;
+                show)
+                    bandit_cache_repositories_show
+                    ;;
+                *)
+                    bandit_msg "BANDIT: Command $COMMAND not allowed for $REPOSITORIES cache" red
+            esac
+            ;;&
+        catalogs | all )
+            case $COMMAND in 
+                clean)
+                    bandit_cache_catalogs_clean
+                    ;;
+                init)
+                    bandit_cache_catalogs_init
+                    ;;
+                show)
+                    bandit_cache_catalogs_show
+                    ;;
+                *)
+                    bandit_msg "BANDIT: Command $COMMAND not allowed for $CATALOGS cache" red
+            esac
+            ;;&
+        sources | all )
+            case $COMMAND in 
+                clean)
+                    bandit_cache_sources_clean
+                    ;;
+                init)
+                    bandit_cache_sources_init
+                    ;;
+                show)
+                    bandit_cache_sources_show
+                    ;;
+                *)
+                    bandit_msg "BANDIT: Command $COMMAND not allowed for $CACHE cache" red
+            esac
+            ;;&
+        builds | all )
+            case $COMMAND in 
+                clean)
+                    bandit_cache_builds_clean
+                    ;;
+                init)
+                    bandit_cache_builds_init
+                    ;;
+                show)
+                    bandit_cache_builds_show
+                    ;;
+                *)
+                    bandit_msg "BANDIT: Command $COMMAND not allowed for $CACHE cache" red
+            esac
+            ;;
+        repositories | catalogs | sources | builds | all )
+            # Stop matching patterns
+            ;;
+        *)
+            bandit_msg "BANDIT: Unknown type of cache: $CACHE" red
+            ;;
+    esac   
+}

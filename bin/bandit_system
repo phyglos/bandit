@@ -61,7 +61,7 @@ bandit_system_do()
             esac
             ;;
         *)
-            bandit_msg "BANDIT: Unknown type of $SYSTEM systems" red
+            bandit_msg "BANDIT: Unknown type of system: $SYSTEM" red
             ;;
     esac   
 }

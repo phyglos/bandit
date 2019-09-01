@@ -25,9 +25,9 @@ _bandit()
    
     # Define BANDIT commands and options
     local commands=' help edit search - --'
-    local short_options='-h -s -r -c -b -p -v'
-    local long_options='--help --system --repository --catalog --bundle --package --version'
-    local help_options=' edit search systems repositories catalogs bundles items packages'
+    local short_options='-h -v -s -r -c -b -p -x'
+    local long_options='--help --version --system --repository --catalog --bundle --package --cache'
+    local help_options=' edit search systems repositories catalogs bundles items packages caches'
     local search_options='--no-pager --pager -r -c -b -i -f -l -x all'
     local systems_options='host builder target'
     local system_host_options='check init clean'
@@ -37,6 +37,7 @@ _bandit()
     local catalog_actions='download fetch install remove'
     local bundle_actions='edit download fetch config build install raise remove'
     local package_actions='bundles info files'
+    local cache_actions='clean init show'
     
     # Program the autocompletion 
     COMPREPLY=()
@@ -90,6 +91,11 @@ _bandit()
 		COMPREPLY=( $(compgen -W "$catalogs" -- $current) )
 		return 0
 		;;
+	    -x | --cache)
+		local caches="repositories catalogs sources builds"
+		COMPREPLY=( $(compgen -W "$caches" -- $current) )
+		return 0
+		;;
 	esac
     fi
 
@@ -120,12 +126,16 @@ _bandit()
 		COMPREPLY=( $(compgen -W "$catalog_actions" -- $current) )
 		return 0
 		;;
-	    -b| --bundle)
+	    -b | --bundle)
 		COMPREPLY=( $(compgen -W "$bundle_actions" -- $current) )
 		return 0
 		;;
-	    -p| --package)
+	    -p | --package)
 		COMPREPLY=( $(compgen -W "$package_actions" -- $current) )
+		return 0
+		;;
+	    -x | --cache)
+		COMPREPLY=( $(compgen -W "$cache_actions" -- $current) )
 		return 0
 		;;
 	esac

@@ -394,9 +394,7 @@ case $object in
         COMMAND=$1; shift
         COMMAND_PARAMS=$*
 
-        # Start the work on the system
-        bandit_mkdir $BANDIT_LOGS/systems
-        
+        # Start the work on caches       
         case $COMMAND in
             init | show | clean )
                 # Run interactively without logging

@@ -60,7 +60,7 @@ bandit_show_help_bundles()
     echo "      delete      Delete a bundle from an existing catalog"
     echo "                  (Use 'remove' to uninstall the bundle items)"
     echo
-    echo "      download    Download (inconditionally) from origins into the corresponding caches"
+    echo "      download    Download (unconditionally) from origins into the corresponding caches"
     echo "      fetch       Download (when not in cache) from origins"
     echo "                  <params>:"
     echo "                    --all      for fetching sources and build packs (default)"
@@ -96,7 +96,7 @@ bandit_show_help_catalogs()
     echo
     echo "    <catalog>:    Name of the catalog"
     echo "    <action>:"
-    echo "      download    Download (inconditionally) the catalog tarball"
+    echo "      download    Download (unconditionally) the catalog tarball"
     echo "      fetch       Download (when not in cache) the catalog tarball"
     echo "      install     Install the catalog"   
     echo "      remove      Remove the catalog"   
@@ -171,7 +171,7 @@ bandit_show_help_systems()
     echo
     echo "  bandit -s|--system <system> <action>" 
     echo
-    echo "     host check     Checks the building requiremts of the HOST"
+    echo "     host check     Checks the building requirements of the HOST"
     echo "     host clean     Cleans the HOST from previous installations"
     echo "     host init      Creates users and partitions on the HOST"
     echo "     builder enter  Enter into the BUILDER chroot jail"
